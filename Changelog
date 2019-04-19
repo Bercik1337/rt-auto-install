@@ -1,0 +1,20 @@
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+VERSION 0.1   2019-04-07
+
+Updated packages:
+* xmlrpc-c-1.51.03
+* libtorrent-0.13.7
+* rtorrent-0.9.7
+* rutorrent-3.7
+
+Misc:
+* Added TODO and Changelog
+* Dropped support for old Debian versions <10
+* changed apache2 rutorrent path from /var/www/html/rutorrent -> /var/www/rutorrent
+* installer uses package names WITHOUT version numbers for instance: php-geoip instead php5-geoip
+* changed name structure for installer: 
+	Rtorrent-Auto-Install-<version>-<OS_release>-<OS_codename>
+	Rtorrent-Auto-Install-0.1-Debian10-Buster
+	OS release includes numeric value because sometimes it's hard to remember Toy Story characters
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
