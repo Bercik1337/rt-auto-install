@@ -15,11 +15,12 @@ IIt behaves like original version of Patrick's script. Gets sources for each pac
 Please use `systemctl start rtorrent` and `systemctl stop rtorrent` instead of the service command.
 
 
-## Supported operating systems
+## Supported operating systems ##
 **Debian 10 Buster**
+
 More to come, see TODO.
 
-##What the scripts do##
+## What the scripts does ##
 In the installation process you have to choose a system user to run rtorrent.
 Also you will get the opportunity of installing a total of 46 plugins. See list further down.
 The script add a init script that makes rtorrent start, at a possible reboot, in the
