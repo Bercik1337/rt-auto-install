@@ -36,7 +36,7 @@ Installation video - gonna record new clip
 Run the script with sudo or as root
 	
 	git clone https://github.com/Bercik1337/rt-auto-install.git
-	cd Rtorrent-Auto-Install
+	cd rt-auto-install
 	sudo ./Rt-Install-0.1-Debian10-Buster-minimal
 
 FAQ
