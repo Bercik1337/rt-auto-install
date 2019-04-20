@@ -966,7 +966,7 @@ SET_WEB_USER
 # NOTICE: Change lib, rtorrent, rutorrent versions on upgrades.
 while true; do
 	HEADER
-	echo " ${BOLD}Script last modified:${NORMAL} ${RED}2019/04/24${NORMAL}"
+	echo " ${BOLD}Script last modified:${NORMAL} ${RED}2019/04/20${NORMAL}"
 	echo " ${BOLD}rTorrent version:${NORMAL} ${RED}0.9.7${NORMAL}"
 	echo " ${BOLD}libTorrent version:${NORMAL} ${RED}0.13.7${NORMAL}"
 	echo " ${BOLD}ruTorrent version:${NORMAL} ${RED}3.7${NORMAL}"

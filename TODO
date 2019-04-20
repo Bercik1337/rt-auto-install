@@ -1,13 +1,14 @@
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TODO:
-Make all scripts grab newest version of files WITHOUT version number in them.
-Remove section for selecting plugins. It's stupid.
-Make process quiet (less verbose).
-Delayed start of service?
-Use > sources.d instead of >> sources.list
-Add Ubuntu Server support.
-Add Linux Mint support.
-SSL support with Let's Encrypt or similar + SSL config for apache.
-Have one script for ALL systems.
-Reorganize package installation into one step.
-Make it immune to multiple runs.
+   Make all scripts grab newest version of files WITHOUT version number in them.
+   Remove section for selecting plugins. It's stupid.
+   Make process quiet (less verbose).
+   Delayed start of service?
+   Use > sources.d instead of >> sources.list
+   Add Ubuntu Server support.
+   Add Linux Mint support.
+   SSL support with Let's Encrypt or similar + SSL config for apache.
+   Have one script for ALL systems.
+   Reorganize package installation into one step.
+   Make it immune to multiple runs.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
