@@ -786,21 +786,30 @@ function INSTALL_RTORRENT {
 function INSTALL_RUTORRENT {
 	# Installing rutorrent.
 	echo "${CYAN}Installing rutorrent${NORMAL}"
+	echo "${YELLOW}Downloading package${NORMAL}"
 	curl -L http://dl.bintray.com/novik65/generic/ruTorrent-3.7.zip -o rutorrent-3.7.zip
+	CHECKLASTRC
+	echo "${YELLOW}Unpacking${NORMAL}"
 	unzip -qq rutorrent-3.7.zip
+	CHECKLASTRC
+	echo "${YELLOW}Renaming${NORMAL}"
 	mv ruTorrent-master/ rutorrent
+	CHECKLASTRC
 	
 	if [ -d /var/www/rutorrent ]; then
 		rm -r /var/www/rutorrent
 	fi
 
 	# Changeing SCGI mount point in rutorrent config.
+	echo "${YELLOW}Changing SCGI mount point${NORMAL}"
 	sed -i "s/\/RPC2/\/rutorrent\/RPC2/g" ./rutorrent/conf/config.php
-
+	CHECKLASTRC
+	echo "${YELLOW}Moving to /var/www/ ${NORMAL}"
 	mv -f rutorrent /var/www/
 	CHECKLASTRC
-	rm -v rutorrent-3.7.zip
-
+	echo "${YELLOW}Cleanup${NORMAL}"
+	rm rutorrent-3.7.zip
+	CHECKLASTRC
 	if [ -d "$TEMP_PLUGIN_DIR" ]; then
 		mv -fv "$TEMP_PLUGIN_DIR"/* /var/www/rutorrent/plugins
 	fi
