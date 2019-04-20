@@ -6,17 +6,17 @@
 
 ## Types of installation 
 
-**minimal**
+* **minimal**
 It uses packages from repository. No need to pull sources, compile or install development tools.
 
-**sources**
-IIt behaves like original version of Patrick's script. Gets sources for each package and compiles them.
+* **sources**
+It behaves like original version of Patrick's script. Gets sources for each package and compiles them.
 
 Please use `systemctl start rtorrent` and `systemctl stop rtorrent` instead of the service command.
 
 
 ## Supported operating systems ##
-**Debian 10 Buster**
+* **Debian 10 Buster**
 
 More to come, see TODO.
 
