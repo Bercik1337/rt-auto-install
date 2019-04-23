@@ -31,7 +31,9 @@ given username's screen/tmux session. Use "service rtorrent-init start" and
 Installation
 ------------
 
-Installation video - gonna record new clip
+**Installation video**
+[![rt-auto-install script youtube](https://img.youtube.com/vi/3XMNglsQvPo/0.jpg)](https://www.youtube.com/watch?v=3XMNglsQvPo)
+
 
 Run the script with sudo or as root
 	
