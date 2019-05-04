@@ -17,6 +17,7 @@ Please use `systemctl start rtorrent` and `systemctl stop rtorrent` instead of t
 
 ## Supported operating systems ##
 * **Debian 10 Buster**
+* **Ubuntu 19 Disco Dingo**
 
 More to come, see TODO.
 
@@ -32,6 +33,7 @@ Installation
 ------------
 
 **Installation video**
+
 [![rt-auto-install script youtube](https://img.youtube.com/vi/3XMNglsQvPo/0.jpg)](https://www.youtube.com/watch?v=3XMNglsQvPo)
 
 
