@@ -11,6 +11,7 @@ It uses packages from repository. No need to pull sources, compile or install de
 
 * **sources**
 It behaves like original version of Patrick's script. Gets sources for each package and compiles them.
+Work in progress . . .
 
 Please use `systemctl start rtorrent` and `systemctl stop rtorrent` instead of the service command.
 
@@ -18,7 +19,7 @@ Please use `systemctl start rtorrent` and `systemctl stop rtorrent` instead of t
 ## Supported operating systems ##
 * **Debian 10 Buster**
 * **Ubuntu 19 Disco Dingo**
-
+* **Ubuntu 18.04 BionicBeaver**
 More to come, see TODO.
 
 ## What the scripts does ##
