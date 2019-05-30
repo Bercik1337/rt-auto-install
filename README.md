@@ -19,8 +19,8 @@ Please use `systemctl start rtorrent` and `systemctl stop rtorrent` instead of t
 ## Supported operating systems ##
 * **Debian 10 Buster**
 * **Ubuntu 19 Disco Dingo**
-* **Ubuntu 18.04 BionicBeaver**
-* **Ubuntu 18.10 CosmicCuttlefish**
+* **Ubuntu 18.04 Bionic Beaver**
+* **Ubuntu 18.10 Cosmic Cuttlefish**
 
 More to come, see TODO.
 
