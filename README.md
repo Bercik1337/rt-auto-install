@@ -20,6 +20,8 @@ Please use `systemctl start rtorrent` and `systemctl stop rtorrent` instead of t
 * **Debian 10 Buster**
 * **Ubuntu 19 Disco Dingo**
 * **Ubuntu 18.04 BionicBeaver**
+* **Ubuntu 18.10 CosmicCuttlefish**
+
 More to come, see TODO.
 
 ## What the scripts does ##
