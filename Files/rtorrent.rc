@@ -102,3 +102,17 @@ encryption = allow_incoming,enable_retry,try_outgoing
 #hash_max_tries = 10
 
 scgi_port = 127.0.0.1:5000
+
+
+####### Heavy I/O seedbox configuration
+####### Uncomment lines below if you have 1Gbit+ Internet link
+####### thanks Zebirek
+####pieces.memory.max.set = 8048M
+####network.max_open_sockets.set = 999
+####network.max_open_files.set = 600
+####network.http.max_open.set = 99
+####network.receive_buffer.size.set =  32M
+####network.send_buffer.size.set    = 64M
+####pieces.preload.type.set = 2
+#####pieces.preload.min_size.set = 262144
+#####pieces.preload.min_rate.set = 5120
