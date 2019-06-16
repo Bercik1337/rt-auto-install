@@ -1,0 +1,480 @@
+#!/bin/bash
+# PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
+clear
+
+# Formatting variables
+BOLD=$(tput bold)
+NORMAL=$(tput sgr0)
+GREEN=$(tput setaf 2)
+LBLUE=$(tput setaf 6)
+RED=$(tput setaf 1)
+PURPLE=$(tput setaf 5)
+YELLOW=$(tput setaf 3)
+BLUE=$(tput setaf 4)
+CYAN=$(tput setaf 6)
+WHITE=$(tput setaf 7)
+
+# Pretty function to spit out ok/fail after each important step.
+function CHECKLASTRC {
+if [ $(echo $?) -ne 0 ]; then
+echo "${WHITE}[${RED}FAIL${WHITE}]${NORMAL}"
+exit 1
+else
+echo "${WHITE}[${GREEN}ok${WHITE}]${NORMAL}"
+sleep 5
+fi
+}
+
+# The system user rtorrent is going to run as
+RTORRENT_USER=""
+
+# The user that is going to log into rutorrent (htaccess)
+WEB_USER=""
+
+# Array with webusers including their hashed paswords
+WEB_USER_ARRAY=()
+
+# Temporary download folder for plugins
+TEMP_PLUGIN_DIR="rutorrentPlugins/"
+
+# Array of downloaded plugins
+PLUGIN_ARRAY=()
+
+#rTorrent users home dir.
+HOMEDIR=""
+
+# Function to check if running user is root
+function CHECK_ROOT {
+	if [ "$(id -u)" != "0" ]; then
+		echo
+		echo "This script must be run as root." 1>&2
+		echo
+		exit 1
+	fi
+}
+
+# Checks for apache2-utils and unzip if it's installed. It's is needed to make the Web user
+function APACHE_UTILS {
+	AP_UT_CHECK="$(dpkg-query -W -f='${Status}' apache2-utils 2>/dev/null | grep -c "ok installed")"
+	UNZIP_CHECK="$(dpkg-query -W -f='${Status}' unzip 2>/dev/null | grep -c "ok installed")"
+	CURL_CHECK="$(dpkg-query -W -f='${Status}' curl 2>/dev/null | grep -c "ok installed")"
+
+	if [ "$AP_UT_CHECK" -ne 1 ] || [ "$UNZIP_CHECK" -ne 1 ] || [ "CURL_CHECK" -ne 1 ]; then
+		echo " One or more of the packages apache2-utils, unzip or curl is not installed and is needed for the setup."
+		read -p " Do you want to install it? [y/n] " -n 1
+		if [[ $REPLY =~ [Yy]$ ]]; then
+			clear
+			apt-get update
+			apt-get -y install apache2-utils unzip curl
+		else
+			clear
+			exit
+		fi
+	fi
+}
+
+# License
+function LICENSE {
+	clear
+	echo "${BOLD}--------------------------------------------------------------------------------"
+	echo " THE BEER-WARE LICENSE (Revision 42):"
+	echo " ${GREEN}Bercik${NORMAL} wrote this script. As long as you retain this notice you"
+	echo " can do whatever you want with this stuff. If we meet some day, and you think"
+	echo " this stuff is worth it, you can buy me a beer in return.${NORMAL}"
+	echo
+	echo "For contacting Bercik use Github https://github.com/Bercik1337"
+	echo
+	echo " -  author of old (original) script ${LBLUE}Patrick Kerwood${NORMAL}"
+	echo "${BOLD}--------------------------------------------------------------------------------${NORMAL}"
+	echo
+	read -p " Press any key to continue..." -n 1
+	echo
+}
+
+# Function to set the system user, rtorrent is going to run as
+function SET_RTORRENT_USER {
+	con=0
+	while [ $con -eq 0 ]; do
+		echo -n "Please type a valid system user: "
+		read RTORRENT_USER
+
+		if [[ -z $(cat /etc/passwd | grep "^$RTORRENT_USER:") ]]; then
+			echo
+			echo "This user does not exist!"
+		elif [[ $(cat /etc/passwd | grep "^$RTORRENT_USER:" | cut -d: -f3) -lt 999 ]]; then
+			echo
+			echo "That user's UID is too low!"
+		elif [[ $RTORRENT_USER == nobody ]]; then
+			echo
+			echo "You cant use 'nobody' as user!"
+		else
+			HOMEDIR=$(cat /etc/passwd | grep "$RTORRENT_USER": | cut -d: -f6)
+			con=1
+		fi
+	done
+}
+
+# Function to  create users for the webinterface
+function SET_WEB_USER {
+	while true; do
+		echo -n "Please type the username for the webinterface, system user not required: "
+		read WEB_USER
+		USER=$(htpasswd -n $WEB_USER 2>/dev/null)
+		if [ $? = 0 ]; then
+			WEB_USER_ARRAY+=($USER)
+			break
+		else
+			echo
+			echo "${RED}Something went wrong!"
+			echo "You have entered an unusable username and/or different passwords.${NORMAL}"
+			echo
+		fi
+	done
+}
+
+# Function to list WebUI users in the menu
+function LIST_WEB_USERS {
+	for i in ${WEB_USER_ARRAY[@]}; do
+		USER_CUT=$(echo $i | cut -d \: -f 1)
+		echo -n " $USER_CUT"
+	done
+}
+
+# Function to list plugins, downloaded, in the menu
+function LIST_PLUGINS {
+	if [ ${#PLUGIN_ARRAY[@]} -eq 0 ]; then
+		echo "   No plugins downloaded!"
+	else
+		for i in "${PLUGIN_ARRAY[@]}"; do
+			echo "   - $i"
+		done
+	fi
+}
+
+# Header for the menu
+function HEADER {
+	clear
+	echo "${BOLD}--------------------------------------------------------------------------------"
+	echo "                       Rtorrent + Rutorrent Auto Install"
+	echo "                       ${LBLUE}Bercik https://github.com/Bercik1337 ${NORMAL}"
+	echo "${BOLD}--------------------------------------------------------------------------------${NORMAL}"
+	echo
+}
+
+# Function for the Plugins download part.
+function DOWNLOAD_PLUGIN {
+		curl -L "http://dl.bintray.com/novik65/generic/plugins-3.6.tar.gz" -o plugins-3.6.tar.gz
+		tar -zxvf plugins-3.6.tar.gz -C /tmp/
+		if [ $? -eq "0" ]; then
+			rm "$file"
+			echo
+			PLUGIN_ARRAY+=("${name}")
+			error="${GREEN}${BOLD}plugins${NORMAL}${GREEN} downloaded, unpacked and moved to temporary plugins folder${NORMAL}"
+			return 0
+		else
+			echo
+			error="${RED}Something went wrong.. Error!${NORMAL}"
+			return 1
+		fi
+}
+
+
+# Function for installing dependencies
+clear
+echo "${CYAN}Installing dependencies${NORMAL}"
+function APT_DEPENDENCIES {
+	apt-get update
+	apt-get -y install openssl git apache2 apache2-utils libapache2-mod-scgi unrar-free \
+	php php-curl php-cli libapache2-mod-php tmux unzip curl mediainfo unrar-free
+	CHECKLASTRC
+}
+
+
+# Function for setting up xmlrpc, libtorrent and rtorrent
+function INSTALL_RTORRENT {
+	
+	echo "${CYAN}Install xmlrpc${NORMAL}"
+	apt-get install libxmlrpc-core-c3
+	CHECKLASTRC
+	
+	
+	# Download and install libtorrent
+ 	echo "${CYAN}Install libtorrent ${NORMAL}" 	
+	apt-get -y install libtorrent20
+	CHECKLASTRC
+
+	# Download and install rtorrent
+	echo "${CYAN}Install rtorrent${NORMAL}" 	
+	apt-get -y install rtorrent
+	CHECKLASTRC
+
+	ldconfig
+
+	# Creating session directory
+	echo "${CYAN}Creating session directory ${NORMAL}" 	
+	if [ ! -d "$HOMEDIR"/.rtorrent-session ]; then
+		mkdir "$HOMEDIR"/.rtorrent-session
+		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/.rtorrent-session
+		CHECKLASTRC
+	else
+		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/.rtorrent-session
+		CHECKLASTRC
+	fi
+	
+	# Creating downloads folder
+	echo "${CYAN}Creating Downloads directory ${NORMAL}" 
+	if [ ! -d "$HOMEDIR"/Downloads ]; then
+		mkdir "$HOMEDIR"/Downloads
+		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/Downloads
+		CHECKLASTRC
+	else
+		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/Downloads
+		CHECKLASTRC
+	fi
+
+	# Copying rtorrent.rc file.
+	echo "${CYAN}Copying rtorrent.rc${NORMAL}"
+	cp Files/rtorrent.rc $HOMEDIR/.rtorrent.rc
+	CHECKLASTRC
+	chown "$RTORRENT_USER"."$RTORRENT_USER" $HOMEDIR/.rtorrent.rc
+	#sed -i "s/HOMEDIRHERE/$HOMEDIR/g" $HOMEDIR/.rtorrent.rc ###temp disabled, problems with sed.
+}
+
+# Function for installing rutorrent and plugins
+function INSTALL_RUTORRENT {
+	# Installing rutorrent.
+	echo "${CYAN}Installing rutorrent${NORMAL}"
+	echo "${YELLOW}Downloading package${NORMAL}"
+	curl -L http://dl.bintray.com/novik65/generic/ruTorrent-3.7.zip -o rutorrent-3.7.zip
+	CHECKLASTRC
+	echo "${YELLOW}Unpacking${NORMAL}"
+	unzip -qq rutorrent-3.7.zip
+	CHECKLASTRC
+	echo "${YELLOW}Renaming${NORMAL}"
+	mv ruTorrent-master/ rutorrent
+	CHECKLASTRC
+	
+	if [ -d /var/www/rutorrent ]; then
+		rm -r /var/www/rutorrent
+	fi
+
+	# Changeing SCGI mount point in rutorrent config.
+	echo "${YELLOW}Changing SCGI mount point${NORMAL}"
+	sed -i "s/\/RPC2/\/rutorrent\/RPC2/g" ./rutorrent/conf/config.php
+	CHECKLASTRC
+	echo "${YELLOW}Moving to /var/www/ ${NORMAL}"
+	mv -f rutorrent /var/www/
+	CHECKLASTRC
+	echo "${YELLOW}Cleanup${NORMAL}"
+	rm rutorrent-3.7.zip
+	CHECKLASTRC
+	if [ -d "$TEMP_PLUGIN_DIR" ]; then
+		mv -fv "$TEMP_PLUGIN_DIR"/* /var/www/rutorrent/plugins
+	fi
+
+	# Changing permissions for rutorrent and plugins.
+	echo "${CYAN}Changing permissions for rutorrent${NORMAL}"
+	chown -R www-data.www-data /var/www/rutorrent
+	chmod -R 775 /var/www/rutorrent
+	CHECKLASTRC
+}
+
+# Function for configuring apache
+function CONFIGURE_APACHE {
+	# Creating symlink for scgi.load
+	if [ ! -h /etc/apache2/mods-enabled/scgi.load ]; then
+		ln -s /etc/apache2/mods-available/scgi.load /etc/apache2/mods-enabled/scgi.load
+	fi
+
+	# Check if apache2 has port 80 enabled
+	if ! grep --quiet "^Listen 80$" /etc/apache2/ports.conf; then
+		echo "Listen 80" >> /etc/apache2/ports.conf;
+	fi
+
+	# Adding ServerName localhost to apache2.conf
+	if ! grep --quiet "^ServerName$" /etc/apache2/apache2.conf; then
+		echo "ServerName localhost" >> /etc/apache2/apache2.conf;
+	fi
+
+	# Creating Apache virtual host
+	echo "${CYAN}Creating apache vhost${NORMAL}"
+	if [ ! -f /etc/apache2/sites-available/001-default-rutorrent.conf ]; then
+
+		cat > /etc/apache2/sites-available/001-default-rutorrent.conf << EOF 
+<VirtualHost *:80>
+    #ServerName www.example.com
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    CustomLog /var/log/apache2/rutorrent.log vhost_combined
+    ErrorLog /var/log/apache2/rutorrent_error.log
+    SCGIMount /rutorrent/RPC2 127.0.0.1:5000
+
+    <Directory "/var/www/rutorrent">
+        AuthName "Tits or GTFO"
+        AuthType Basic
+        Require valid-user
+        AuthUserFile /var/www/rutorrent/.htpasswd
+    </Directory>
+
+</VirtualHost>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+EOF
+		a2ensite 001-default-rutorrent.conf
+		CHECKLASTRC
+		a2dissite 000-default.conf
+		systemctl restart apache2.service
+	fi
+
+	# Creating .htaccess file
+	printf "%s\n" "${WEB_USER_ARRAY[@]}" > /var/www/rutorrent/.htpasswd
+}
+
+function INSTALL_FFMPEG {
+	printf "\n# ffpmeg mirror\ndeb http://www.deb-multimedia.org buster main non-free\n" >> /etc/apt/sources.list
+	wget http://www.deb-multimedia.org/pool/main/d/deb-multimedia-keyring/deb-multimedia-keyring_2016.8.1_all.deb
+	dpkg -i deb-multimedia-keyring_2016.8.1_all.deb
+	apt-get update
+	apt-get -y --force-yes install deb-multimedia-keyring
+	apt-get update
+	apt-get -y install ffmpeg
+}
+
+# Function for showing the end result when install is complete
+function INSTALL_COMPLETE {
+	rm -rf $TEMP_PLUGIN_DIR
+
+	HEADER
+
+	echo "${GREEN}Installation is complete.${NORMAL}"
+	echo
+	echo
+	echo "${RED}Your default Apache2 vhost file has been disabled and replaced with a new one.${NORMAL}"
+	echo "${RED}If you were using it, combine the default and rutorrent vhost file and enable it again.${NORMAL}"
+	echo
+	echo "${PURPLE}Your downloads folder is in ${LBLUE}$HOMEDIR/Downloads${NORMAL}"
+	echo "${PURPLE}Sessions data is ${LBLUE}$HOMEDIR/.rtorrent-session${NORMAL}"
+	echo "${PURPLE}rtorrent's configuration file is ${LBLUE}$HOMEDIR/.rtorrent.rc${NORMAL}"
+	echo
+	echo "${PURPLE}If you want to change settings for rtorrent, such as download folder, etc.,"
+	echo "you need to edit the '.rtorrent.rc' file. E.g. 'nano $HOMEDIR/.rtorrent.rc'${NORMAL}"
+	echo
+	echo "Rtorrent can be started without rebooting with 'sudo systemctl start rtorrent.service'."
+
+	# The IPv6 local address, is not very used for now, anyway if needed, just change 'inet' to 'inet6'
+	lcl=$(ip addr | grep 'inet ' | awk '{print $2}' | cut -d/ -f1 | grep -v "127." | head -n 1)
+	ext=$(curl -s http://icanhazip.com)
+
+	if [[ ! -z "$lcl" ]] && [[ ! -z "$ext" ]]; then
+		echo "${LBLUE}LOCAL IP:${NORMAL} http://$lcl/rutorrent"
+		echo "${LBLUE}EXTERNAL IP:${NORMAL} http://$ext/rutorrent"
+		echo
+		echo "Visit rutorrent through the above address."
+		echo 
+	else
+		if [[ -z "$lcl" ]]; then
+			echo "Can't detect the local IP address"
+			echo "Try visit rutorrent at http://127.0.0.1/rutorrent"
+			echo 
+		elif [[ -z "$ext" ]]; then
+			echo "${LBLUE}LOCAL:${NORMAL} http://$lcl/rutorrent"
+			echo "Visit rutorrent through your local network"
+		else
+			echo "Can't detect the IP address"
+			echo "Try visit rutorrent at http://127.0.0.1/rutorrent"
+			echo 
+		fi
+	fi
+}
+
+function INSTALL_SYSTEMD_SERVICE {
+	cat > "/etc/systemd/system/rtorrent.service" <<-EOF
+	[Unit]
+	Description=rtorrent (in tmux)
+
+	[Service]
+	Type=oneshot
+	RemainAfterExit=yes
+	User=$RTORRENT_USER
+	ExecStart=/usr/bin/tmux -2 new-session -d -s rtorrent rtorrent
+	ExecStop=/usr/bin/tmux kill-session -t rtorrent
+
+	[Install]
+	WantedBy=default.target
+	EOF
+
+	systemctl enable rtorrent.service
+}
+
+function START_RTORRENT {
+	systemctl start rtorrent.service	
+}
+
+CHECK_ROOT
+LICENSE
+APACHE_UTILS
+rm -rf $TEMP_PLUGIN_DIR
+HEADER
+SET_RTORRENT_USER
+SET_WEB_USER
+
+# NOTICE: Change lib, rtorrent, rutorrent versions on upgrades.
+while true; do
+	HEADER
+	echo " ${BOLD}Script last modified:${NORMAL} ${RED}2019/04/20${NORMAL}"
+	echo " ${BOLD}rTorrent version:${NORMAL} ${RED}0.9.7${NORMAL}"
+	echo " ${BOLD}libTorrent version:${NORMAL} ${RED}0.13.7${NORMAL}"
+	echo " ${BOLD}ruTorrent version:${NORMAL} ${RED}3.7${NORMAL}"
+	echo
+	echo " ${BOLD}rTorrent user:${NORMAL}${GREEN} $RTORRENT_USER${NORMAL}"
+	echo
+	echo -n " ${BOLD}ruTorrent user(s):${NORMAL}${GREEN}"
+	LIST_WEB_USERS
+	echo
+	echo
+	echo " ${NORMAL}${BOLD}ruTorrent plugins:${NORMAL}${GREEN}"
+	echo
+	echo " ${NORMAL}[1] - Change rTorrent user"
+	echo " [2] - Add another ruTorrent user"
+	echo " [c] - Show Changelog"
+	echo " [t] - Show TODO"
+	echo
+	echo " [0] - Start installation"
+	echo " [q] - Quit"
+	echo
+	echo -n "${GREEN}>>${NORMAL} "
+	read case
+
+	case "$case" in
+		1)
+			SET_RTORRENT_USER
+			;;
+		2)
+			SET_WEB_USER
+			;;
+		c)
+			cat Changelog
+			read -rsp $'Press any key to continue...\n' -n1 ke
+			;;
+		t)
+			cat TODO
+			read -rsp $'Press any key to continue...\n' -n1 ke
+			;;	
+		0)
+			APT_DEPENDENCIES
+			INSTALL_RTORRENT
+			INSTALL_RUTORRENT
+			CONFIGURE_APACHE
+			INSTALL_SYSTEMD_SERVICE
+			START_RTORRENT
+			INSTALL_COMPLETE
+			break
+			;;
+		q)
+			break
+			;;
+	esac
+done
