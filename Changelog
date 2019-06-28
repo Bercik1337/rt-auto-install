@@ -1,4 +1,14 @@
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+VERSION 0.3   2019-06-28
+* Script merged into _single_ file. Now maintanance will be easier.
+* Added DETECTOS function/
+* Added OSDETAILS function/
+* Added INSTALL_RTORRENT_APT_R96 and INSTALL_RTORRENT_APT_R97 functions/
+* Main menu shows rt/libt versions based on OS you run.
+* Added few return codes (3,4)/
+* Filename changed to Rt-Install-minimal, no version numbers or OS names.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 VERSION 0.2   2019-06-16
 * Removed plugin selection section.
 
