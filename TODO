@@ -1,7 +1,6 @@
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TODO:
    Make all scripts grab newest version of files WITHOUT version number in them.
-   Remove section for selecting plugins. It's stupid.
    Make process quiet (less verbose).
    Delayed start of service?
    Use > sources.d instead of >> sources.list
