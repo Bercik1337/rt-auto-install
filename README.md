@@ -4,23 +4,18 @@
 
 
 
-## Types of installation 
+## News
 
-* **minimal**
-It uses packages from repository. No need to pull sources, compile or install development tools.
+**Current version** v0.3 released 2019/06/28
+We now have SINGLE file for ALL supported operating systems!
 
-* **sources**
-It behaves like original version of Patrick's script. Gets sources for each package and compiles them.
-Work in progress . . .
-
-Please use `systemctl start rtorrent` and `systemctl stop rtorrent` instead of the service command.
-
+For details, always go to Changelog.
 
 ## Supported operating systems ##
 * **Debian 10 Buster**
-* **Ubuntu 19 Disco Dingo**
-* **Ubuntu 18.04 Bionic Beaver**
+* **Ubuntu 19.04 Disco Dingo**
 * **Ubuntu 18.10 Cosmic Cuttlefish**
+* **Ubuntu 18.04 Bionic Beaver**
 
 More to come, see TODO.
 
@@ -44,7 +39,7 @@ Run the script with sudo or as root
 	
 	git clone https://github.com/Bercik1337/rt-auto-install.git
 	cd rt-auto-install
-	sudo ./Rt-Install-0.1-Debian10-Buster-minimal
+	sudo ./Rt-Install-minimal
 
 FAQ
 ------------
@@ -57,7 +52,7 @@ That's certainly NOT the case here. rtorrent is ran usually 24/7, does not work 
 I might be the only person using this script - so be it. No containers for this app.
 
 ### Where is the -sources version
-Getting there...
+Depraceted. At least for now...
 
 ### Support for more OSes? 
 See TODO
