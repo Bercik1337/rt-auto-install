@@ -29,28 +29,33 @@ echo "${PURPLE}Detecting Operating System" #; for i in {5..1};do echo -n ". " &&
 #getting os-release variable
 OSRELEASE=$(grep PRETTY_NAME /etc/os-release)
 #checking distribution
-DISTRO=$(grep -i -o -e Debian -i -o -e Ubuntu <<< $OSRELEASE)
+DISTRO=$(grep -i -o -e Debian -i -o -e Ubuntu -i -o -e Mint <<< $OSRELEASE)
 #checking release
-DISTRONAMEVER=$(grep -i -o -e buster -i -o -e "18.04" -i -o -e "18.10" -i -o -e "19.04"  <<< $OSRELEASE)
+DISTRONAMEVER=$(grep -i -o -e buster -i -o -e "18.04" -i -o -e "18.10" -i -o -e "19.1" -i -o -e "19" <<< $OSRELEASE)
 
 case $DISTRO in
-    Debian)
-		echo "${BOLD}name: ${GREEN}Debian"
-		case $DISTRONAMEVER in
-				buster) echo "${PURPLE}${BOLD}release:${GREEN} 10 (Buster)" ; OSFINALNAME=deb10buster; ;;
-				*) echo "${YELLOW}It seems you run Debian OS but unsupported release"; exit 4 ;;
-		esac;;
-    Ubuntu)
-    		echo "${BOLD}name: ${GREEN}Ubuntu"
-    		case $DISTRONAMEVER in
+				Debian)
+					echo "${BOLD}name: ${GREEN}Debian"
+					case $DISTRONAMEVER in
+					buster) echo "${PURPLE}${BOLD}release:${GREEN} 10 (Buster)" ; OSFINALNAME=deb10buster; ;;
+					*) echo "${YELLOW}It seems you run Debian OS but unsupported release"; exit 4 ;;
+					esac;;
+				Ubuntu)
+					echo "${BOLD}name: ${GREEN}Ubuntu"
+					case $DISTRONAMEVER in
     				18.04) echo "${PURPLE}${BOLD}release:${GREEN} 18.04 (Bionic Beaver)" ; OSFINALNAME=ubu1804 ;;
     				18.10) echo "${PURPLE}${BOLD}release:${GREEN} 18.10 (Cosmic Cuttlefish)" ; OSFINALNAME=ubu1810 ;;
     				19.04) echo "${PURPLE}${BOLD}release:${GREEN} 19.04 (Disco Dingo)" ; OSFINALNAME=ubu1904 ;;
     				*) echo "${YELLOW}It seems you run Ubuntu OS but unsupported release"; exit 4 ;;
-
-    		esac;;
-    *)
-    		echo "${RED}You run unsupported Operating System. Sorry bro."; exit 5;;
+					esac;;
+				Mint) echo "${BOLD}name: ${GREEN}Mint"
+					case $DISTRONAMEVER in
+    				19.1) echo "${PURPLE}${BOLD}release:${GREEN} 19.1 (Tessa)" ; OSFINALNAME=ubu1804 ;;
+    				19) echo "${PURPLE}${BOLD}release:${GREEN} 19 (Tara)" ; OSFINALNAME=ubu1804 ;;
+					*) echo "${YELLOW}It seems you run Mint OS but unsupported release"; exit 4 ;;
+					esac;;
+ *)
+				echo "${RED}You run unsupported Operating System. Sorry bro."; exit 5;;
 esac
 echo ${CYAN}
 

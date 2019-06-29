@@ -4,7 +4,6 @@ TODO:
    Make process quiet (less verbose).
    Delayed start of service?
    Use > sources.d instead of >> sources.list
-   Add Linux Mint support.
    Add CentOS support.
    Add Fedora support.
    SSL support with Let's Encrypt or similar + SSL config for apache.
