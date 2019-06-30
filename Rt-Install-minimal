@@ -31,7 +31,7 @@ OSRELEASE=$(grep PRETTY_NAME /etc/os-release)
 #checking distribution
 DISTRO=$(grep -i -o -e Debian -i -o -e Ubuntu -i -o -e Mint <<< $OSRELEASE)
 #checking release
-DISTRONAMEVER=$(grep -i -o -e buster -i -o -e "18.04" -i -o -e "18.10" -i -o -e "19.1" -i -o -e "19" <<< $OSRELEASE)
+DISTRONAMEVER=$(grep -i -o -e buster -i -o -e "18.04" -i -o -e "18.10" -i -o -e "19.04" -i -o -e "19.1" -i -o -e "19" <<< $OSRELEASE)
 
 case $DISTRO in
 				Debian)
