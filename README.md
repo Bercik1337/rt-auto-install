@@ -34,7 +34,9 @@ Installation
 
 **Installation video**
 
-[![rt-auto-install script youtube](https://img.youtube.com/vi/B3n2fE1Eo9Y/0.jpg)](https://www.youtube.com/watch?v=B3n2fE1Eo9Y)
+[![rt-auto-install script youtube](https://img.youtube.com/vi/uBxfSg0blPM/0.jpg)](https://www.youtube.com/watch?v=uBxfSg0blPM)
+
+Old video for v0.1 here -> https://www.youtube.com/watch?v=B3n2fE1Eo9Y
 
 
 Run the script with sudo or as root
