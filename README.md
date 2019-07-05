@@ -47,7 +47,7 @@ Run the script with sudo or as root
 
 FAQ
 ------------
-### But why if we have Docker version?
+### But _WHY_ if we have Docker version?
 I took over abandoned installation script because author didn't want to develop it anymore. Excuse was that everything moved to Docker.
 
 In my personal opinion that's a **bad move**, and no one else fixed script - so I did. Docker itself is not a bad idea, but I would like to see it in dynamic, scalable environments where it grows and shrinks depending on workload.
@@ -56,7 +56,7 @@ That's certainly NOT the case here. rtorrent is ran usually 24/7, does not work 
 I might be the only person using this script - so be it. No containers for this app.
 
 ### Where is the -sources version
-Depraceted. At least for now...
+Deprecated. At least for now...
 
 ### Support for more OSes? 
 See TODO
