@@ -1,6 +1,7 @@
 
 # Rtorrent + Rutorrent Auto Install Script by Bercik
 ### Modern script for automatic rtorrent, rutorrent installation under Linux.
+	Makes your system seedbox ready in minutes!
 
 
 
@@ -10,6 +11,14 @@
 We now have SINGLE file for ALL supported operating systems!
 
 For details, always go to Changelog.
+
+## Features ##
+
+* This script performs automatic installation of rTorrent (BitTorrent client) and ruTorrent(web based GUI).
+* It detects your OS and uses most recent version of rT available in repository of your Linux distribution.
+* Uses SINGLE file for all supported operating systems.
+* Gives menu-driven guidance when creating username.
+* It's actively developed and I'm not planning to drop it like others did :P
 
 ## Supported operating systems ##
 * **Debian 10    Buster**
