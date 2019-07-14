@@ -9,4 +9,5 @@ TODO:
    SSL support with Let's Encrypt or similar + SSL config for apache.
    Reorganize package installation into one step.
    Make it immune to multiple runs.
+   Add custom http port selector.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
