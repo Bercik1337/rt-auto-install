@@ -8,7 +8,7 @@
 ## News
 
 **Current version** v0.4 released 2019/07/22
-Added Raspberry Pi support! Rasbpian 10 (buster)
+Added Raspberry Pi support! Raspbian 10 (buster)
 
 For details, always go to Changelog.
 
