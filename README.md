@@ -7,8 +7,8 @@
 
 ## News
 
-**Current version** v0.3 released 2019/06/28
-We now have SINGLE file for ALL supported operating systems!
+**Current version** v0.4 released 2019/07/22
+Added Raspberry Pi support! Rasbpian 10 (buster)
 
 For details, always go to Changelog.
 
