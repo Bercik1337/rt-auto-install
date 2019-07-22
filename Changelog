@@ -1,3 +1,6 @@
+VERSION 0.4   2019-07-22
+* Added Raspberry support (Raspbian buster)
+
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 VERSION 0.3   2019-06-28
 * Script merged into _single_ file. Now maintanance will be easier.

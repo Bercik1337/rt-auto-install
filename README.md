@@ -22,6 +22,7 @@ For details, always go to Changelog.
 
 ## Supported operating systems ##
 * **Debian 10    Buster**
+* **Raspbian 10  Buster**
 * **Ubuntu 19.04 Disco Dingo**
 * **Ubuntu 18.10 Cosmic Cuttlefish**
 * **Ubuntu 18.04 Bionic Beaver**
