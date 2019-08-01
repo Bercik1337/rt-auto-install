@@ -1,14 +1,19 @@
+VERSION 0.5   2019-08-01
+* Added -h --help, -d --demo, -f --fast CLI parameters.
+* Changed display method of TODO and Changelog to show only 15 newest lines.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 VERSION 0.4   2019-07-22
 * Added Raspberry support (Raspbian buster)
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 VERSION 0.3   2019-06-28
 * Script merged into _single_ file. Now maintanance will be easier.
-* Added DETECTOS function/
-* Added OSDETAILS function/
-* Added INSTALL_RTORRENT_APT_R96 and INSTALL_RTORRENT_APT_R97 functions/
+* Added DETECTOS function.
+* Added OSDETAILS function.
+* Added INSTALL_RTORRENT_APT_R96 and INSTALL_RTORRENT_APT_R97 functions.
 * Main menu shows rt/libt versions based on OS you run.
-* Added few return codes (3,4)/
+* Added few return codes (3,4).
 * Filename changed to Rt-Install-minimal, no version numbers or OS names.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -17,7 +22,6 @@ VERSION 0.2   2019-06-16
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 VERSION 0.1   2019-04-20
-
 Updated packages:
 * xmlrpc-c-1.51.03
 * libtorrent-0.13.7

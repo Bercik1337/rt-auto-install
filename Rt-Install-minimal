@@ -1,9 +1,10 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
-LASTMODIFIED="2019/07/22"
-SCRIPTVERSION="0.4"
+LASTMODIFIED="2019/08/01"
+SCRIPTVERSION="0.5"
 
 # Formatting variables
+#colors
 BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
 GREEN=$(tput setaf 2)
@@ -14,10 +15,38 @@ YELLOW=$(tput setaf 3)
 BLUE=$(tput setaf 4)
 CYAN=$(tput setaf 6)
 WHITE=$(tput setaf 7)
+#config
+FASTMODE='0'
+
+# Brief usage in CLI
+function DISPLAY_HELP {
+echo "${PURPLE} Bercik's rt-auto-install script. Version $SCRIPTVERSION released $LASTMODIFIED${NORMAL}"
+echo " Quick help:"
+echo "   -h --help         - you are looking at it"
+echo "   -d --demo         - hides pubic IP at the end"
+echo "   -f --fast         - skip all fancy slowdowns, not useful when having problems"
+echo " "
+echo "All above are optional. No need to use them."
+echo "${GREEN}Remember to run as root or with sudo.${NORMAL}"
+echo ""
+echo "${BOLD}Bugs, feature requests? Visit https://github.com/Bercik1337/rt-auto${NORMAL}"
+echo ""
+}
+
+#command line options
+while true; do
+   case $1 in
+        -f | --fast )           eval FASTMODE='1'  ;;
+        -d | --demo )           DEMO=1             ;;
+        -h | --help )           DISPLAY_HELP; exit ;;
+   esac 
+    shift || break
+done
 
 #detecting os
 function DETECTOS {
-echo "${PURPLE}Detecting Operating System" #; for i in {5..1};do echo -n ". " && sleep 1; done; echo -e \
+echo "${PURPLE}Detecting Operating System" 
+if [[ "$FASTMODE" -ne "1" ]]; then for i in {5..1}; do echo -n ". " && sleep 1;  done ; echo -e ; fi
 
 ## examples
 ###PRETTY_NAME="Ubuntu 18.04.2 LTS"
@@ -92,13 +121,13 @@ clear
 
 # Pretty function to spit out ok/fail after each important step.
 function CHECKLASTRC {
-if [ $(echo $?) -ne 0 ]; then
-echo "${WHITE}[${RED}FAIL${WHITE}]${NORMAL}"
-exit 1
-else
-echo "${WHITE}[${GREEN}ok${WHITE}]${NORMAL}"
-sleep 5
-fi
+  if [ $(echo $?) -ne 0 ]; then
+   echo "${WHITE}[${RED}FAIL${WHITE}]${NORMAL}"
+   exit 1
+  else
+   echo "${WHITE}[${GREEN}ok${WHITE}]${NORMAL}"
+   if [[ "$FASTMODE" -ne "1" ]]; then sleep 5; fi
+  fi
 }
 
 # The system user rtorrent is going to run as
@@ -158,9 +187,8 @@ function LICENSE {
 	echo " can do whatever you want with this stuff. If we meet some day, and you think"
 	echo " this stuff is worth it, you can buy me a beer in return.${NORMAL}"
 	echo
-	echo "For contacting Bercik use Github https://github.com/Bercik1337"
+	echo "Contact? use Github https://github.com/Bercik1337"
 	echo
-	echo " -  author of old (original) script ${LBLUE}Patrick Kerwood${NORMAL}"
 	echo "${BOLD}--------------------------------------------------------------------------${NORMAL}"
 	echo
 	read -p " Press any key to continue..." -n 1
@@ -494,6 +522,10 @@ function INSTALL_COMPLETE {
 	# The IPv6 local address, is not very used for now, anyway if needed, just change 'inet' to 'inet6'
 	lcl=$(ip addr | grep 'inet ' | awk '{print $2}' | cut -d/ -f1 | grep -v "127." | head -n 1)
 	ext=$(curl -s http://icanhazip.com)
+    if [[ "$DEMO" -eq "1" ]]
+    then
+    ext="DEMO MODE! Public IP hidden"
+    fi
 
 	if [[ ! -z "$lcl" ]] && [[ ! -z "$ext" ]]; then
 		echo "${LBLUE}LOCAL IP:${NORMAL} http://$lcl/rutorrent"
@@ -540,6 +572,7 @@ function START_RTORRENT {
 	systemctl start rtorrent.service	
 }
 
+
 CHECK_ROOT
 LICENSE
 APACHE_UTILS
@@ -584,11 +617,11 @@ while true; do
 			SET_WEB_USER
 			;;
 		c)
-			cat Changelog
+			head -n 15 Changelog
 			read -rsp $'Press any key to continue...\n' -n1 ke
 			;;
 		t)
-			cat TODO
+			head -n 15 TODO
 			read -rsp $'Press any key to continue...\n' -n1 ke
 			;;	
 		0)

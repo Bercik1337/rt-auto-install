@@ -7,8 +7,12 @@
 
 ## News
 
-**Current version** v0.4 released 2019/07/22
-Added Raspberry Pi support! Raspbian 10 (buster)
+**Current version** v0.5 released 2019/08/01
+We CLI parameters:
+Added "demo" mode. It hides your public IP at the end.            (-d --demo)
+Added "fast" mode. It drops all slowdowns, for people in a hurry. (-f --fast)
+Added "help" parameter.                                           (-h --help)
+Menu displays only 15 recent lines of Changelog and TODO.
 
 For details, always go to Changelog.
 
