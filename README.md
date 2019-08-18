@@ -4,6 +4,7 @@
 	Makes your system seedbox ready in minutes!
 
 
+![Logo](http://oi66.tinypic.com/24y07bp.jpg)
 
 ## News
 
