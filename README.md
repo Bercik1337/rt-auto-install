@@ -44,6 +44,11 @@ The script add a init script that makes rtorrent start, at a possible reboot, in
 given username's screen/tmux session. Use "service rtorrent-init start" and
 "service rtorrent-init stop" to start and stop rtorrent respectively.
 
+Promo
+------------
+
+[![rt-auto-install promo](https://img.youtube.com/vi/F0MvYg7bAqk/0.jpg)](https://youtu.be/F0MvYg7bAqk)
+
 
 Installation
 ------------
