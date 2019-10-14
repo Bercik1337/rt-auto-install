@@ -8,13 +8,18 @@
 
 ## News
 
-**Current version** v0.5 released 2019/08/01
+**Current version** v0.6 released 2019/10/14
 
 New CLI parameters:
-* Added "demo" mode. It hides your public IP at the end.            (-d --demo)
-* Added "fast" mode. It drops all slowdowns, for people in a hurry. (-f --fast)
-* Added "help" parameter.                                           (-h --help)
-* Menu displays only 15 recent lines of Changelog and TODO.
+ Added support for Debian 11 Bullseye
+ Added option cr - change rTorrent port 
+ Added option ch - change http rutorrent port 
+ Added functions SET_RT_PORT and SET_HTTP_PORT
+ Virtualhost file is no longer dynamically created
+ Created 001-default-rutorrent.conf and ports.conf in Files/
+ Removed rutorrent plugins from main menu
+
+Btw. I'm looking for help with CentOS support. See issues.
 
 For details, always go to Changelog.
 
@@ -27,6 +32,7 @@ For details, always go to Changelog.
 * It's actively developed and I'm not planning to drop it like others did :P
 
 ## Supported operating systems ##
+* **Debian 11    Bullseye**
 * **Debian 10    Buster**
 * **Raspbian 10  Buster**
 * **Ubuntu 19.04 Disco Dingo**

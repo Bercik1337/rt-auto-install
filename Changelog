@@ -1,3 +1,13 @@
+VERSION 0.6   2019-10-14
+* Added support for Debian 11 Bullseye
+* Added option cr - change rTorrent port 
+* Added option ch - change http rutorrent port 
+* Added functions SET_RT_PORT and SET_HTTP_PORT
+* Virtualhost file is no longer dynamically created
+* Created 001-default-rutorrent.conf and ports.conf in Files/
+* Removed rutorrent plugins from main menu
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 VERSION 0.5   2019-08-01
 * Added -h --help, -d --demo, -f --fast CLI parameters.
 * Changed display method of TODO and Changelog to show only 15 newest lines.
