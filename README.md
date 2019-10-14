@@ -4,20 +4,19 @@
 	Makes your system seedbox ready in minutes!
 
 
-![Logo](http://oi66.tinypic.com/24y07bp.jpg)
+![Logo](https://i.imgur.com/KtvJriL.jpg)
 
 ## News
 
 **Current version** v0.6 released 2019/10/14
 
-New CLI parameters:
- Added support for Debian 11 Bullseye
- Added option cr - change rTorrent port 
- Added option ch - change http rutorrent port 
- Added functions SET_RT_PORT and SET_HTTP_PORT
- Virtualhost file is no longer dynamically created
- Created 001-default-rutorrent.conf and ports.conf in Files/
- Removed rutorrent plugins from main menu
+	Added support for Debian 11 Bullseye
+	Added option cr - change rTorrent port 
+	Added option ch - change http rutorrent port 
+	Added functions SET_RT_PORT and SET_HTTP_PORT
+	Virtualhost file is no longer dynamically created
+	Created 001-default-rutorrent.conf and ports.conf in Files/
+	Removed rutorrent plugins from main menu
 
 Btw. I'm looking for help with CentOS support. See issues.
 
