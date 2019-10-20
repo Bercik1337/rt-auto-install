@@ -29,7 +29,7 @@ echo " "
 echo "All above are optional. No need to use them."
 echo "${GREEN}Remember to run as root or with sudo.${NORMAL}"
 echo ""
-echo "${BOLD}Bugs, feature requests? Visit https://github.com/Bercik1337/rt-auto${NORMAL}"
+echo "${BOLD}Bugs, feature requests? Visit https://github.com/Bercik1337/rt-auto-install${NORMAL}"
 echo ""
 }
 
