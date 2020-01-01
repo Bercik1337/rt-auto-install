@@ -1,7 +1,7 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
-LASTMODIFIED="2019/10/14"
-SCRIPTVERSION="0.6"
+LASTMODIFIED="2012/01/01"
+SCRIPTVERSION="0.7"
 
 # Formatting variables
 #colors
@@ -156,7 +156,7 @@ HOMEDIR=""
 function CHECK_ROOT {
 	if [ "$(id -u)" != "0" ]; then
 		echo
-		echo "This script must be run as root." 1>&2
+		echo "${RED}This script must be run as root." 1>&2
 		echo
 		exit 1
 	fi
@@ -312,8 +312,8 @@ function DOWNLOAD_PLUGIN {
 
 # Function for installing dependencies
 clear
-echo "${CYAN}Installing dependencies${NORMAL}"
 function APT_DEPENDENCIES {
+echo "${CYAN}Installing dependencies${NORMAL}"
 	apt-get update
 	apt-get -y install openssl git apache2 apache2-utils libapache2-mod-scgi unrar-free \
 	php php-curl php-cli libapache2-mod-php tmux unzip curl mediainfo unrar-free
@@ -534,7 +534,11 @@ function INSTALL_COMPLETE {
     fi
 
 	if [[ ! -z "$lcl" ]] && [[ ! -z "$ext" ]]; then
+			if [[ $HTTP_PORT != "" ]]; then
+		echo "${LBLUE}LOCAL IP:${NORMAL} http://$lcl:$HTTP_PORT/rutorrent"
+			else
 		echo "${LBLUE}LOCAL IP:${NORMAL} http://$lcl/rutorrent"
+			fi
 		echo "${LBLUE}EXTERNAL IP:${NORMAL} http://$ext/rutorrent"
 		echo
 		echo "Visit rutorrent through the above address."
@@ -574,11 +578,181 @@ function INSTALL_SYSTEMD_SERVICE {
 	systemctl enable rtorrent.service
 }
 
+# Function for creating file structure before installation
+function PREPARE_CONFIG_FILES {
+echo "${CYAN}Creating file structure"
+mkdir -p Files
+
+cat > "Files/001-default-rutorrent.conf" << 'EOF'
+<VirtualHost *:80>
+    #ServerName www.example.com
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    CustomLog /var/log/apache2/rutorrent.log vhost_combined
+    ErrorLog /var/log/apache2/rutorrent_error.log
+    SCGIMount /rutorrent/RPC2 127.0.0.1:5000
+
+    <Directory "/var/www/rutorrent">
+        AuthName "Tits or GTFO"
+        AuthType Basic
+        Require valid-user
+        AuthUserFile /var/www/rutorrent/.htpasswd
+    </Directory>
+
+</VirtualHost>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+EOF
+
+cat > "Files/ports.conf" << 'EOF'
+# If you just change the port or add more ports here, you will likely also
+# have to change the VirtualHost statement in
+# /etc/apache2/sites-enabled/000-default.conf
+
+Listen 80
+
+<IfModule ssl_module>
+	Listen 443
+</IfModule>
+
+<IfModule mod_gnutls.c>
+	Listen 443
+</IfModule>
+
+# vim: syntax=apache tss=4 sw=4 sts=4 sr noet
+EOF
+
+cat > "Files/rtorrent.rc" << 'EOF'
+# This is an example resource file for rTorrent. Copy to
+# ~/.rtorrent.rc and enable/modify the options as needed. Remember to
+# uncomment the options you wish to enable.
+
+# Maximum and minimum number of peers to connect to per torrent.
+#min_peers = 40
+#max_peers = 100
+
+# Same as above but for seeding completed torrents (-1 = same as downloading)
+#min_peers_seed = 10
+#max_peers_seed = 50
+
+# Maximum number of simultanious uploads per torrent.
+#max_uploads = 15
+
+# Global upload and download rate in KiB. "0" for unlimited.
+#download_rate = 0
+#upload_rate = 0
+
+# Default directory to save the downloaded torrents.
+directory = ~/Downloads
+
+# Default session directory. Make sure you don't run multiple instance
+# of rtorrent using the same session directory. Perhaps using a
+# relative path?
+session = ~/.rtorrent-session
+
+# Watch a directory for new torrents, and stop those that have been
+# deleted.
+#schedule = watch_directory,5,5,load_start=./watch/*.torrent
+#schedule = untied_directory,5,5,stop_untied=
+
+# Close torrents when diskspace is low.
+schedule = low_diskspace,5,60,close_low_diskspace=100M
+
+# The ip address reported to the tracker.
+#ip = 127.0.0.1
+#ip = rakshasa.no
+
+# The ip address the listening socket and outgoing connections is
+# bound to.
+#bind = 127.0.0.1
+#bind = rakshasa.no
+
+# Port range to use for listening.
+port_range = 6790-6999
+
+# Start opening ports at a random position within the port range.
+#port_random = no
+
+# Check hash for finished torrents. Might be usefull until the bug is
+# fixed that causes lack of diskspace not to be properly reported.
+#check_hash = no
+
+# Set whetever the client should try to connect to UDP trackers.
+#use_udp_trackers = yes
+
+# Alternative calls to bind and ip that should handle dynamic ip's.
+#schedule = ip_tick,0,1800,ip=rakshasa
+#schedule = bind_tick,0,1800,bind=rakshasa
+
+# Encryption options, set to none (default) or any combination of the following:
+# allow_incoming, try_outgoing, require, require_RC4, enable_retry, prefer_plaintext
+#
+# The example value allows incoming encrypted connections, starts unencrypted
+# outgoing connections but retries with encryption if they fail, preferring
+# plaintext to RC4 encryption after the encrypted handshake
+#
+encryption = allow_incoming,enable_retry,try_outgoing
+
+# Enable DHT support for trackerless torrents or when all trackers are down.
+# May be set to "disable" (completely disable DHT), "off" (do not start DHT),
+# "auto" (start and stop DHT as needed), or "on" (start DHT immediately).
+# The default is "off". For DHT to work, a session directory must be defined.
+# 
+# dht = auto
+
+# UDP port to use for DHT. 
+# 
+# dht_port = 6881
+
+# Enable peer exchange (for torrents not marked private)
+#
+# peer_exchange = yes
+
+#
+# Do not modify the following parameters unless you know what you're doing.
+#
+
+# Hash read-ahead controls how many MB to request the kernel to read
+# ahead. If the value is too low the disk may not be fully utilized,
+# while if too high the kernel might not be able to keep the read
+# pages in memory thus end up trashing.
+#hash_read_ahead = 10
+
+# Interval between attempts to check the hash, in milliseconds.
+#hash_interval = 100
+
+# Number of attempts to check the hash while using the mincore status,
+# before forcing. Overworked systems might need lower values to get a
+# decent hash checking rate.
+#hash_max_tries = 10
+
+scgi_port = 127.0.0.1:5000
+
+
+####### Heavy I/O seedbox configuration
+####### Uncomment lines below if you have 1Gbit+ Internet link
+####### thanks Zebirek
+####pieces.memory.max.set = 8048M
+####network.max_open_sockets.set = 999
+####network.max_open_files.set = 600
+####network.http.max_open.set = 99
+####network.receive_buffer.size.set =  32M
+####network.send_buffer.size.set    = 64M
+####pieces.preload.type.set = 2
+#####pieces.preload.min_size.set = 262144
+#####pieces.preload.min_rate.set = 5120
+EOF
+
+}
+
 function START_RTORRENT {
 	systemctl start rtorrent.service	
 }
 
-
+PREPARE_CONFIG_FILES
 CHECK_ROOT
 LICENSE
 APACHE_UTILS
@@ -644,7 +818,7 @@ while true; do
     				ubu1804)  APT_DEPENDENCIES; INSTALL_RTORRENT_APT_R96; INSTALL_RUTORRENT  			;;
     				ubu1810)  APT_DEPENDENCIES; INSTALL_RTORRENT_APT_R97; INSTALL_RUTORRENT  			;;
     				ubu1904)  APT_DEPENDENCIES; INSTALL_RTORRENT_APT_R97; INSTALL_RUTORRENT  			;;
-                                ubu1910)  APT_DEPENDENCIES; INSTALL_RTORRENT_APT_R97; INSTALL_RUTORRENT                         ;;
+                    ubu1910)  APT_DEPENDENCIES; INSTALL_RTORRENT_APT_R97; INSTALL_RUTORRENT             ;;
 			esac
 					
 			#APT_DEPENDENCIES

@@ -1,3 +1,11 @@
+VERSION 0.7   2020-01-01
+* Added support for Ubuntu 19.10 Eoan Ermine
+* Files/ folder removed, everything merged into single file now! You can literally wget entire thing. 
+* Fix display custom port for http connection. When [ch] option used, script didn't show proper link in summary for local IP.
+* Removed obsolete rtorrent-init file
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 VERSION 0.6   2019-10-14
 * Added support for Debian 11 Bullseye
 * Added option cr - change rTorrent port 

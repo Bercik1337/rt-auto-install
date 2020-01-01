@@ -8,15 +8,13 @@
 
 ## News
 
-**Current version** v0.6 released 2019/10/14
+**Current version** v0.7 released 2020/01/01
 
-	Added support for Debian 11 Bullseye
-	Added option cr - change rTorrent port 
-	Added option ch - change http rutorrent port 
-	Added functions SET_RT_PORT and SET_HTTP_PORT
-	Virtualhost file is no longer dynamically created
-	Created 001-default-rutorrent.conf and ports.conf in Files/
-	Removed rutorrent plugins from main menu
+	Added support for Ubuntu 19.10 Eoan Ermine
+	Files/ folder removed, everything merged into single file now! You can literally wget entire thing. 
+	Fix display port for custom http connection (option [ch])
+	Removed obsolete rtorrent-init file
+
 
 Btw. I'm looking for help with CentOS support. See issues.
 
@@ -34,6 +32,7 @@ For details, always go to Changelog.
 * **Debian 11    Bullseye**
 * **Debian 10    Buster**
 * **Raspbian 10  Buster**
+* **Ubuntu 19.10 Eoan Ermine**
 * **Ubuntu 19.04 Disco Dingo**
 * **Ubuntu 18.10 Cosmic Cuttlefish**
 * **Ubuntu 18.04 Bionic Beaver**
@@ -70,6 +69,8 @@ Run the script with sudo or as root
 	git clone https://github.com/Bercik1337/rt-auto-install.git
 	cd rt-auto-install
 	sudo ./Rt-Install-minimal
+	
+	or now you can simply wget https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/Rt-Install-minimal
 
 FAQ
 ------------
