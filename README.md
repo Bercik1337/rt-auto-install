@@ -29,7 +29,6 @@ For details, always go to Changelog.
 * It's actively developed and I'm not planning to drop it like others did :P
 
 ## Supported operating systems ##
-* **Debian 11    Bullseye**
 * **Debian 10    Buster**
 * **Raspbian 10  Buster**
 * **Ubuntu 19.10 Eoan Ermine**
