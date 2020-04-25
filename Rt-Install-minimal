@@ -1,6 +1,6 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
-LASTMODIFIED="2012/01/01"
+LASTMODIFIED="2020/01/01"
 SCRIPTVERSION="0.7"
 
 # Formatting variables
@@ -68,7 +68,7 @@ case $DISTRO in
 					echo "${BOLD}name: ${GREEN}Debian"
 					case $DISTRONAMEVER in
 					buster) echo "${PURPLE}${BOLD}release:${GREEN} 10 (Buster)" ; OSFINALNAME=deb10buster; ;;
-				  bullseye) echo "${PURPLE}${BOLD}release:${GREEN} 11 (Bullseye)" ; OSFINALNAME=deb11bullseye; ;;
+#				  bullseye) echo "${PURPLE}${BOLD}release:${GREEN} 11 (Bullseye)" ; OSFINALNAME=deb11bullseye; ;;
 					*) echo "${YELLOW}It seems you run Debian OS but unsupported release"; exit 4 ;;
 					esac;;
 				Raspbian)
