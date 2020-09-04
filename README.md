@@ -8,12 +8,9 @@
 
 ## News
 
-**Current version** v0.7 released 2020/01/01
+**Current version** v0.8 released 2020/09/04
 
-	Added support for Ubuntu 19.10 Eoan Ermine
-	Files/ folder removed, everything merged into single file now! You can literally wget entire thing. 
-	Fix display port for custom http connection (option [ch])
-	Removed obsolete rtorrent-init file
+	Added support for Ubuntu 20.04 Focal Fossa
 
 
 Btw. I'm looking for help with CentOS support. See issues.
@@ -35,6 +32,7 @@ For details, always go to Changelog.
 * **Ubuntu 19.04 Disco Dingo**
 * **Ubuntu 18.10 Cosmic Cuttlefish**
 * **Ubuntu 18.04 Bionic Beaver**
+* **Ubuntu 20.04 Focal Fossa**
 * **Mint   19.01 Tessa**
 * **Mint   19    Tara**
 
