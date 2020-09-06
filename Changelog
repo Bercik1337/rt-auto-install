@@ -1,3 +1,12 @@
+VERSION 0.8   2020-09-04
+* Added support for Ubuntu 20.04 Focal Fossa
+* Added support for Debian 11 Bullseye
+* New function INSTALL_SCGI
+* Cleanup of few old comments
+* Cleanup of tabbing and spacing in DISTRO section
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 VERSION 0.7   2020-01-01
 * Added support for Ubuntu 19.10 Eoan Ermine
 * Files/ folder removed, everything merged into single file now! You can literally wget entire thing. 

@@ -11,9 +11,8 @@
 **Current version** v0.8 released 2020/09/04
 
 	Added support for Ubuntu 20.04 Focal Fossa
+	Added support for Debian 11 Bullseye
 
-
-Btw. I'm looking for help with CentOS support. See issues.
 
 For details, always go to Changelog.
 
@@ -27,12 +26,13 @@ For details, always go to Changelog.
 
 ## Supported operating systems ##
 * **Debian 10    Buster**
+* **Debian 11    Bullseye**
 * **Raspbian 10  Buster**
+* **Ubuntu 20.04 Focal Fossa**
 * **Ubuntu 19.10 Eoan Ermine**
 * **Ubuntu 19.04 Disco Dingo**
 * **Ubuntu 18.10 Cosmic Cuttlefish**
 * **Ubuntu 18.04 Bionic Beaver**
-* **Ubuntu 20.04 Focal Fossa**
 * **Mint   19.01 Tessa**
 * **Mint   19    Tara**
 
@@ -79,8 +79,6 @@ In my personal opinion that's a **bad move**, and no one else fixed script - so 
 That's certainly NOT the case here. rtorrent is ran usually 24/7, does not work in cluster solutions or anything close to that. So sticking it into Docker is 1. waste of resources (CPU, disk) 2. Security risk (everything you'd normally have PLUS Docker problems).
 I might be the only person using this script - so be it. No containers for this app.
 
-### Where is the -sources version
-Deprecated. At least for now...
 
 ### Support for more OSes? 
 See TODO
