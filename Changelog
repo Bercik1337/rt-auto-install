@@ -1,3 +1,9 @@
+VERSION 0.9   2020-12-16
+* Added support for Ubuntu 20.10 Groovy Gorilla
+* Tmux stop function has been set to send-keys so it now tries to gracefully close rt instead of killing it
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 VERSION 0.8   2020-09-04
 * Added support for Ubuntu 20.04 Focal Fossa
 * Added support for Debian 11 Bullseye
