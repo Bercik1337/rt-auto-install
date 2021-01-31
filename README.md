@@ -8,10 +8,10 @@
 
 ## News
 
-**Current version** v0.9 released 2020/12/16
+**Current version** v1.0 released 2021/01/31
 
-	Added support for Ubuntu 20.10 Groovy Gorilla
-	Changed tmux stop function
+	rutorrent updated to version 3.10 (yes finally)
+	code cleanup
 
 
 For details, always go to Changelog.
