@@ -499,13 +499,13 @@ function INSTALL_RUTORRENT {
 	# Installing rutorrent.
 	echo "${CYAN}Installing rutorrent${NORMAL}"
 	echo "${YELLOW}Downloading package${NORMAL}"
-	curl -L http://dl.bintray.com/novik65/generic/ruTorrent-3.7.zip -o rutorrent-3.7.zip
+	curl -L https://github.com/Novik/ruTorrent/archive/refs/tags/v3.10.zip -o rutorrent.zip
 	CHECKLASTRC
 	echo "${YELLOW}Unpacking${NORMAL}"
-	unzip -qq rutorrent-3.7.zip
+	unzip -qq rutorrent.zip
 	CHECKLASTRC
 	echo "${YELLOW}Renaming${NORMAL}"
-	mv ruTorrent-master/ rutorrent
+	mv ruTorrent-3.10 rutorrent
 	CHECKLASTRC
 	
 	if [ -d /var/www/rutorrent ]; then
