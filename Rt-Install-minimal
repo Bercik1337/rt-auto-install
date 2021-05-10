@@ -520,7 +520,7 @@ function INSTALL_RUTORRENT {
 	mv -f rutorrent /var/www/
 	CHECKLASTRC
 	echo "${YELLOW}Cleanup${NORMAL}"
-	rm rutorrent-3.7.zip
+	rm rutorrent.zip
 	CHECKLASTRC
 	if [ -d "$TEMP_PLUGIN_DIR" ]; then
 		mv -fv "$TEMP_PLUGIN_DIR"/* /var/www/rutorrent/plugins
