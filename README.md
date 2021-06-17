@@ -8,10 +8,12 @@
 
 ## News
 
-**Current version** v0.9 released 2020/12/16
+**Current version** v1.0 released 2021/06/17
 
-	Added support for Ubuntu 20.10 Groovy Gorilla
-	Changed tmux stop function
+	Added support for Ubuntu 21.04 Hirsute Hippo
+	Added support for Linux Mint 20 Ulyana
+	Added support for Linux Mint 20.1 Ulyssa
+	Wow! v1.0 at last
 
 
 For details, always go to Changelog.
@@ -29,12 +31,15 @@ For details, always go to Changelog.
 * **Debian 11    Bullseye**
 * **Debian 10    Buster**
 * **Raspbian 10  Buster**
+* **Ubuntu 21.04 Hirsute Hippo**
 * **Ubuntu 20.10 Groovy Gorilla**
 * **Ubuntu 20.04 Focal Fossa**
 * **Ubuntu 19.10 Eoan Ermine**
 * **Ubuntu 19.04 Disco Dingo**
 * **Ubuntu 18.10 Cosmic Cuttlefish**
 * **Ubuntu 18.04 Bionic Beaver**
+* **Mint   20.1  Ulyssa**
+* **Mint   20    Ulyana**
 * **Mint   19.01 Tessa**
 * **Mint   19    Tara**
 
@@ -52,6 +57,12 @@ Promo
 
 [![rt-auto-install promo](https://img.youtube.com/vi/F0MvYg7bAqk/0.jpg)](https://youtu.be/F0MvYg7bAqk)
 
+Screenshoot
+------------
+
+![Screenshot1](https://i.ibb.co/5R1YWtN/rt-main-menu.png)
+![Screenshot2](https://i.ibb.co/GvB8Tdq/rt-complete.png)
+
 
 Installation
 ------------
@@ -60,7 +71,6 @@ Installation
 
 [![rt-auto-install script youtube](https://img.youtube.com/vi/uBxfSg0blPM/0.jpg)](https://www.youtube.com/watch?v=uBxfSg0blPM)
 
-Old video for v0.1 here -> https://www.youtube.com/watch?v=B3n2fE1Eo9Y
 
 
 Run the script with sudo or as root
