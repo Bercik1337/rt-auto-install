@@ -1,7 +1,7 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
-LASTMODIFIED="2021/06/17"
-SCRIPTVERSION="1.0"
+LASTMODIFIED="2021/11/20"
+SCRIPTVERSION="1.1"
 
 # Formatting variables
 #colors
@@ -232,6 +232,13 @@ function SET_RTORRENT_USER {
 		fi
 	done
 }
+# Function to set the group for Downloads folder and rtorrent config file
+function SET_RTORRENT_GROUP {
+		RTORRENT_GROUP=$(id -g $RTORRENT_USER)
+}
+
+
+
 
 # Function to  create users for the webinterface
 function SET_WEB_USER {
@@ -364,10 +371,10 @@ function INSTALL_RTORRENT_APT_R96 {
 	echo "${CYAN}Creating session directory ${NORMAL}" 	
 	if [ ! -d "$HOMEDIR"/.rtorrent-session ]; then
 		mkdir "$HOMEDIR"/.rtorrent-session
-		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/.rtorrent-session
+		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/.rtorrent-session
 		CHECKLASTRC
 	else
-		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/.rtorrent-session
+		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/.rtorrent-session
 		CHECKLASTRC
 	fi
 	
@@ -375,10 +382,10 @@ function INSTALL_RTORRENT_APT_R96 {
 	echo "${CYAN}Creating Downloads directory ${NORMAL}" 
 	if [ ! -d "$HOMEDIR"/Downloads ]; then
 		mkdir "$HOMEDIR"/Downloads
-		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/Downloads
+		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/Downloads
 		CHECKLASTRC
 	else
-		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/Downloads
+		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/Downloads
 		CHECKLASTRC
 	fi
 
@@ -386,7 +393,7 @@ function INSTALL_RTORRENT_APT_R96 {
 	echo "${CYAN}Copying rtorrent.rc${NORMAL}"
 	cp Files/rtorrent.rc $HOMEDIR/.rtorrent.rc
 	CHECKLASTRC
-	chown "$RTORRENT_USER"."$RTORRENT_USER" $HOMEDIR/.rtorrent.rc
+	chown "$RTORRENT_USER"."$RTORRENT_GROUP" $HOMEDIR/.rtorrent.rc
 	#sed -i "s/HOMEDIRHERE/$HOMEDIR/g" $HOMEDIR/.rtorrent.rc ###temp disabled, problems with sed.
 }
 function INSTALL_RTORRENT_APT_R97 {
@@ -413,10 +420,10 @@ function INSTALL_RTORRENT_APT_R97 {
 	echo "${CYAN}Creating session directory ${NORMAL}" 	
 	if [ ! -d "$HOMEDIR"/.rtorrent-session ]; then
 		mkdir "$HOMEDIR"/.rtorrent-session
-		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/.rtorrent-session
+		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/.rtorrent-session
 		CHECKLASTRC
 	else
-		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/.rtorrent-session
+		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/.rtorrent-session
 		CHECKLASTRC
 	fi
 	
@@ -424,10 +431,10 @@ function INSTALL_RTORRENT_APT_R97 {
 	echo "${CYAN}Creating Downloads directory ${NORMAL}" 
 	if [ ! -d "$HOMEDIR"/Downloads ]; then
 		mkdir "$HOMEDIR"/Downloads
-		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/Downloads
+		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/Downloads
 		CHECKLASTRC
 	else
-		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/Downloads
+		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/Downloads
 		CHECKLASTRC
 	fi
 
@@ -435,7 +442,7 @@ function INSTALL_RTORRENT_APT_R97 {
 	echo "${CYAN}Copying rtorrent.rc${NORMAL}"
 	cp Files/rtorrent.rc $HOMEDIR/.rtorrent.rc
 	CHECKLASTRC
-	chown "$RTORRENT_USER"."$RTORRENT_USER" $HOMEDIR/.rtorrent.rc
+	chown "$RTORRENT_USER"."$RTORRENT_GROUP" $HOMEDIR/.rtorrent.rc
 	#sed -i "s/HOMEDIRHERE/$HOMEDIR/g" $HOMEDIR/.rtorrent.rc ###temp disabled, problems with sed.
 }
 function INSTALL_RTORRENT_APT_R98 {
@@ -462,10 +469,10 @@ function INSTALL_RTORRENT_APT_R98 {
 	echo "${CYAN}Creating session directory ${NORMAL}" 	
 	if [ ! -d "$HOMEDIR"/.rtorrent-session ]; then
 		mkdir "$HOMEDIR"/.rtorrent-session
-		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/.rtorrent-session
+		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/.rtorrent-session
 		CHECKLASTRC
 	else
-		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/.rtorrent-session
+		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/.rtorrent-session
 		CHECKLASTRC
 	fi
 	
@@ -473,10 +480,10 @@ function INSTALL_RTORRENT_APT_R98 {
 	echo "${CYAN}Creating Downloads directory ${NORMAL}" 
 	if [ ! -d "$HOMEDIR"/Downloads ]; then
 		mkdir "$HOMEDIR"/Downloads
-		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/Downloads
+		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/Downloads
 		CHECKLASTRC
 	else
-		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/Downloads
+		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/Downloads
 		CHECKLASTRC
 	fi
 
@@ -484,7 +491,7 @@ function INSTALL_RTORRENT_APT_R98 {
 	echo "${CYAN}Copying rtorrent.rc${NORMAL}"
 	cp Files/rtorrent.rc $HOMEDIR/.rtorrent.rc
 	CHECKLASTRC
-	chown "$RTORRENT_USER"."$RTORRENT_USER" $HOMEDIR/.rtorrent.rc
+	chown "$RTORRENT_USER"."$RTORRENT_GROUP" $HOMEDIR/.rtorrent.rc
 	#sed -i "s/HOMEDIRHERE/$HOMEDIR/g" $HOMEDIR/.rtorrent.rc ###temp disabled, problems with sed.
 }
 
@@ -836,6 +843,7 @@ APACHE_UTILS
 rm -rf $TEMP_PLUGIN_DIR
 HEADER
 SET_RTORRENT_USER
+SET_RTORRENT_GROUP
 SET_WEB_USER
 
 # NOTICE: Change lib, rtorrent, rutorrent versions on upgrades.
@@ -870,6 +878,7 @@ while true; do
 	case "$case" in
 		1)
 			SET_RTORRENT_USER
+			SET_RTORRENT_GROUP
 			;;
 		2)
 			SET_WEB_USER

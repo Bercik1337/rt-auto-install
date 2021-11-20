@@ -8,12 +8,9 @@
 
 ## News
 
-**Current version** v1.0 released 2021/06/17
+**Current version** v1.1 released 2021/11/20
 
-	Added support for Ubuntu 21.04 Hirsute Hippo
-	Added support for Linux Mint 20 Ulyana
-	Added support for Linux Mint 20.1 Ulyssa
-	Wow! v1.0 at last
+	Fixed #15 problem with non-default user group
 
 
 For details, always go to Changelog.
