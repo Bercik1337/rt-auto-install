@@ -8,9 +8,10 @@
 
 ## News
 
-**Current version** v1.1 released 2021/11/20
+**Current version** v1.1 released 2022/01/16
 
-	Fixed #15 problem with non-default user group
+	Fixed #19 Fixed rare case if wget is missing
+	Added support for Ubuntu 21.10 (Impish Indri)
 
 
 For details, always go to Changelog.
@@ -28,6 +29,7 @@ For details, always go to Changelog.
 * **Debian 11    Bullseye**
 * **Debian 10    Buster**
 * **Raspbian 10  Buster**
+* **Ubuntu 21.10 Impish Indri**
 * **Ubuntu 21.04 Hirsute Hippo**
 * **Ubuntu 20.10 Groovy Gorilla**
 * **Ubuntu 20.04 Focal Fossa**

@@ -1,3 +1,9 @@
+VERSION 1.2   2022-01-16
+* Fixed #19 Fixed rare case if wget is missing
+* Added support for Ubuntu 21.10 (Impish Indri)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 VERSION 1.1   2021-11-20
 * Fixed #15 error if usergroup is not the same as username
 
