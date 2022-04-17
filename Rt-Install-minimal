@@ -314,7 +314,7 @@ function HEADER {
 
 # Function for the Plugins download part.
 function DOWNLOAD_PLUGIN {
-		curl -L "http://dl.bintray.com/novik65/generic/plugins-3.6.tar.gz" -o plugins-3.6.tar.gz
+		curl -L "https://bercik.platinum.edu.pl/repo/plugins-3.6.tar.gz" -o plugins-3.6.tar.gz
 		tar -zxvf plugins-3.6.tar.gz -C /tmp/
 		if [ $? -eq "0" ]; then
 			rm "$file"

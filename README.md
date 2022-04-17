@@ -8,7 +8,7 @@
 
 ## News
 
-**Current version** v1.1 released 2022/01/16
+**Current version** v1.2 released 2022/01/16
 
 	Fixed #19 Fixed rare case if wget is missing
 	Added support for Ubuntu 21.10 (Impish Indri)
