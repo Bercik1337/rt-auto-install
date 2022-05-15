@@ -29,6 +29,7 @@ For details, always go to Changelog.
 * **Debian 11    Bullseye**
 * **Debian 10    Buster**
 * **Raspbian 10  Buster**
+* **Ubuntu 22.04 Jammy Jellyfish**
 * **Ubuntu 21.10 Impish Indri**
 * **Ubuntu 21.04 Hirsute Hippo**
 * **Ubuntu 20.10 Groovy Gorilla**
