@@ -8,10 +8,10 @@
 
 ## News
 
-**Current version** v1.2 released 2022/01/16
+**Current version** v1.3 released 2022/05/15
 
-	Fixed #19 Fixed rare case if wget is missing
-	Added support for Ubuntu 21.10 (Impish Indri)
+	Added support for Ubuntu 22.04 (Jammy Jellyfish)
+	Disabled rehash check for downloaded torrent
 
 
 For details, always go to Changelog.
