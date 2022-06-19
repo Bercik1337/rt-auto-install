@@ -1,7 +1,7 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
-LASTMODIFIED="2022/05/15"
-SCRIPTVERSION="1.3"
+LASTMODIFIED="2022/06/19"
+SCRIPTVERSION="1.4"
 
 # Formatting variables
 #colors
@@ -59,9 +59,9 @@ if [[ "$FASTMODE" -ne "1" ]]; then for i in {5..1}; do echo -n ". " && sleep 1; 
 #getting os-release variable
 OSRELEASE=$(grep PRETTY_NAME /etc/os-release)
 #checking distribution
-DISTRO=$(grep -i -o -e Debian -i -o -e Ubuntu -i -o -e Mint -i -o -e Raspbian <<< $OSRELEASE)
+DISTRO=$(grep -i -o -e Debian -i -o -e Ubuntu -i -o -e Mint -i -o -e Raspbian -i -o -e LMDE <<< $OSRELEASE)
 #checking release
-DISTRONAMEVER=$(grep -i -o -e buster -i -o -e bullseye -i -o -e "18.04" -i -o -e "18.10" -i -o -e "19.04" -i -o -e "20.04" -i -o -e "20.10" -i -o -e "21.04" -i -o -e "21.10" -i -o -e "22.04" -i -o -e "19.10" -i -o -e "19.1" -i -o -e "19" -i -o -e "20" -i -o -e "20.1" <<< $OSRELEASE)
+DISTRONAMEVER=$(grep -i -o -e buster -i -o -e bullseye -i -o -e "18.04" -i -o -e "18.10" -i -o -e "19.04" -i -o -e "20.04" -i -o -e "20.10" -i -o -e "21.04" -i -o -e "21.10" -i -o -e "22.04" -i -o -e "19.10" -i -o -e "19.1" -i -o -e "19" -i -o -e "20" -i -o -e "20.1" -i -o -e "elsie" <<< $OSRELEASE)
 
 case $DISTRO in
 			Debian)
@@ -90,7 +90,12 @@ case $DISTRO in
 					21.04) echo "${PURPLE}${BOLD}release:${GREEN} 21.04 (Hirsute Hippo)";          OSFINALNAME=ubu2104             ;;
 					21.10) echo "${PURPLE}${BOLD}release:${GREEN} 21.10 (Impish Indri)";          OSFINALNAME=ubu2104             ;;
 					22.04) echo "${PURPLE}${BOLD}release:${GREEN} 22.04 (Jammy Jellifish)";          OSFINALNAME=ubu2104             ;;
-    				*) echo "${YELLOW}It seems you run Ubuntu OS but unsupported release"; exit 4							;;
+					esac;;
+			LMDE)
+				echo "${BOLD}name: ${GREEN}LMDE"
+					case $DISTRONAMEVER in
+					elsie) echo "${PURPLE}${BOLD}release:${GREEN} Elsie";          OSFINALNAME=ubu2010		;;
+    				*) echo "${YELLOW}It seems you run LMDE OS but unsupported release"; exit 4							;;
 					esac;;
 
 

@@ -8,10 +8,9 @@
 
 ## News
 
-**Current version** v1.3 released 2022/05/15
+**Current version** v1.4 released 2022/06/19
 
-	Added support for Ubuntu 22.04 (Jammy Jellyfish)
-	Disabled rehash check for downloaded torrent
+	Added support for LMDE 5 (Elsie)
 
 
 For details, always go to Changelog.
@@ -42,6 +41,7 @@ For details, always go to Changelog.
 * **Mint   20    Ulyana**
 * **Mint   19.01 Tessa**
 * **Mint   19    Tara**
+* **LMDE   5     Elsie**
 
 More to come, see TODO.
 
