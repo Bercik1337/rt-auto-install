@@ -8,10 +8,16 @@
 
 ## News
 
-**Current version** v1.4 released 2022/06/19
+**Current version** v1.5 released 2022/07/24
 
-	Added support for LMDE 5 (Elsie)
-
+	Added support for Linux Mint 19.1 (Tessa)
+	Added support for Linux Mint 19.2 (Tina)
+	Added support for Linux Mint 19.3 (Tricia)
+	Added support for Linux Mint 20.1 (Ulyssa)
+	Added support for Linux Mint 20.2 (Uma)
+	Added support for Linux Mint 20.3 (Una)
+	Add End of Life warning
+	Remove support for all EOL systems
 
 For details, always go to Changelog.
 
@@ -29,17 +35,21 @@ For details, always go to Changelog.
 * **Debian 10    Buster**
 * **Raspbian 10  Buster**
 * **Ubuntu 22.04 Jammy Jellyfish**
-* **Ubuntu 21.10 Impish Indri**
-* **Ubuntu 21.04 Hirsute Hippo**
-* **Ubuntu 20.10 Groovy Gorilla**
+~~ * **Ubuntu 21.10 Impish Indri** ~~ 
+~~ * **Ubuntu 21.04 Hirsute Hippo** ~~ 
+~~ * **Ubuntu 20.10 Groovy Gorilla** ~~ 
 * **Ubuntu 20.04 Focal Fossa**
-* **Ubuntu 19.10 Eoan Ermine**
-* **Ubuntu 19.04 Disco Dingo**
-* **Ubuntu 18.10 Cosmic Cuttlefish**
+~~ * **Ubuntu 19.10 Eoan Ermine** ~~ 
+~~ * **Ubuntu 19.04 Disco Dingo** ~~ 
+~~ * **Ubuntu 18.10 Cosmic Cuttlefish** ~~ 
 * **Ubuntu 18.04 Bionic Beaver**
+* **Mint   20.3  Una**
+* **Mint   20.2  Uma**
 * **Mint   20.1  Ulyssa**
 * **Mint   20    Ulyana**
-* **Mint   19.01 Tessa**
+* **Mint   19.3  Tricia**
+* **Mint   19.2  Tina**
+* **Mint   19.1  Tessa**
 * **Mint   19    Tara**
 * **LMDE   5     Elsie**
 

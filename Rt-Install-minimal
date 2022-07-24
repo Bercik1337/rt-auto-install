@@ -1,7 +1,7 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
-LASTMODIFIED="2022/06/19"
-SCRIPTVERSION="1.4"
+LASTMODIFIED="2022/07/24"
+SCRIPTVERSION="1.5"
 
 # Formatting variables
 #colors
@@ -61,7 +61,15 @@ OSRELEASE=$(grep PRETTY_NAME /etc/os-release)
 #checking distribution
 DISTRO=$(grep -i -o -e Debian -i -o -e Ubuntu -i -o -e Mint -i -o -e Raspbian -i -o -e LMDE <<< $OSRELEASE)
 #checking release
-DISTRONAMEVER=$(grep -i -o -e buster -i -o -e bullseye -i -o -e "18.04" -i -o -e "18.10" -i -o -e "19.04" -i -o -e "20.04" -i -o -e "20.10" -i -o -e "21.04" -i -o -e "21.10" -i -o -e "22.04" -i -o -e "19.10" -i -o -e "19.1" -i -o -e "19" -i -o -e "20" -i -o -e "20.1" -i -o -e "elsie" <<< $OSRELEASE)
+DISTRONAMEVER=$(grep -i -o -e buster -i -o -e bullseye -i -o -e "18.04" -i -o -e "18.10" -i -o -e "19.04" -i -o -e "20.04" -i -o -e "20.10" -i -o -e "21.04" -i -o -e "21.10" -i -o -e "22.04" -i -o -e "19.10"  -i -o -e "19.2"  -i -o -e "19.3" -i -o -e "19.1" -i -o -e "19" -i -o -e "20" -i -o -e "20.1"  -i -o -e "20.2" -i -o -e "20.3"  -i -o -e "elsie" <<< $OSRELEASE)
+function EOL {
+echo 
+echo  "${RED}Your system has reached End Of Life - it is no longer usable, please change OS to newer release"
+echo  
+echo  
+echo "${GREEN} Exiting ..."
+exit 0
+}
 
 case $DISTRO in
 			Debian)
@@ -82,13 +90,13 @@ case $DISTRO in
 				echo "${BOLD}name: ${GREEN}Ubuntu"
 					case $DISTRONAMEVER in
     				18.04) echo "${PURPLE}${BOLD}release:${GREEN} 18.04 (Bionic Beaver)" ;		OSFINALNAME=ubu1804			;;
-    				18.10) echo "${PURPLE}${BOLD}release:${GREEN} 18.10 (Cosmic Cuttlefish)" ;	OSFINALNAME=ubu1810			;;
-    				19.04) echo "${PURPLE}${BOLD}release:${GREEN} 19.04 (Disco Dingo)" ;		OSFINALNAME=ubu1904			;;
-	 				19.10) echo "${PURPLE}${BOLD}release:${GREEN} 19.10 (Eoan Ermine)" ;		OSFINALNAME=ubu1910			;;
+    				18.10) echo "${PURPLE}${BOLD}release:${GREEN} 18.10 (Cosmic Cuttlefish)" ; EOL ;	OSFINALNAME=ubu1810			;;
+    				19.04) echo "${PURPLE}${BOLD}release:${GREEN} 19.04 (Disco Dingo)" ; EOL ;		OSFINALNAME=ubu1904			;;
+	 				19.10) echo "${PURPLE}${BOLD}release:${GREEN} 19.10 (Eoan Ermine)" ; EOL ;		OSFINALNAME=ubu1910			;;
 	 				20.04) echo "${PURPLE}${BOLD}release:${GREEN} 20.04 (Focal Fossa)" ;		OSFINALNAME=ubu2004			;;
-					20.10) echo "${PURPLE}${BOLD}release:${GREEN} 20.10 (Groovy Gorilla)";          OSFINALNAME=ubu2010		;;
-					21.04) echo "${PURPLE}${BOLD}release:${GREEN} 21.04 (Hirsute Hippo)";          OSFINALNAME=ubu2104             ;;
-					21.10) echo "${PURPLE}${BOLD}release:${GREEN} 21.10 (Impish Indri)";          OSFINALNAME=ubu2104             ;;
+					20.10) echo "${PURPLE}${BOLD}release:${GREEN} 20.10 (Groovy Gorilla)";  EOL ;         OSFINALNAME=ubu2010		;;
+					21.04) echo "${PURPLE}${BOLD}release:${GREEN} 21.04 (Hirsute Hippo)";  EOL ;        OSFINALNAME=ubu2104             ;;
+					21.10) echo "${PURPLE}${BOLD}release:${GREEN} 21.10 (Impish Indri)"; EOL ;        OSFINALNAME=ubu2110             ;;
 					22.04) echo "${PURPLE}${BOLD}release:${GREEN} 22.04 (Jammy Jellifish)";          OSFINALNAME=ubu2104             ;;
 					esac;;
 			LMDE)
@@ -102,10 +110,14 @@ case $DISTRO in
 			Mint) 
 				echo "${BOLD}name: ${GREEN}Mint"
 					case $DISTRONAMEVER in
+    				19.3) echo "${PURPLE}${BOLD}release:${GREEN} 19.3 (Tricia)" ; OSFINALNAME=ubu1804 ;;
+    				19.2) echo "${PURPLE}${BOLD}release:${GREEN} 19.2 (Tina)" ; OSFINALNAME=ubu1804 ;;
     				19.1) echo "${PURPLE}${BOLD}release:${GREEN} 19.1 (Tessa)" ; OSFINALNAME=ubu1804 ;;
     				19) echo "${PURPLE}${BOLD}release:${GREEN} 19 (Tara)" ; OSFINALNAME=ubu1804 ;;
-                20) echo "${PURPLE}${BOLD}release:${GREEN} 20 (Ulyana)" ; OSFINALNAME=ubu2010 ;;
+				20.3) echo "${PURPLE}${BOLD}release:${GREEN} 20.3 (Una)" ; OSFINALNAME=ubu2010 ;;
+				20.2) echo "${PURPLE}${BOLD}release:${GREEN} 20.2 (Uma)" ; OSFINALNAME=ubu2010 ;;
 				20.1) echo "${PURPLE}${BOLD}release:${GREEN} 20.1 (Ulyssa)" ; OSFINALNAME=ubu2010 ;;
+				20) echo "${PURPLE}${BOLD}release:${GREEN} 20 (Ulyana)" ; OSFINALNAME=ubu2010 ;;
 					*) echo "${YELLOW}It seems you run Mint OS but unsupported release"; exit 4 ;;
 					esac;;
  			*)
@@ -142,6 +154,8 @@ esac
 }
 OSDETAILS
 clear
+
+
 
 # Pretty function to spit out ok/fail after each important step.
 function CHECKLASTRC {

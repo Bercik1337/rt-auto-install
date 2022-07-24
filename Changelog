@@ -1,3 +1,15 @@
+VERSION 1.5   2022-07-24
+* Added support for Linux Mint 19.1 (Tessa)
+* Added support for Linux Mint 19.2 (Tina)
+* Added support for Linux Mint 19.3 (Tricia)
+* Added support for Linux Mint 20.1 (Ulyssa)
+* Added support for Linux Mint 20.2 (Uma)
+* Added support for Linux Mint 20.3 (Una)
+* Add function EOL
+* Remove support for all EOL systems
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 VERSION 1.4   2022-06-19
 * Added support for LMDE 5 (Elsie)
 
