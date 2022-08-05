@@ -8,16 +8,9 @@
 
 ## News
 
-**Current version** v1.5 released 2022/07/24
+**Current version** v1.6 released 2022/08/05
 
-	Added support for Linux Mint 19.1 (Tessa)
-	Added support for Linux Mint 19.2 (Tina)
-	Added support for Linux Mint 19.3 (Tricia)
-	Added support for Linux Mint 20.1 (Ulyssa)
-	Added support for Linux Mint 20.2 (Uma)
-	Added support for Linux Mint 20.3 (Una)
-	Add End of Life warning
-	Remove support for all EOL systems
+	Added support for Linux Mint 21   (Vanessa)
 
 For details, always go to Changelog.
 
@@ -43,6 +36,7 @@ For details, always go to Changelog.
 * ~~Ubuntu 19.04 Disco Dingo~~ 
 * ~~Ubuntu 18.10 Cosmic Cuttlefish~~ 
 * **Ubuntu 18.04 Bionic Beaver**
+* **Mint   21    Vanessa**
 * **Mint   20.3  Una**
 * **Mint   20.2  Uma**
 * **Mint   20.1  Ulyssa**
