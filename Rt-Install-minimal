@@ -82,7 +82,7 @@ case $DISTRO in
 			Raspbian)
                 echo "${BOLD}name: ${GREEN}Rasbian"
                     case $DISTRONAMEVER in
-					buster) echo "${PURPLE}${BOLD}release:${GREEN} 10 (Buster)" ;				OSFINALNAME=deb10buster;	;;
+					buster) echo "${PURPLE}${BOLD}release:${GREEN} 10 (Buster)" ;				OSFINALNAME=deb10busterARM;	;;
                     *) echo "${YELLOW}It seems you run Rasbian OS but unsupported release"; exit 4							;;
                     esac;;
 
@@ -141,6 +141,7 @@ function OSDETAILS {
 
 case $OSFINALNAME in
 			    deb10buster)  RTVERSION=0.9.7; LIBTORRENTVERSION=0.13.7; RUTORRENTVERSION=3.10  ;;
+			 deb10busterARM)  RTVERSION=0.9.7; LIBTORRENTVERSION=0.13.7; RUTORRENTVERSION=3.10  ;;
 			  deb11bullseye)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=3.10  ;;
     				ubu1804)  RTVERSION=0.9.6; LIBTORRENTVERSION=0.13.6; RUTORRENTVERSION=3.10  ;;
     				ubu1810)  RTVERSION=0.9.7; LIBTORRENTVERSION=0.13.7; RUTORRENTVERSION=3.10  ;;
@@ -528,6 +529,14 @@ function INSTALL_SCGI {
 	dpkg -i libapache2*.deb
 	CHECKLASTRC
 }	
+
+function INSTALL_SCGI_ARM {
+
+	echo "${CYAN}Download scgi${NORMAL}"
+	wget http://ftp.debian.org/debian/pool/main/s/scgi/libapache2-mod-scgi_1.13-1.1_arm64.deb
+	echo "${CYAN}Install scgi${NORMAL}"
+	dpkg -i libapache2*.deb
+	CHECKLASTRC
 
 # Function for installing rutorrent and plugins
 function INSTALL_RUTORRENT {
@@ -925,6 +934,7 @@ while true; do
 			case $OSFINALNAME in
 				#installing os-dependend packages
 				deb10buster)  APT_DEPENDENCIES; INSTALL_RTORRENT_APT_R97; INSTALL_RUTORRENT								;;
+				deb10busterARM)  APT_DEPENDENCIES; INSTALL_RTORRENT_APT_R97; INSTALL_SCGI_ARM; INSTALL_RUTORRENT		;;
     				ubu1804)  APT_DEPENDENCIES; INSTALL_RTORRENT_APT_R96; INSTALL_RUTORRENT								;;
     				ubu1810)  APT_DEPENDENCIES; INSTALL_RTORRENT_APT_R97; INSTALL_RUTORRENT								;;
     				ubu1904)  APT_DEPENDENCIES; INSTALL_RTORRENT_APT_R97; INSTALL_RUTORRENT								;;
