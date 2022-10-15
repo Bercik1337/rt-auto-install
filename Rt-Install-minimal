@@ -293,7 +293,7 @@ function SET_RT_PORT {
 	
 # Function to  change apache http port
 function SET_HTTP_PORT {
-		echo -n "Please specify port  for Apache HTTP rutorrent connections [eg 8080]: "
+		echo -n "Please specify port for Apache HTTP rutorrent connections [eg 8080]: "
 		read HTTP_PORT
 		echo "Changing port in 001-default-rutorrent.conf config file"
 		sed -i  "s/<VirtualHost \*:.*/<VirtualHost *:$HTTP_PORT>/" Files/001-default-rutorrent.conf 
@@ -570,6 +570,13 @@ function INSTALL_RUTORRENT {
 
 # Function for configuring apache
 function CONFIGURE_APACHE {
+
+	# Creating self-signed certs
+	if [ ! -f /etc/ssl/certs/apache-selfsigned.crt ]; then
+        	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/apache-selfsigned.key -out /etc/ssl/certs/apache-selfsigned.crt
+		a2enmod ssl
+        fi
+
 	# Creating symlink for scgi.load
 	if [ ! -h /etc/apache2/mods-enabled/scgi.load ]; then
 		ln -s /etc/apache2/mods-available/scgi.load /etc/apache2/mods-enabled/scgi.load
@@ -695,7 +702,7 @@ cat > "Files/001-default-rutorrent.conf" << 'EOF'
 <VirtualHost *:80>
     #ServerName www.example.com
     ServerAdmin webmaster@localhost
-    DocumentRoot /var/www
+    DocumentRoot /var/www/rutorrent
     ErrorLog ${APACHE_LOG_DIR}/error.log
     CustomLog ${APACHE_LOG_DIR}/access.log combined
 
@@ -711,6 +718,28 @@ cat > "Files/001-default-rutorrent.conf" << 'EOF'
     </Directory>
 
 </VirtualHost>
+
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+  #ServerName  www.example.com
+  DocumentRoot /var/www/rutorrent
+
+  LogLevel info ssl:warn
+  ErrorLog /var/log/apache2/ssl_error.log
+  CustomLog /var/log/apache2/ssl_access.log common
+  
+  <Directory "/var/www/rutorrent">
+      AuthName "Tits or GTFO"
+      AuthType Basic
+      Require valid-user
+      AuthUserFile /var/www/rutorrent/.htpasswd
+  </Directory>
+
+SSLEngine on
+SSLCertificateFile /etc/ssl/certs/apache-selfsigned.crt
+SSLCertificateKeyFile /etc/ssl/private/apache-selfsigned.key
+</VirtualHost>
+</IfModule>
 
 # vim: syntax=apache ts=4 sw=4 sts=4 sr noet
 EOF
