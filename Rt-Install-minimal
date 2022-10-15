@@ -1,7 +1,7 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
-LASTMODIFIED="2022/08/05"
-SCRIPTVERSION="1.6"
+LASTMODIFIED="2022/10/15"
+SCRIPTVERSION="1.7"
 
 # Formatting variables
 #colors
@@ -573,7 +573,15 @@ function CONFIGURE_APACHE {
 
 	# Creating self-signed certs
 	if [ ! -f /etc/ssl/certs/apache-selfsigned.crt ]; then
-        	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/apache-selfsigned.key -out /etc/ssl/certs/apache-selfsigned.crt
+        	openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/private/apache-selfsigned.key << SSLCONFIG > /etc/ssl/certs/apache-selfsigned.crt
+.
+.
+.
+.
+Bercik rt-auto-install seedbox
+.
+.
+SSLCONFIG
 		a2enmod ssl
         fi
 
@@ -655,6 +663,7 @@ function INSTALL_COMPLETE {
 		echo "${LBLUE}EXTERNAL IP:${NORMAL} http://$ext/rutorrent"
 		echo
 		echo "Visit rutorrent through the above address."
+		echo "${RED}Now also available over HTTPS!"
 		echo 
 	else
 		if [[ -z "$lcl" ]]; then
@@ -702,7 +711,7 @@ cat > "Files/001-default-rutorrent.conf" << 'EOF'
 <VirtualHost *:80>
     #ServerName www.example.com
     ServerAdmin webmaster@localhost
-    DocumentRoot /var/www/rutorrent
+    DocumentRoot /var/www
     ErrorLog ${APACHE_LOG_DIR}/error.log
     CustomLog ${APACHE_LOG_DIR}/access.log combined
 
@@ -722,7 +731,7 @@ cat > "Files/001-default-rutorrent.conf" << 'EOF'
 <IfModule mod_ssl.c>
 <VirtualHost *:443>
   #ServerName  www.example.com
-  DocumentRoot /var/www/rutorrent
+  DocumentRoot /var/www/
 
   LogLevel info ssl:warn
   ErrorLog /var/log/apache2/ssl_error.log

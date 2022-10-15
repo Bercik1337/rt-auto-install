@@ -8,9 +8,9 @@
 
 ## News
 
-**Current version** v1.6 released 2022/08/05
+**Current version** v1.7 released 2022/10/15
 
-	Added support for Linux Mint 21   (Vanessa)
+	Added self signed SSL cert generation for HTTPS (thx @tbennett6421)
 
 For details, always go to Changelog.
 
