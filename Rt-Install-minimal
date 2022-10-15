@@ -648,7 +648,7 @@ function INSTALL_COMPLETE {
 
 	# The IPv6 local address, is not very used for now, anyway if needed, just change 'inet' to 'inet6'
 	lcl=$(ip addr | grep 'inet ' | awk '{print $2}' | cut -d/ -f1 | grep -v "127." | head -n 1)
-	ext=$(curl -s http://icanhazip.com)
+	ext=$(curl -s http://www.icanhazip.com)
     if [[ "$DEMO" -eq "1" ]]
     then
     ext="DEMO MODE! Public IP hidden"
