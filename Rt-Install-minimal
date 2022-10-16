@@ -244,7 +244,7 @@ function SET_RTORRENT_USER {
 		if [[ -z $(cat /etc/passwd | grep "^$RTORRENT_USER:") ]]; then
 			echo
 			echo "This user does not exist!"
-		elif [[ $(cat /etc/passwd | grep "^$RTORRENT_USER:" | cut -d: -f3) -lt 999 ]]; then
+		elif [[ $(cat /etc/passwd | grep "^$RTORRENT_USER:" | cut -d: -f3) -lt 1 ]]; then
 			echo
 			echo "That user's UID is too low!"
 		elif [[ $RTORRENT_USER == nobody ]]; then
