@@ -251,7 +251,7 @@ function SET_RTORRENT_USER {
 			echo
 			echo "You cant use 'nobody' as user!"
 		else
-			HOMEDIR=$(cat /etc/passwd | grep "$RTORRENT_USER": | cut -d: -f6)
+			HOMEDIR=$(cat /etc/passwd | grep /"$RTORRENT_USER":/ | cut -d: -f6)
 			con=1
 		fi
 	done
