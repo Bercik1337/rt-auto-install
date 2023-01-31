@@ -2,8 +2,6 @@
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
 LASTMODIFIED="2022/10/15"
 SCRIPTVERSION="1.7"
-#config
-FASTMODE='1'
 
 # Formatting variables
 #colors
@@ -49,14 +47,6 @@ function DISPLAY_HELP {
 #detecting os
 function DETECTOS {
 	echo "${PURPLE}${BOLD}Detecting Operating System"
-	if [[ "$FASTMODE" -ne "1" ]]
-	then
-		for i in {5..1}
-		do
-			echo -n ". " && sleep 1
-		done
-		echo -e
-	fi
 
 	## examples
 	###PRETTY_NAME="Ubuntu 18.04.2 LTS"
@@ -224,10 +214,6 @@ function CHECKLASTRC {
 		exit 1
 	else
 		echo "${WHITE}[${GREEN}ok${WHITE}]${NORMAL}"
-		if [[ "$FASTMODE" -ne "1" ]]
-		then
-			sleep 5
-		fi
 	fi
 }
 
@@ -972,8 +958,6 @@ CHANGELOG_TODO
 while true
 do
 	case $1 in
-	-f|--fast)
-		eval FASTMODE='1';;
 	-d|--demo)
 		DEMO=1;;
 	-h|--help)
