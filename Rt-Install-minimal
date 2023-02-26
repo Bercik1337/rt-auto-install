@@ -98,6 +98,7 @@ case $DISTRO in
 					21.04) echo "${PURPLE}${BOLD}release:${GREEN} 21.04 (Hirsute Hippo)";  EOL ;        OSFINALNAME=ubu2104             ;;
 					21.10) echo "${PURPLE}${BOLD}release:${GREEN} 21.10 (Impish Indri)"; EOL ;        OSFINALNAME=ubu2110             ;;
 					22.04) echo "${PURPLE}${BOLD}release:${GREEN} 22.04 (Jammy Jellifish)";          OSFINALNAME=ubu2104             ;;
+					*) echo "${YELLOW}It seems you run Ubuntu OS but unsupported release"; exit 4
 					esac;;
 			LMDE)
 				echo "${BOLD}name: ${GREEN}LMDE"
