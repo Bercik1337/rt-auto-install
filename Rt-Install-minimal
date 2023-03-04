@@ -35,7 +35,6 @@ function DISPLAY_HELP {
 	echo " Quick help:"
 	echo "   -h --help         - you are looking at it"
 	echo "   -d --demo         - hides pubic IP at the end"
-	echo "   -f --fast         - skip all fancy slowdowns, not useful when having problems"
 	echo ""
 	echo "All above are optional. No need to use them."
 	echo "${GREEN}Remember to run as root or with sudo.${NORMAL}"
@@ -61,7 +60,7 @@ function DETECTOS {
 	#checking distribution
 	DISTRO=$(grep -i -o -e 'Debian\|Ubuntu\|Mint\|Raspbian\|LMDE' <<< $OSRELEASE)
 	#checking release
-	DISTRONAMEVER=$(grep -i -o -e 'buster\|bullseye\|18.04\|18.10\|19.04\|20.04\|20.10\|21.04\|21.10\|22.04\|19.10\|19.2\|19.3\|19.1\|19\|20\|20.1\|20.2\|20.3\|21\|elsie' <<< $OSRELEASE)
+	DISTRONAMEVER=$(grep -i -o -e 'buster\|bullseye\|18.04\|18.10\|19.04\|20.04\|20.10\|21.04\|21.10\|22.04\|22.10\|19.10\|19.2\|19.3\|19.1\|19\|20\|20.1\|20.2\|20.3\|21\|21.1\|elsie' <<< $OSRELEASE)
 
 	case $DISTRO in
 	Debian)
@@ -116,7 +115,13 @@ function DETECTOS {
 			OSFINALNAME=ubu2110;;
 		22.04)
 			echo "${PURPLE}${BOLD}release:${GREEN} 22.04 (Jammy Jellifish)"
-			OSFINALNAME=ubu2104;;
+			OSFINALNAME=ubu2204;;
+		22.10)
+			echo "${PURPLE}${BOLD}release:${GREEN} 22.10 (Kinetic Kudu)"
+			OSFINALNAME=ubu2210;;
+		*)
+			echo "${YELLOW}It seems you run Mint OS but unsupported release";
+			exit 4;;
 		esac;;
 	LMDE)
 		echo "${BOLD}name: ${GREEN}LMDE"
@@ -134,30 +139,33 @@ function DETECTOS {
 		19)
 			echo "${PURPLE}${BOLD}release:${GREEN} 19 (Tara)"
 			OSFINALNAME=ubu1804;;
-		19.3)
-			echo "${PURPLE}${BOLD}release:${GREEN} 19.3 (Tricia)"
+		19.1)
+			echo "${PURPLE}${BOLD}release:${GREEN} 19.1 (Tessa)"
 			OSFINALNAME=ubu1804;;
 		19.2)
 			echo "${PURPLE}${BOLD}release:${GREEN} 19.2 (Tina)"
 			OSFINALNAME=ubu1804;;
-		19.1)
-			echo "${PURPLE}${BOLD}release:${GREEN} 19.1 (Tessa)"
+		19.3)
+			echo "${PURPLE}${BOLD}release:${GREEN} 19.3 (Tricia)"
 			OSFINALNAME=ubu1804;;
 		20)
 			echo "${PURPLE}${BOLD}release:${GREEN} 20 (Ulyana)"
-			OSFINALNAME=ubu2010;;
+			OSFINALNAME=ubu2004;;
 		20.1)
 			echo "${PURPLE}${BOLD}release:${GREEN} 20.1 (Ulyssa)"
-			OSFINALNAME=ubu2010;;
+			OSFINALNAME=ubu2004;;
 		20.2)
 			echo "${PURPLE}${BOLD}release:${GREEN} 20.2 (Uma)"
-			OSFINALNAME=ubu2010;;
+			OSFINALNAME=ubu2004;;
 		20.3)
 			echo "${PURPLE}${BOLD}release:${GREEN} 20.3 (Una)"
-			OSFINALNAME=ubu2010;;
+			OSFINALNAME=ubu2004;;
 		21)
 			echo "${PURPLE}${BOLD}release:${GREEN} 21 (Vanessa)"
-			OSFINALNAME=ubu2010;;
+			OSFINALNAME=ubu2204;;
+		21.1)
+			echo "${PURPLE}${BOLD}release:${GREEN} 21 (Vera)"
+			OSFINALNAME=ubu2204;;
 		*)
 			echo "${YELLOW}It seems you run Mint OS but unsupported release${NORMAL}"
 			exit 4;;
@@ -199,7 +207,7 @@ function OSDETAILS {
 		RTVERSION=0.9.7
 		LIBTORRENTVERSION=0.13.7
 		RUTORRENTVERSION=3.10;;
-	deb11bullseye|ubu2004|ubu2010|ubu2104|ubu2110|ubu2204)
+	deb11bullseye|ubu2004|ubu2010|ubu2104|ubu2110|ubu2204|ubu2210)
 		RTVERSION=0.9.8
 		LIBTORRENTVERSION=0.13.8
 		RUTORRENTVERSION=3.10;;
@@ -1029,7 +1037,7 @@ do
 			INSTALL_RTORRENT_APT_R97
 			INSTALL_RUTORRENT;;
 		#modern systems without scgi package ;(
-		deb11bullseye|ubu2004|ubu2010|ubu2104|ubu2110)
+		deb11bullseye|ubu2004|ubu2010|ubu2104|ubu2110|ubu2204|ubu2210)
 			APT_DEPENDENCIES_NOSCGI
 			INSTALL_SCGI
 			INSTALL_RTORRENT_APT_R98
