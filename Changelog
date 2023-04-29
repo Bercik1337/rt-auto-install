@@ -1,3 +1,7 @@
+VERSION 1.8   2023-04-29
+* Added support for Ubuntu 23.04 (Lunar Lobster)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 VERSION 1.7   2022-10-15
 * Added self signed SSL cert generation for HTTPS (thx @tbennett6421)
 

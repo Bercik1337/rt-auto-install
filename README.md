@@ -8,9 +8,9 @@
 
 ## News
 
-**Current version** v1.7 released 2022/10/15
+**Current version** v1.8 released 2023/04/29
 
-	Added self signed SSL cert generation for HTTPS (thx @tbennett6421)
+	Added  support for Ubuntu 23.04 (Lunar Lobster)
 
 For details, always go to Changelog.
 
@@ -27,6 +27,7 @@ For details, always go to Changelog.
 * **Debian 11    Bullseye**
 * **Debian 10    Buster**
 * **Raspbian 10  Buster**
+* **Ubuntu 23.04 Lunar Lobster**
 * **Ubuntu 22.04 Jammy Jellyfish**
 * ~~Ubuntu 21.10 Impish Indri~~ 
 * ~~Ubuntu 21.04 Hirsute Hippo~~ 
