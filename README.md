@@ -8,9 +8,9 @@
 
 ## News
 
-**Current version** v1.8 released 2023/04/29
+**Current version** v1.9 released 2023/06/11
 
-	Added  support for Ubuntu 23.04 (Lunar Lobster)
+	Updated ruTorrent version from 3.10 to 4.1.6
 
 For details, always go to Changelog.
 
