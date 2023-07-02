@@ -8,9 +8,9 @@
 
 ## News
 
-**Current version** v1.9 released 2023/06/11
+**Current version** v1.9a released 2023/07/02
 
-	Updated ruTorrent version from 3.10 to 4.1.6
+	Added support for Debian 12 (Bookworm)
 
 For details, always go to Changelog.
 
@@ -24,6 +24,7 @@ For details, always go to Changelog.
 
 ## Supported operating systems ##
 
+* **Debian 12    Bookworm**
 * **Debian 11    Bullseye**
 * **Debian 10    Buster**
 * **Raspbian 10  Buster**

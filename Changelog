@@ -1,3 +1,8 @@
+VERSION 1.9a   2023-07-02
+* Added support for Debian 12 (Bookworm)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 VERSION 1.9   2023-06-11
 * Updated ruTorrent from 3.10 to 4.1.6
 
