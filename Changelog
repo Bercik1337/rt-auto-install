@@ -1,3 +1,8 @@
+VERSION 1.9b   2023-10-07
+* Rutorrent version upgraded from 4.1.6 to 4.2.6
+* Added info message about ignoring known errors (_cloudflare spectrogram screenshots plugin)
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 VERSION 1.9a   2023-07-02
 * Added support for Debian 12 (Bookworm)
 

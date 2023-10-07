@@ -8,9 +8,10 @@
 
 ## News
 
-**Current version** v1.9a released 2023/07/02
+**Current version** v1.9b released 2023/10/07
 
-	Added support for Debian 12 (Bookworm)
+	Rutorrent version upgraded from 4.1.6 to 4.2.6
+	Added info message about ignoring known errors (_cloudflare spectrogram screenshots plugin)
 
 For details, always go to Changelog.
 
