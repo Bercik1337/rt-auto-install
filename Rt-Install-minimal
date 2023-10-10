@@ -1,10 +1,10 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
-LASTMODIFIED="2022/10/15"
-SCRIPTVERSION="1.7"
+LASTMODIFIED="2023/10/10"
+SCRIPTVERSION="2.0"
 
 # Formatting variables
-#colors
+# colors
 BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
 GREEN=$(tput setaf 2)
@@ -22,12 +22,16 @@ RTORRENT_USER=""
 WEB_USER=""
 # Array with webusers including their hashed paswords
 WEB_USER_ARRAY=()
-# Temporary download folder for plugins
-TEMP_PLUGIN_DIR="rutorrentPlugins/"
 # Array of downloaded plugins
 PLUGIN_ARRAY=()
-#rTorrent users home dir.
+# rTorrent users home dir.
 HOMEDIR=""
+
+# grep the Software Versions
+RTVERSION=$(apt-cache policy rtorrent | head -3 | tail -1 | cut -d' ' -f4 | cut -d'-' -f1)
+LIBTORRENTVERSION=$(apt-cache policy libtorrent?? | head -3 | tail -1 | cut -d' ' -f4 | cut -d':' -f2 | cut -d'-' -f1)
+RUTORRENTVERSION=$(wget -q https://api.github.com/repos/Novik/ruTorrent/tags -O - | grep name | cut -d'"' -f4 | grep -v 'rutorrent\|plugins\|beta' | head -1)
+ARCHITECTURE=$(dpkg --print-architecture)
 
 # Brief usage in CLI
 function DISPLAY_HELP {
@@ -35,15 +39,15 @@ function DISPLAY_HELP {
 	echo " Quick help:"
 	echo "   -h --help         - you are looking at it"
 	echo "   -d --demo         - hides pubic IP at the end"
-	echo ""
+	echo
 	echo "All above are optional. No need to use them."
 	echo "${GREEN}Remember to run as root or with sudo.${NORMAL}"
-	echo ""
+	echo
 	echo "${BOLD}Bugs, feature requests? Visit https://github.com/Bercik1337/rt-auto-install${NORMAL}"
-	echo ""
+	echo
 }
 
-#detecting os
+# detecting os
 function DETECTOS {
 	echo "${PURPLE}${BOLD}Detecting Operating System"
 
@@ -120,7 +124,7 @@ function DETECTOS {
 			echo "${PURPLE}${BOLD}release:${GREEN} 22.10 (Kinetic Kudu)"
 			OSFINALNAME=ubu2210;;
 		*)
-			echo "${YELLOW}It seems you run Mint OS but unsupported release";
+			echo "${YELLOW}It seems you run Mint OS but unsupported release${NORMAL}";
 			exit 4;;
 		esac;;
 	LMDE)
@@ -171,7 +175,7 @@ function DETECTOS {
 			exit 4;;
 		esac;;
 	*)
-		echo "${RED}You run unsupported Operating System. Sorry bro."
+		echo "${RED}You run unsupported Operating System. Sorry bro.${NORMAL}"
 		exit 5;;
 	esac
 
@@ -189,36 +193,18 @@ function DETECTOS {
 
 function EOL {
 	echo
-	echo  "${RED}Your system has reached End Of Life - it is no longer usable, please change OS to newer release"
+	echo "${RED}Your system has reached End Of Life - it is no longer usable, please change OS to newer release"
 	echo
 	echo
 	echo "${GREEN} Exiting ...${NORMAL}"
 	exit 0
 }
 
-#setup rT/libt/ruT version variables based on OS
-function OSDETAILS {
-	case $OSFINALNAME in
-	ubu1804)
-		RTVERSION=0.9.6
-		LIBTORRENTVERSION=0.13.6
-		RUTORRENTVERSION=3.10;;
-	deb10buster|ubu1810|ubu1904|ubu1910)
-		RTVERSION=0.9.7
-		LIBTORRENTVERSION=0.13.7
-		RUTORRENTVERSION=3.10;;
-	deb11bullseye|ubu2004|ubu2010|ubu2104|ubu2110|ubu2204|ubu2210)
-		RTVERSION=0.9.8
-		LIBTORRENTVERSION=0.13.8
-		RUTORRENTVERSION=3.10;;
-	esac
-}
-
 # Pretty function to spit out ok/fail after each important step.
 function CHECKLASTRC {
 	if [ $(echo $?) -ne 0 ]
 	then
-		echo "${WHITE}[${RED}FAIL${WHITE}]${NORMAL}"
+		echo "${WHITE}[${RED}fail${WHITE}]${NORMAL}"
 		exit 1
 	else
 		echo "${WHITE}[${GREEN}ok${WHITE}]${NORMAL}"
@@ -249,11 +235,11 @@ function APACHE_UTILS {
 		read -p " Do you want to install it? [y/n] " -n 1
 		if [[ $REPLY =~ [Yy]$ ]]
 		then
-			clear
+			#clear
 			apt-get update
 			apt-get -y install apache2-utils unzip curl wget
 		else
-			clear
+			#clear
 			exit
 		fi
 	fi
@@ -261,14 +247,14 @@ function APACHE_UTILS {
 
 # License
 function LICENSE {
-	clear
+	#clear
 	echo "${BOLD}--------------------------------------------------------------------------"
 	echo " THE BEER-WARE LICENSE (Revision 42):"
 	echo " ${GREEN}Bercik${NORMAL} wrote this script. As long as you retain this notice you"
-	echo " can do whatever you want with this stuff. If we meet some day, and you think"
-	echo " this stuff is worth it, you can buy me a beer in return.${NORMAL}"
+	echo " can do whatever you want with this stuff. If we meet some day, and you"
+	echo " think this stuff is worth it, you can buy me a beer in return.${NORMAL}"
 	echo
-	echo "Contact? use Github https://github.com/Bercik1337"
+	echo " Contact? use Github https://github.com/Bercik1337"
 	echo
 	echo "${BOLD}--------------------------------------------------------------------------${NORMAL}"
 	echo
@@ -304,7 +290,7 @@ function SET_RTORRENT_USER {
 	done
 }
 
-# Function to  create users for the webinterface
+# Function to create users for the webinterface
 function SET_WEB_USER {
 	while true
 	do
@@ -324,7 +310,7 @@ function SET_WEB_USER {
 	done
 }
 
-# Function to  change rtorrent port
+# Function to change rtorrent port
 function SET_RT_PORT {
 	echo -n "Please specify port range for rTorrent connections [eg 51000-51500]: "
 	read RT_PORT
@@ -333,7 +319,7 @@ function SET_RT_PORT {
 	CHECKLASTRC
 }
 
-# Function to  change apache http port
+# Function to change apache http port
 function SET_HTTP_PORT {
 	echo -n "Please specify port for Apache HTTP rutorrent connections [eg 8080]: "
 	read HTTP_PORT
@@ -354,76 +340,53 @@ function LIST_WEB_USERS {
 	done
 }
 
-# Function to list plugins, downloaded, in the menu
-function LIST_PLUGINS {
-	if [ ${#PLUGIN_ARRAY[@]} -eq 0 ]
-	then
-		echo "   No plugins downloaded!"
-	else
-		for i in "${PLUGIN_ARRAY[@]}"
-		do
-			echo "   - $i"
-		done
-	fi
-}
-
 # Header for the menu
 function HEADER {
-	clear
-	echo "${WHITE}--------------------------------------------------------"
+	#clear
+	echo "${WHITE}${BOLD}--------------------------------------------------------"
 	echo "        ${LBLUE}Rtorrent + Rutorrent Auto Install"
 	echo "        Bercik https://github.com/Bercik1337 ${NORMAL}"
 	echo "${BOLD}--------------------------------------------------------${NORMAL}"
 	echo
 }
 
-# Function for the Plugins download part.
-function DOWNLOAD_PLUGIN {
-	curl -L "https://bercik.platinum.edu.pl/repo/plugins-3.6.tar.gz" -o plugins-3.6.tar.gz
-	tar -zxvf plugins-3.6.tar.gz -C /tmp/
-	if [ $? -eq "0" ]
-	then
-		rm "$file"
-		echo
-		PLUGIN_ARRAY+=("${name}")
-		error="${GREEN}${BOLD}plugins${NORMAL}${GREEN} downloaded, unpacked and moved to temporary plugins folder${NORMAL}"
-		return 0
-	else
-		echo
-		error="${RED}Something went wrong.. Error!${NORMAL}"
-		return 1
-	fi
-}
-
 # Function for installing dependencies
-clear
 function APT_DEPENDENCIES {
 	echo "${CYAN}Installing dependencies${NORMAL}"
 	apt-get update
-	apt-get -y install openssl git apache2 apache2-utils unrar-free libapache2-mod-scgi \
-	php php-curl php-cli libapache2-mod-php tmux unzip curl mediainfo unrar-free
+	apt-get -y install openssl git apache2 apache2-utils unrar-free php php-curl php-cli libapache2-mod-php tmux unzip curl mediainfo unrar-free
 	CHECKLASTRC
 }
 
-function APT_DEPENDENCIES_NOSCGI {
-	echo "${CYAN}Installing dependencies${NORMAL}"
-	apt-get update
-	apt-get -y install openssl git apache2 apache2-utils unrar-free \
-	php php-curl php-cli libapache2-mod-php tmux unzip curl mediainfo unrar-free
+# Manual SCGI installation because some evil people removed it from main repository
+function INSTALL_SCGI {
+	SCGI=$(apt-cache show libapache2-mod-scgi 2>&1 | grep -cv "E: No packages found")
+	
+	if [ $SCGI -ne 1 ]
+	then
+		echo "${CYAN}Download scgi${NORMAL}"
+		
+		case $ARCHITECTURE in
+		armhf)
+			wget http://ftp.debian.org/debian/pool/main/s/scgi/libapache2-mod-scgi_1.13-1.1_armhf.deb;;
+		arm64)
+			wget http://ftp.debian.org/debian/pool/main/s/scgi/libapache2-mod-scgi_1.13-1.1_arm64.deb;;
+		amd64)
+			wget http://mirrors.kernel.org/ubuntu/pool/universe/s/scgi/libapache2-mod-scgi_1.13-1.1build1_amd64.deb;;
+		esac
+		
+		echo "${CYAN}Install scgi${NORMAL}"
+		dpkg -i libapache2*.deb
+		rm -f libapache2*.deb
+	else
+		echo "${CYAN}Install scgi${NORMAL}"
+		apt-get -y install libapache2-mod-scgi
+	fi
 	CHECKLASTRC
 }
 
 # Function for setting up xmlrpc, libtorrent and rtorrent
-function INSTALL_RTORRENT_APT_R96 {
-	echo "${CYAN}Install xmlrpc${NORMAL}"
-	apt-get install libxmlrpc-core-c3
-	CHECKLASTRC
-
-	# Download and install libtorrent
- 	echo "${CYAN}Install libtorrent ${NORMAL}"
-	apt-get -y install libtorrent19
-	CHECKLASTRC
-
+function INSTALL_RTORRENT {
 	# Download and install rtorrent
 	echo "${CYAN}Install rtorrent${NORMAL}"
 	apt-get -y install rtorrent
@@ -436,10 +399,10 @@ function INSTALL_RTORRENT_APT_R96 {
 	if [ ! -d "$HOMEDIR"/.rtorrent-session ]
 	then
 		mkdir "$HOMEDIR"/.rtorrent-session
-		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/.rtorrent-session
+		chown "$RTORRENT_USER":"$RTORRENT_GROUP" "$HOMEDIR"/.rtorrent-session
 		CHECKLASTRC
 	else
-		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/.rtorrent-session
+		chown "$RTORRENT_USER":"$RTORRENT_GROUP" "$HOMEDIR"/.rtorrent-session
 		CHECKLASTRC
 	fi
 
@@ -448,10 +411,10 @@ function INSTALL_RTORRENT_APT_R96 {
 	if [ ! -d "$HOMEDIR"/Downloads ]
 	then
 		mkdir "$HOMEDIR"/Downloads
-		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/Downloads
+		chown "$RTORRENT_USER":"$RTORRENT_GROUP" "$HOMEDIR"/Downloads
 		CHECKLASTRC
 	else
-		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/Downloads
+		chown "$RTORRENT_USER":"$RTORRENT_GROUP" "$HOMEDIR"/Downloads
 		CHECKLASTRC
 	fi
 
@@ -459,115 +422,8 @@ function INSTALL_RTORRENT_APT_R96 {
 	echo "${CYAN}Copying rtorrent.rc${NORMAL}"
 	cp Files/rtorrent.rc $HOMEDIR/.rtorrent.rc
 	CHECKLASTRC
-	chown "$RTORRENT_USER"."$RTORRENT_GROUP" $HOMEDIR/.rtorrent.rc
+	chown "$RTORRENT_USER":"$RTORRENT_GROUP" $HOMEDIR/.rtorrent.rc
 	#sed -i "s/HOMEDIRHERE/$HOMEDIR/g" $HOMEDIR/.rtorrent.rc ###temp disabled, problems with sed.
-}
-
-function INSTALL_RTORRENT_APT_R97 {
-	echo "${CYAN}Install xmlrpc${NORMAL}"
-	apt-get install libxmlrpc-core-c3
-	CHECKLASTRC
-
-	# Download and install libtorrent
- 	echo "${CYAN}Install libtorrent ${NORMAL}"
-	apt-get -y install libtorrent20
-	CHECKLASTRC
-
-	# Download and install rtorrent
-	echo "${CYAN}Install rtorrent${NORMAL}"
-	apt-get -y install rtorrent
-	CHECKLASTRC
-
-	ldconfig
-
-	# Creating session directory
-	echo "${CYAN}Creating session directory ${NORMAL}"
-	if [ ! -d "$HOMEDIR"/.rtorrent-session ]
-	then
-		mkdir "$HOMEDIR"/.rtorrent-session
-		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/.rtorrent-session
-		CHECKLASTRC
-	else
-		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/.rtorrent-session
-		CHECKLASTRC
-	fi
-
-	# Creating downloads folder
-	echo "${CYAN}Creating Downloads directory ${NORMAL}"
-	if [ ! -d "$HOMEDIR"/Downloads ]
-	then
-		mkdir "$HOMEDIR"/Downloads
-		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/Downloads
-		CHECKLASTRC
-	else
-		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/Downloads
-		CHECKLASTRC
-	fi
-
-	# Copying rtorrent.rc file.
-	echo "${CYAN}Copying rtorrent.rc${NORMAL}"
-	cp Files/rtorrent.rc $HOMEDIR/.rtorrent.rc
-	CHECKLASTRC
-	chown "$RTORRENT_USER"."$RTORRENT_GROUP" $HOMEDIR/.rtorrent.rc
-	#sed -i "s/HOMEDIRHERE/$HOMEDIR/g" $HOMEDIR/.rtorrent.rc ###temp disabled, problems with sed.
-}
-
-function INSTALL_RTORRENT_APT_R98 {
-	echo "${CYAN}Install xmlrpc${NORMAL}"
-	apt-get install libxmlrpc-core-c3
-	CHECKLASTRC
-
-	# Download and install libtorrent
- 	echo "${CYAN}Install libtorrent ${NORMAL}"
-	apt-get -y install libtorrent21
-	CHECKLASTRC
-
-	# Download and install rtorrent
-	echo "${CYAN}Install rtorrent${NORMAL}"
-	apt-get -y install rtorrent
-	CHECKLASTRC
-
-	ldconfig
-
-	# Creating session directory
-	echo "${CYAN}Creating session directory ${NORMAL}"
-	if [ ! -d "$HOMEDIR"/.rtorrent-session ]
-	then
-		mkdir "$HOMEDIR"/.rtorrent-session
-		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/.rtorrent-session
-		CHECKLASTRC
-	else
-		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/.rtorrent-session
-		CHECKLASTRC
-	fi
-
-	# Creating downloads folder
-	echo "${CYAN}Creating Downloads directory ${NORMAL}"
-	if [ ! -d "$HOMEDIR"/Downloads ]
-	then
-		mkdir "$HOMEDIR"/Downloads
-		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/Downloads
-		CHECKLASTRC
-	else
-		chown "$RTORRENT_USER"."$RTORRENT_GROUP" "$HOMEDIR"/Downloads
-		CHECKLASTRC
-	fi
-
-	# Copying rtorrent.rc file.
-	echo "${CYAN}Copying rtorrent.rc${NORMAL}"
-	cp Files/rtorrent.rc $HOMEDIR/.rtorrent.rc
-	CHECKLASTRC
-	chown "$RTORRENT_USER"."$RTORRENT_GROUP" $HOMEDIR/.rtorrent.rc
-	#sed -i "s/HOMEDIRHERE/$HOMEDIR/g" $HOMEDIR/.rtorrent.rc ###temp disabled, problems with sed.
-}
-
-#Manual SCGI installation because some evil people removed it from main repository
-function INSTALL_SCGI {
-	echo "${CYAN}Download scgi${NORMAL}"
-	wget http://mirrors.kernel.org/ubuntu/pool/universe/s/scgi/libapache2-mod-scgi_1.13-1.1build1_amd64.deb
-	echo "${CYAN}Install scgi${NORMAL}"
-	dpkg -i libapache2*.deb
-	CHECKLASTRC
 }
 
 # Function for installing rutorrent and plugins
@@ -575,23 +431,38 @@ function INSTALL_RUTORRENT {
 	# Installing rutorrent.
 	echo "${CYAN}Installing rutorrent${NORMAL}"
 	echo "${YELLOW}Downloading package${NORMAL}"
-	curl -L https://github.com/Novik/ruTorrent/archive/refs/tags/v3.10.zip -o rutorrent.zip
+	curl -L https://github.com/Novik/ruTorrent/archive/refs/tags/$RUTORRENTVERSION.zip -o rutorrent.zip
 	CHECKLASTRC
 	echo "${YELLOW}Unpacking${NORMAL}"
 	unzip -qq rutorrent.zip
 	CHECKLASTRC
 	echo "${YELLOW}Renaming${NORMAL}"
-	mv ruTorrent-3.10 rutorrent
+
+	LATEST="ruTorrent-${RUTORRENTVERSION:1}"
+	mv $LATEST rutorrent
 	CHECKLASTRC
 
 	if [ -d /var/www/rutorrent ]
 	then
 		rm -r /var/www/rutorrent
 	fi
-
+	
+	# Deactivate plugins
+	sed -i '$a[_cloudflare]' rutorrent/conf/plugins.ini
+	sed -i '$aenabled = no' rutorrent/conf/plugins.ini
+	
+	sed -i '$a[screenshots]' rutorrent/conf/plugins.ini
+	sed -i '$aenabled = no' rutorrent/conf/plugins.ini
+	
+	sed -i '$a[spectrogram]' rutorrent/conf/plugins.ini
+	sed -i '$aenabled = no' rutorrent/conf/plugins.ini
+	
+	sed -i '$a[rutracker_check]' rutorrent/conf/plugins.ini
+	sed -i '$aenabled = no' rutorrent/conf/plugins.ini
+	
 	# Changeing SCGI mount point in rutorrent config.
 	echo "${YELLOW}Changing SCGI mount point${NORMAL}"
-	sed -i "s/\/RPC2/\/rutorrent\/RPC2/g" ./rutorrent/conf/config.php
+	sed -i "s/\/RPC2/\/rutorrent\/RPC2/g" rutorrent/conf/config.php
 	CHECKLASTRC
 	echo "${YELLOW}Moving to /var/www/ ${NORMAL}"
 	mv -f rutorrent /var/www/
@@ -600,14 +471,9 @@ function INSTALL_RUTORRENT {
 	rm rutorrent.zip
 	CHECKLASTRC
 
-	if [ -d "$TEMP_PLUGIN_DIR" ]
-	then
-		mv -fv "$TEMP_PLUGIN_DIR"/* /var/www/rutorrent/plugins
-	fi
-
 	# Changing permissions for rutorrent and plugins.
 	echo "${CYAN}Changing permissions for rutorrent${NORMAL}"
-	chown -R www-data.www-data /var/www/rutorrent
+	chown -R www-data:www-data /var/www/rutorrent
 	chmod -R 775 /var/www/rutorrent
 	CHECKLASTRC
 }
@@ -663,18 +529,8 @@ SSLCONFIG
 	printf "%s\n" "${WEB_USER_ARRAY[@]}" > /var/www/rutorrent/.htpasswd
 }
 
-function INSTALL_FFMPEG {
-	printf "\n# ffpmeg mirror\ndeb http://www.deb-multimedia.org buster main non-free\n" >> /etc/apt/sources.list
-	wget http://www.deb-multimedia.org/pool/main/d/deb-multimedia-keyring/deb-multimedia-keyring_2016.8.1_all.deb
-	dpkg -i deb-multimedia-keyring_2016.8.1_all.deb
-	apt-get update
-	apt-get -y --force-yes install deb-multimedia-keyring
-	apt-get -y install ffmpeg
-}
-
 # Function for showing the end result when install is complete
 function INSTALL_COMPLETE {
-	rm -rf $TEMP_PLUGIN_DIR
 
 	HEADER
 
@@ -694,8 +550,8 @@ function INSTALL_COMPLETE {
 
 	# The IPv6 local address, is not very used for now, anyway if needed, just change 'inet' to 'inet6'
 	lcl=$(ip addr | grep 'inet ' | awk '{print $2}' | cut -d/ -f1 | grep -v "127." | head -n 1)
-	ext=$(curl -s http://www.icanhazip.com)
-	
+	ext=$(curl -s https://ipv4.icanhazip.com/)
+
 	if [[ "$DEMO" -eq "1" ]]
 	then
 		ext="DEMO MODE! Public IP hidden"
@@ -712,7 +568,7 @@ function INSTALL_COMPLETE {
 		echo "${LBLUE}EXTERNAL IP:${NORMAL} http://$ext/rutorrent"
 		echo
 		echo "Visit rutorrent through the above address."
-		echo "${RED}Now also available over HTTPS!"
+		echo "${RED}Now also available over HTTPS!${NORMAL}"
 		echo
 	else
 		if [[ -z "$lcl" ]]
@@ -889,23 +745,19 @@ EOF
 	# The example value allows incoming encrypted connections, starts unencrypted
 	# outgoing connections but retries with encryption if they fail, preferring
 	# plaintext to RC4 encryption after the encrypted handshake
-	#
 	encryption = allow_incoming,enable_retry,try_outgoing
 
 	# Enable DHT support for trackerless torrents or when all trackers are down.
 	# May be set to "disable" (completely disable DHT), "off" (do not start DHT),
 	# "auto" (start and stop DHT as needed), or "on" (start DHT immediately).
 	# The default is "off". For DHT to work, a session directory must be defined.
-	#
-	# dht = auto
+	#dht = auto
 
 	# UDP port to use for DHT.
-	#
-	# dht_port = 6881
+	#dht_port = 6881
 
 	# Enable peer exchange (for torrents not marked private)
-	#
-	# peer_exchange = yes
+	#peer_exchange = yes
 
 	#
 	# Do not modify the following parameters unless you know what you're doing.
@@ -927,18 +779,19 @@ EOF
 
 	scgi_port = 127.0.0.1:5000
 
-	####### Heavy I/O seedbox configuration
-	####### Uncomment lines below if you have 1Gbit+ Internet link
-	####### thanks Zebirek
-	####pieces.memory.max.set = 8048M
-	####network.max_open_sockets.set = 999
-	####network.max_open_files.set = 600
-	####network.http.max_open.set = 99
-	####network.receive_buffer.size.set =  32M
-	####network.send_buffer.size.set    = 64M
-	####pieces.preload.type.set = 2
-	#####pieces.preload.min_size.set = 262144
-	#####pieces.preload.min_rate.set = 5120
+	# Heavy I/O seedbox configuration
+	# Uncomment lines below if you have 1Gbit+ Internet link
+	# thanks Zebirek
+	#
+	#pieces.memory.max.set = 8048M
+	#network.max_open_sockets.set = 999
+	#network.max_open_files.set = 600
+	#network.http.max_open.set = 99
+	#network.receive_buffer.size.set =  32M
+	#network.send_buffer.size.set    = 64M
+	#pieces.preload.type.set = 2
+	#pieces.preload.min_size.set = 262144
+	#pieces.preload.min_rate.set = 5120
 EOF
 }
 
@@ -953,16 +806,15 @@ function START_RTORRENT {
 }
 
 CHECK_ROOT
+APACHE_UTILS
 HEADER
 LICENSE
-DETECTOS
-OSDETAILS
+#DETECTOS
 SET_RTORRENT_USER
-SET_RTORRENT_GROUP
 SET_WEB_USER
 CHANGELOG_TODO
 
-#command line options
+# command line options
 while true
 do
 	case $1 in
@@ -975,7 +827,6 @@ do
 	shift || break
 done
 
-# NOTICE: Change lib, rtorrent, rutorrent versions on upgrades.
 while true
 do
 	HEADER
@@ -1008,12 +859,12 @@ do
 	2)
 		SET_WEB_USER;;
 	c)
-		clear
+		#clear
 		HEADER
 		head -n 15 Files/Changelog
 		read -rsp $'Press any key to continue...\n' -n1 ke;;
 	t)
-		clear
+		#clear
 		HEADER
 		head -n 15 Files/TODO
 		read -rsp $'Press any key to continue...\n' -n1 ke;;
@@ -1023,34 +874,20 @@ do
 		SET_HTTP_PORT;;
 	0)
 		PREPARE_CONFIG_FILES
-		APACHE_UTILS
-		rm -rf $TEMP_PLUGIN_DIR
-
-		case $OSFINALNAME in
-		#installing os-dependend packages
-		ubu1804)
-			APT_DEPENDENCIES
-			INSTALL_RTORRENT_APT_R96
-			INSTALL_RUTORRENT;;
-		deb10buster|ubu1810|ubu1904|ubu1910)
-			APT_DEPENDENCIES
-			INSTALL_RTORRENT_APT_R97
-			INSTALL_RUTORRENT;;
-		#modern systems without scgi package ;(
-		deb11bullseye|ubu2004|ubu2010|ubu2104|ubu2110|ubu2204|ubu2210)
-			APT_DEPENDENCIES_NOSCGI
-			INSTALL_SCGI
-			INSTALL_RTORRENT_APT_R98
-			INSTALL_RUTORRENT;;
-		esac
-
+		APT_DEPENDENCIES
+		INSTALL_SCGI
+		INSTALL_RTORRENT
+		INSTALL_RUTORRENT
 		CONFIGURE_APACHE
 		INSTALL_SYSTEMD_SERVICE
 		START_RTORRENT
 		INSTALL_COMPLETE
+		rm -rf Files
+		tput sgr0
 		break;;
 	q)
 		rm -rf Files
+		tput sgr0
 		break;;
 	esac
 done
