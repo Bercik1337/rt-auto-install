@@ -5,14 +5,14 @@ SCRIPTVERSION="2.0"
 
 # Formatting variables
 # colors
-BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
-GREEN=$(tput setaf 2)
-LBLUE=$(tput setaf 6)
+BOLD=$(tput bold)
+
 RED=$(tput setaf 1)
-PURPLE=$(tput setaf 5)
+GREEN=$(tput setaf 2)
 YELLOW=$(tput setaf 3)
 BLUE=$(tput setaf 4)
+MAGENTA=$(tput setaf 5)
 CYAN=$(tput setaf 6)
 WHITE=$(tput setaf 7)
 
@@ -31,180 +31,14 @@ HOMEDIR=""
 RTVERSION=$(apt-cache policy rtorrent | head -3 | tail -1 | cut -d' ' -f4 | cut -d'-' -f1)
 LIBTORRENTVERSION=$(apt-cache policy libtorrent?? | head -3 | tail -1 | cut -d' ' -f4 | cut -d':' -f2 | cut -d'-' -f1)
 RUTORRENTVERSION=$(wget -q https://api.github.com/repos/Novik/ruTorrent/tags -O - | grep name | cut -d'"' -f4 | grep -v 'rutorrent\|plugins\|beta' | head -1)
+# grep System architecture
 ARCHITECTURE=$(dpkg --print-architecture)
-
-# Brief usage in CLI
-function DISPLAY_HELP {
-	echo "${PURPLE} Bercik's rt-auto-install script. Version $SCRIPTVERSION released $LASTMODIFIED${NORMAL}"
-	echo " Quick help:"
-	echo "   -h --help         - you are looking at it"
-	echo "   -d --demo         - hides pubic IP at the end"
-	echo
-	echo "All above are optional. No need to use them."
-	echo "${GREEN}Remember to run as root or with sudo.${NORMAL}"
-	echo
-	echo "${BOLD}Bugs, feature requests? Visit https://github.com/Bercik1337/rt-auto-install${NORMAL}"
-	echo
-}
-
-# detecting os
-function DETECTOS {
-	echo "${PURPLE}${BOLD}Detecting Operating System"
-
-	## examples
-	###PRETTY_NAME="Ubuntu 18.04.2 LTS"
-	###PRETTY_NAME="Ubuntu 18.10"
-	###PRETTY_NAME="Ubuntu 19.04"
-	###PRETTY_NAME="Debian GNU/Linux buster/sid"
-	###PRETTY_NAME="Slackware 14.2 x86_64 (post 14.2 -current)"
-	###PRETTY_NAME="Raspbian GNU/Linux 10 (buster)"
-
-	#getting os-release variable
-	OSRELEASE=$(grep PRETTY_NAME /etc/os-release)
-	#checking distribution
-	DISTRO=$(grep -i -o -e 'Debian\|Ubuntu\|Mint\|Raspbian\|LMDE' <<< $OSRELEASE)
-	#checking release
-	DISTRONAMEVER=$(grep -i -o -e 'buster\|bullseye\|18.04\|18.10\|19.04\|20.04\|20.10\|21.04\|21.10\|22.04\|22.10\|19.10\|19.2\|19.3\|19.1\|19\|20\|20.1\|20.2\|20.3\|21\|21.1\|elsie' <<< $OSRELEASE)
-
-	case $DISTRO in
-	Debian)
-		echo "${BOLD}name: ${GREEN}Debian"
-		case $DISTRONAMEVER in
-		buster)
-			echo "${PURPLE}${BOLD}release:${GREEN} 10 (Buster)"
-			OSFINALNAME=deb10buster;;
-		bullseye)
-			echo "${PURPLE}${BOLD}release:${GREEN} 11 (Bullseye)"
-			OSFINALNAME=deb11bullseye;;
-		*)
-			echo "${YELLOW}It seems you run Debian OS but unsupported release${NORMAL}"
-			exit 4;;
-		esac;;
-	Raspbian)
-		echo "${BOLD}name: ${GREEN}Rasbian"
-		case $DISTRONAMEVER in
-		buster)
-			echo "${PURPLE}${BOLD}release:${GREEN} 10 (Buster)"
-			OSFINALNAME=deb10buster;;
-		*)
-			echo "${YELLOW}It seems you run Rasbian OS but unsupported release${NORMAL}"
-			exit 4;;
-		esac;;
-	Ubuntu)
-		echo "${BOLD}name: ${GREEN}Ubuntu"
-		case $DISTRONAMEVER in
-		18.04)
-			echo "${PURPLE}${BOLD}release:${GREEN} 18.04 (Bionic Beaver)"
-			OSFINALNAME=ubu1804;;
-		18.10)
-			echo "${PURPLE}${BOLD}release:${GREEN} 18.10 (Cosmic Cuttlefish)"
-			OSFINALNAME=ubu1810;;
-		19.04)
-			echo "${PURPLE}${BOLD}release:${GREEN} 19.04 (Disco Dingo)"
-			OSFINALNAME=ubu1904;;
-		19.10)
-			echo "${PURPLE}${BOLD}release:${GREEN} 19.10 (Eoan Ermine)"
-			OSFINALNAME=ubu1910;;
-		20.04)
-			echo "${PURPLE}${BOLD}release:${GREEN} 20.04 (Focal Fossa)"
-			OSFINALNAME=ubu2004;;
-		20.10)
-			echo "${PURPLE}${BOLD}release:${GREEN} 20.10 (Groovy Gorilla)"
-			OSFINALNAME=ubu2010;;
-		21.04)
-			echo "${PURPLE}${BOLD}release:${GREEN} 21.04 (Hirsute Hippo)"
-			OSFINALNAME=ubu2104;;
-		21.10)
-			echo "${PURPLE}${BOLD}release:${GREEN} 21.10 (Impish Indri)"
-			OSFINALNAME=ubu2110;;
-		22.04)
-			echo "${PURPLE}${BOLD}release:${GREEN} 22.04 (Jammy Jellifish)"
-			OSFINALNAME=ubu2204;;
-		22.10)
-			echo "${PURPLE}${BOLD}release:${GREEN} 22.10 (Kinetic Kudu)"
-			OSFINALNAME=ubu2210;;
-		*)
-			echo "${YELLOW}It seems you run Mint OS but unsupported release${NORMAL}";
-			exit 4;;
-		esac;;
-	LMDE)
-		echo "${BOLD}name: ${GREEN}LMDE"
-		case $DISTRONAMEVER in
-		elsie)
-			echo "${PURPLE}${BOLD}release:${GREEN} Elsie"
-			OSFINALNAME=ubu2010;;
-		*)
-			echo "${YELLOW}It seems you run LMDE OS but unsupported release${NORMAL}"
-			exit 4;;
-		esac;;
-	Mint)
-		echo "${BOLD}name: ${GREEN}Mint"
-		case $DISTRONAMEVER in
-		19)
-			echo "${PURPLE}${BOLD}release:${GREEN} 19 (Tara)"
-			OSFINALNAME=ubu1804;;
-		19.1)
-			echo "${PURPLE}${BOLD}release:${GREEN} 19.1 (Tessa)"
-			OSFINALNAME=ubu1804;;
-		19.2)
-			echo "${PURPLE}${BOLD}release:${GREEN} 19.2 (Tina)"
-			OSFINALNAME=ubu1804;;
-		19.3)
-			echo "${PURPLE}${BOLD}release:${GREEN} 19.3 (Tricia)"
-			OSFINALNAME=ubu1804;;
-		20)
-			echo "${PURPLE}${BOLD}release:${GREEN} 20 (Ulyana)"
-			OSFINALNAME=ubu2004;;
-		20.1)
-			echo "${PURPLE}${BOLD}release:${GREEN} 20.1 (Ulyssa)"
-			OSFINALNAME=ubu2004;;
-		20.2)
-			echo "${PURPLE}${BOLD}release:${GREEN} 20.2 (Uma)"
-			OSFINALNAME=ubu2004;;
-		20.3)
-			echo "${PURPLE}${BOLD}release:${GREEN} 20.3 (Una)"
-			OSFINALNAME=ubu2004;;
-		21)
-			echo "${PURPLE}${BOLD}release:${GREEN} 21 (Vanessa)"
-			OSFINALNAME=ubu2204;;
-		21.1)
-			echo "${PURPLE}${BOLD}release:${GREEN} 21 (Vera)"
-			OSFINALNAME=ubu2204;;
-		*)
-			echo "${YELLOW}It seems you run Mint OS but unsupported release${NORMAL}"
-			exit 4;;
-		esac;;
-	*)
-		echo "${RED}You run unsupported Operating System. Sorry bro.${NORMAL}"
-		exit 5;;
-	esac
-
-	echo ${CYAN}
-
-	read -p "Is information above correct? [y/n] " -n 1
-	if [[ $REPLY =~ [Yy]$ ]]
-	then
-		echo -e "\n"
-	else
-		echo -e "\n You run unsupported Operating System. Sorry bro!${NORMAL}"
-		exit 3
-	fi
-}
-
-function EOL {
-	echo
-	echo "${RED}Your system has reached End Of Life - it is no longer usable, please change OS to newer release"
-	echo
-	echo
-	echo "${GREEN} Exiting ...${NORMAL}"
-	exit 0
-}
 
 # Pretty function to spit out ok/fail after each important step.
 function CHECKLASTRC {
 	if [ $(echo $?) -ne 0 ]
 	then
-		echo "${WHITE}[${RED}fail${WHITE}]${NORMAL}"
+		echo "${WHITE}[${RED}failed${WHITE}]${NORMAL}"
 		exit 1
 	else
 		echo "${WHITE}[${GREEN}ok${WHITE}]${NORMAL}"
@@ -228,14 +62,14 @@ function APACHE_UTILS {
 	UNZIP_CHECK="$(dpkg-query -W -f='${Status}' unzip 2>/dev/null | grep -c "ok installed")"
 	CURL_CHECK="$(dpkg-query -W -f='${Status}' curl 2>/dev/null | grep -c "ok installed")"
 	WGET_CHECK="$(dpkg-query -W -f='${Status}' wget 2>/dev/null | grep -c "ok installed")"
-
-	if [ "$AP_UT_CHECK" -ne 1 ] || [ "$UNZIP_CHECK" -ne 1 ] || [ "CURL_CHECK" -ne 1 ] || [ "WGET_CHECK" -ne 1 ]
+	
+	if [ "$AP_UT_CHECK" -ne 1 ] || [ "$UNZIP_CHECK" -ne 1 ] || [ "$CURL_CHECK" -ne 1 ] || [ "$WGET_CHECK" -ne 1 ]
 	then
 		echo " One or more of the packages apache2-utils, unzip, curl or wget is not installed and is needed for the setup."
 		read -p " Do you want to install it? [y/n] " -n 1
 		if [[ $REPLY =~ [Yy]$ ]]
 		then
-			#clear
+			echo
 			apt-get update
 			apt-get -y install apache2-utils unzip curl wget
 		else
@@ -247,9 +81,9 @@ function APACHE_UTILS {
 
 # License
 function LICENSE {
-	#clear
-	echo "${BOLD}--------------------------------------------------------------------------"
-	echo " THE BEER-WARE LICENSE (Revision 42):"
+	clear -x
+	echo "${NORMAL}${BOLD}--------------------------------------------------------------------------"
+	echo " ${NORMAL}THE BEER-WARE LICENSE (Revision 42):"
 	echo " ${GREEN}Bercik${NORMAL} wrote this script. As long as you retain this notice you"
 	echo " can do whatever you want with this stuff. If we meet some day, and you"
 	echo " think this stuff is worth it, you can buy me a beer in return.${NORMAL}"
@@ -267,21 +101,21 @@ function SET_RTORRENT_USER {
 	con=0
 	while [ $con -eq 0 ]
 	do
-		echo -n "Please type a valid system user: "
+		echo -n " Please type a valid system user: ${GREEN}"
 		read RTORRENT_USER
 
 		if [[ -z $(cat /etc/passwd | grep "^$RTORRENT_USER:") ]]
 		then
 			echo
-			echo "This user does not exist!"
+			echo " ${NORMAL}This user does not exist!"
 		elif [[ $(cat /etc/passwd | grep "^$RTORRENT_USER:" | cut -d: -f3) -lt 1 ]]
 		then
 			echo
-			echo "That user's UID is too low!"
+			echo " ${NORMAL}That user's UID is too low!"
 		elif [[ $RTORRENT_USER == nobody ]]
 		then
 			echo
-			echo "You cant use 'nobody' as user!"
+			echo " ${NORMAL}You cant use 'nobody' as user!"
 		else
 			HOMEDIR=$(cat /etc/passwd | grep /"$RTORRENT_USER":/ | cut -d: -f6)
 			RTORRENT_GROUP=$(id -g $RTORRENT_USER)
@@ -294,39 +128,52 @@ function SET_RTORRENT_USER {
 function SET_WEB_USER {
 	while true
 	do
-		echo -n "Please type the username for the webinterface, system user not required: "
+		echo -n " ${NORMAL}Please type any username for the webinterface: ${GREEN}"
 		read WEB_USER
-		USER=$(htpasswd -n $WEB_USER 2>/dev/null)
-		if [ $? = 0 ]
+		tput sgr0
+		echo -n " ${NORMAL}New password: "
+		read -s PASSWORD1
+		echo
+		echo -n " ${NORMAL}Re-type new password: "
+		read -s PASSWORD2
+		echo
+		
+		if [ "$PASSWORD1" == "$PASSWORD2" ]
 		then
-			WEB_USER_ARRAY+=($USER)
-			break
+			USER=$(echo "$PASSWORD1" | htpasswd -i -n "$WEB_USER")
+			if [ $? = 0 ]
+			then
+				WEB_USER_ARRAY+=($USER)
+				break
+			fi
 		else
 			echo
-			echo "${RED}Something went wrong!"
-			echo "You have entered an unusable username and/or different passwords.${NORMAL}"
+			echo " ${RED}Something went wrong!"
+			echo " You have entered an unusable username and/or different passwords.${NORMAL}"
 			echo
 		fi
+		tput sgr0
 	done
 }
 
 # Function to change rtorrent port
 function SET_RT_PORT {
-	echo -n "Please specify port range for rTorrent connections [eg 51000-51500]: "
+	echo -n " Please specify port range for rTorrent connections [eg 51000-51500]: "
 	read RT_PORT
-	echo "Changing port in rtorrent.rc config file"
+	echo " Changing port in rtorrent.rc config file"
 	sed -i "s/port_range.*/port_range = $RT_PORT/" Files/rtorrent.rc
 	CHECKLASTRC
 }
 
 # Function to change apache http port
 function SET_HTTP_PORT {
-	echo -n "Please specify port for Apache HTTP rutorrent connections [eg 8080]: "
+	echo -n " Please specify port for Apache HTTP rutorrent connections [eg 8080]: "
 	read HTTP_PORT
-	echo "Changing port in 001-default-rutorrent.conf config file"
+	echo " Changing port in 001-default-rutorrent.conf config file"
 	sed -i  "s/<VirtualHost \*:.*/<VirtualHost *:$HTTP_PORT>/" Files/001-default-rutorrent.conf
 	CHECKLASTRC
-	echo "Changing port in ports.conf config file"
+	
+	echo " Changing port in ports.conf config file"
 	sed -i  "0,/Listen/ s/Listen.*/Listen $HTTP_PORT/" Files/ports.conf
 	CHECKLASTRC
 }
@@ -342,9 +189,9 @@ function LIST_WEB_USERS {
 
 # Header for the menu
 function HEADER {
-	#clear
+	#clear -x
 	echo "${WHITE}${BOLD}--------------------------------------------------------"
-	echo "        ${LBLUE}Rtorrent + Rutorrent Auto Install"
+	echo "        ${CYAN}Rtorrent + Rutorrent Auto Install"
 	echo "        Bercik https://github.com/Bercik1337 ${NORMAL}"
 	echo "${BOLD}--------------------------------------------------------${NORMAL}"
 	echo
@@ -358,7 +205,7 @@ function APT_DEPENDENCIES {
 	CHECKLASTRC
 }
 
-# Manual SCGI installation because some evil people removed it from main repository
+# SCGI installation because it isn't supported anymore after php7.4
 function INSTALL_SCGI {
 	SCGI=$(apt-cache show libapache2-mod-scgi 2>&1 | grep -cv "E: No packages found")
 	
@@ -369,6 +216,8 @@ function INSTALL_SCGI {
 		case $ARCHITECTURE in
 		armhf)
 			wget http://ftp.debian.org/debian/pool/main/s/scgi/libapache2-mod-scgi_1.13-1.1_armhf.deb;;
+		armel)
+			wget http://ftp.debian.org/debian/pool/main/s/scgi/libapache2-mod-scgi_1.13-1.1_armel.deb;;
 		arm64)
 			wget http://ftp.debian.org/debian/pool/main/s/scgi/libapache2-mod-scgi_1.13-1.1_arm64.deb;;
 		amd64)
@@ -391,9 +240,9 @@ function INSTALL_RTORRENT {
 	echo "${CYAN}Install rtorrent${NORMAL}"
 	apt-get -y install rtorrent
 	CHECKLASTRC
-
+	
 	ldconfig
-
+	
 	# Creating session directory
 	echo "${CYAN}Creating session directory ${NORMAL}"
 	if [ ! -d "$HOMEDIR"/.rtorrent-session ]
@@ -405,7 +254,7 @@ function INSTALL_RTORRENT {
 		chown "$RTORRENT_USER":"$RTORRENT_GROUP" "$HOMEDIR"/.rtorrent-session
 		CHECKLASTRC
 	fi
-
+	
 	# Creating downloads folder
 	echo "${CYAN}Creating Downloads directory ${NORMAL}"
 	if [ ! -d "$HOMEDIR"/Downloads ]
@@ -417,13 +266,12 @@ function INSTALL_RTORRENT {
 		chown "$RTORRENT_USER":"$RTORRENT_GROUP" "$HOMEDIR"/Downloads
 		CHECKLASTRC
 	fi
-
+	
 	# Copying rtorrent.rc file.
 	echo "${CYAN}Copying rtorrent.rc${NORMAL}"
 	cp Files/rtorrent.rc $HOMEDIR/.rtorrent.rc
 	CHECKLASTRC
 	chown "$RTORRENT_USER":"$RTORRENT_GROUP" $HOMEDIR/.rtorrent.rc
-	#sed -i "s/HOMEDIRHERE/$HOMEDIR/g" $HOMEDIR/.rtorrent.rc ###temp disabled, problems with sed.
 }
 
 # Function for installing rutorrent and plugins
@@ -437,28 +285,25 @@ function INSTALL_RUTORRENT {
 	unzip -qq rutorrent.zip
 	CHECKLASTRC
 	echo "${YELLOW}Renaming${NORMAL}"
-
+	
 	LATEST="ruTorrent-${RUTORRENTVERSION:1}"
 	mv $LATEST rutorrent
 	CHECKLASTRC
-
+	
 	if [ -d /var/www/rutorrent ]
 	then
 		rm -r /var/www/rutorrent
 	fi
 	
-	# Deactivate plugins
-	sed -i '$a[_cloudflare]' rutorrent/conf/plugins.ini
-	sed -i '$aenabled = no' rutorrent/conf/plugins.ini
+	# Deactivate not supportet plugins
+	#         not supportet not supportet not supportet not possible by folder rights
+	PLUGINS=("_cloudflare" "screenshots" "spectrogram" "rutracker_check")
 	
-	sed -i '$a[screenshots]' rutorrent/conf/plugins.ini
-	sed -i '$aenabled = no' rutorrent/conf/plugins.ini
-	
-	sed -i '$a[spectrogram]' rutorrent/conf/plugins.ini
-	sed -i '$aenabled = no' rutorrent/conf/plugins.ini
-	
-	sed -i '$a[rutracker_check]' rutorrent/conf/plugins.ini
-	sed -i '$aenabled = no' rutorrent/conf/plugins.ini
+	for PLUGIN in ${PLUGINS[@]}
+	do
+		sed -i '$a['"$PLUGIN"']' rutorrent/conf/plugins.ini
+		sed -i '$aenabled = no' rutorrent/conf/plugins.ini
+	done
 	
 	# Changeing SCGI mount point in rutorrent config.
 	echo "${YELLOW}Changing SCGI mount point${NORMAL}"
@@ -470,7 +315,7 @@ function INSTALL_RUTORRENT {
 	echo "${YELLOW}Cleanup${NORMAL}"
 	rm rutorrent.zip
 	CHECKLASTRC
-
+	
 	# Changing permissions for rutorrent and plugins.
 	echo "${CYAN}Changing permissions for rutorrent${NORMAL}"
 	chown -R www-data:www-data /var/www/rutorrent
@@ -494,82 +339,61 @@ Bercik rt-auto-install seedbox
 SSLCONFIG
 		a2enmod ssl
 	fi
-
-	# Creating symlink for scgi.load
-	if [ ! -h /etc/apache2/mods-enabled/scgi.load ]
-	then
-		ln -s /etc/apache2/mods-available/scgi.load /etc/apache2/mods-enabled/scgi.load
-	fi
-
-	# Check if apache2 has port 80 enabled
-	if ! grep --quiet "^Listen 80$" /etc/apache2/ports.conf
-	then
-		echo "Listen 80" >> /etc/apache2/ports.conf;
-	fi
-
-	# Adding ServerName localhost to apache2.conf
+	
 	if ! grep --quiet "^ServerName$" /etc/apache2/apache2.conf
 	then
 		echo "ServerName localhost" >> /etc/apache2/apache2.conf;
 	fi
-
+	
 	# Creating Apache virtual host
 	echo "${CYAN}Creating apache vhost${NORMAL}"
 	if [ ! -f /etc/apache2/sites-available/001-default-rutorrent.conf ]
 	then
 		cp Files/001-default-rutorrent.conf /etc/apache2/sites-available/001-default-rutorrent.conf
-		cp Files/ports.conf /etc/apache2/ports.conf
+		a2enmod rewrite
 		a2ensite 001-default-rutorrent.conf
 		CHECKLASTRC
 		a2dissite 000-default.conf
 		systemctl restart apache2.service
 	fi
-
+	
 	# Creating .htaccess file
 	printf "%s\n" "${WEB_USER_ARRAY[@]}" > /var/www/rutorrent/.htpasswd
 }
 
 # Function for showing the end result when install is complete
 function INSTALL_COMPLETE {
-
 	HEADER
-
 	echo "${GREEN}Installation is complete.${NORMAL}"
 	echo
+	echo "${RED}Your default Apache2 vhost file has been disabled and replaced with a new one."
+	echo "If you were using it, combine the default and rutorrent vhost file and enable"
+	echo "it again.${NORMAL}"
 	echo
-	echo "${RED}Your default Apache2 vhost file has been disabled and replaced with a new one.${NORMAL}"
-	echo "${RED}If you were using it, combine the default and rutorrent vhost file and enable it again.${NORMAL}"
+	echo "${MAGENTA}Your downloads folder is in ${CYAN}$HOMEDIR/Downloads${NORMAL}"
+	echo "${MAGENTA}Sessions data is ${CYAN}$HOMEDIR/.rtorrent-session${NORMAL}"
+	echo "${MAGENTA}rtorrent's configuration file is ${CYAN}$HOMEDIR/.rtorrent.rc${NORMAL}"
 	echo
-	echo "${PURPLE}Your downloads folder is in ${LBLUE}$HOMEDIR/Downloads${NORMAL}"
-	echo "${PURPLE}Sessions data is ${LBLUE}$HOMEDIR/.rtorrent-session${NORMAL}"
-	echo "${PURPLE}rtorrent's configuration file is ${LBLUE}$HOMEDIR/.rtorrent.rc${NORMAL}"
-	echo
-	echo "${PURPLE}If you want to change settings for rtorrent, such as download folder, etc.,"
+	echo "${MAGENTA}If you want to change settings for rtorrent, such as download folder, etc.,"
 	echo "you need to edit the '.rtorrent.rc' file. E.g. 'nano $HOMEDIR/.rtorrent.rc'${NORMAL}"
 	echo
-
+	
 	# The IPv6 local address, is not very used for now, anyway if needed, just change 'inet' to 'inet6'
 	lcl=$(ip addr | grep 'inet ' | awk '{print $2}' | cut -d/ -f1 | grep -v "127." | head -n 1)
 	ext=$(curl -s https://ipv4.icanhazip.com/)
-
-	if [[ "$DEMO" -eq "1" ]]
-	then
-		ext="DEMO MODE! Public IP hidden"
-	fi
-
+	
 	if [[ ! -z "$lcl" ]] && [[ ! -z "$ext" ]]
 	then
 		if [[ $HTTP_PORT != "" ]]
 		then
-			echo "${LBLUE}LOCAL IP:${NORMAL} http://$lcl:$HTTP_PORT/rutorrent"
+			echo "${CYAN}LOCAL IP:${NORMAL} http://$lcl:$HTTP_PORT/rutorrent"
 		else
-			echo "${LBLUE}LOCAL IP:${NORMAL} http://$lcl/rutorrent"
+			echo "${CYAN}LOCAL IP:${NORMAL} http://$lcl/rutorrent"
 		fi
-		echo "${LBLUE}EXTERNAL IP:${NORMAL} http://$ext/rutorrent"
+		echo "${CYAN}EXTERNAL IP:${NORMAL} http://$ext/rutorrent"
 		echo
 		echo "Visit rutorrent through the above address."
-		echo "${RED}Now also available over HTTPS!${NORMAL}"
-		echo
+		echo "${RED}Now available with HTTPS redirection!${NORMAL}"
 	else
 		if [[ -z "$lcl" ]]
 		then
@@ -578,8 +402,9 @@ function INSTALL_COMPLETE {
 			echo
 		elif [[ -z "$ext" ]]
 		then
-			echo "${LBLUE}LOCAL:${NORMAL} http://$lcl/rutorrent"
+			echo "${CYAN}LOCAL:${NORMAL} http://$lcl/rutorrent"
 			echo "Visit rutorrent through your local network"
+			echo
 		else
 			echo "Can't detect the IP address"
 			echo "Try visit rutorrent at http://127.0.0.1/rutorrent"
@@ -602,79 +427,48 @@ function INSTALL_SYSTEMD_SERVICE {
 	RemainAfterExit=no
 	Restart=on-failure
 	RestartSec=5s
+
 	[Install]
 	WantedBy=default.target
 EOF
 
 	systemctl enable rtorrent.service
+	systemctl start rtorrent.service
 }
 
 # Function for creating file structure before installation
 function PREPARE_CONFIG_FILES {
 	echo "${CYAN}Creating file structure"
-
+	
 	cat > "Files/001-default-rutorrent.conf" << 'EOF'
-	<VirtualHost *:80>
-		#ServerName www.example.com
-		ServerAdmin webmaster@localhost
-		DocumentRoot /var/www
-		ErrorLog ${APACHE_LOG_DIR}/error.log
-		CustomLog ${APACHE_LOG_DIR}/access.log combined
+<VirtualHost *:80>
+	ServerAlias *
+	RewriteEngine on
+	RewriteRule ^/(.*) https://%{HTTP_HOST}/$1 [NC,R=301,L]
+</VirtualHost>
 
-		CustomLog /var/log/apache2/rutorrent.log vhost_combined
-		ErrorLog /var/log/apache2/rutorrent_error.log
+<IfModule mod_ssl.c>
+	<VirtualHost *:443>
+		#ServerName  www.example.com
+		DocumentRoot /var/www/
+		
+		LogLevel info ssl:warn
+		ErrorLog /var/log/apache2/ssl_error.log
+		CustomLog /var/log/apache2/ssl_access.log common
 		SCGIMount /rutorrent/RPC2 127.0.0.1:5000
-
+		
 		<Directory "/var/www/rutorrent">
 			AuthName "Tits or GTFO"
 			AuthType Basic
 			Require valid-user
 			AuthUserFile /var/www/rutorrent/.htpasswd
 		</Directory>
-
+		
+		SSLEngine on
+		SSLCertificateFile /etc/ssl/certs/apache-selfsigned.crt
+		SSLCertificateKeyFile /etc/ssl/private/apache-selfsigned.key
 	</VirtualHost>
-
-	<IfModule mod_ssl.c>
-	<VirtualHost *:443>
-	  #ServerName  www.example.com
-	  DocumentRoot /var/www/
-
-	  LogLevel info ssl:warn
-	  ErrorLog /var/log/apache2/ssl_error.log
-	  CustomLog /var/log/apache2/ssl_access.log common
-
-	  <Directory "/var/www/rutorrent">
-		  AuthName "Tits or GTFO"
-		  AuthType Basic
-		  Require valid-user
-		  AuthUserFile /var/www/rutorrent/.htpasswd
-	  </Directory>
-
-	SSLEngine on
-	SSLCertificateFile /etc/ssl/certs/apache-selfsigned.crt
-	SSLCertificateKeyFile /etc/ssl/private/apache-selfsigned.key
-	</VirtualHost>
-	</IfModule>
-
-	# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
-EOF
-
-	cat > "Files/ports.conf" << 'EOF'
-	# If you just change the port or add more ports here, you will likely also
-	# have to change the VirtualHost statement in
-	# /etc/apache2/sites-enabled/000-default.conf
-
-	Listen 80
-
-	<IfModule ssl_module>
-		Listen 443
-	</IfModule>
-
-	<IfModule mod_gnutls.c>
-		Listen 443
-	</IfModule>
-
-	# vim: syntax=apache tss=4 sw=4 sts=4 sr noet
+</IfModule>
 EOF
 
 	cat > "Files/rtorrent.rc" << 'EOF'
@@ -801,93 +595,84 @@ function CHANGELOG_TODO {
 	curl -sL https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/TODO  -o Files/TODO
 }
 
-function START_RTORRENT {
-	systemctl start rtorrent.service
+function MENU() {
+	while true
+	do
+		clear -x
+		HEADER
+		echo " ${BOLD}    rTorrent version:${NORMAL} ${RED} $RTVERSION ${NORMAL}"
+		echo " ${BOLD}  libTorrent version:${NORMAL} ${RED} $LIBTORRENTVERSION ${NORMAL}"
+		echo " ${BOLD}   ruTorrent version:${NORMAL} ${RED} $RUTORRENTVERSION ${NORMAL}"
+		echo " ${BOLD}      Script version:${NORMAL} ${RED} $SCRIPTVERSION ${NORMAL}"
+		echo " ${BOLD}Script last modified:${NORMAL} ${RED} $LASTMODIFIED ${NORMAL}"
+		echo " Remember to visit https://github.com/Bercik1337/rt-auto-install ${NORMAL}"
+		echo
+		echo " ${BOLD}rTorrent user:${NORMAL}${GREEN} $RTORRENT_USER${NORMAL}"
+		echo -n " ${BOLD}ruTorrent user(s):${NORMAL}${GREEN}"
+		LIST_WEB_USERS
+		echo
+		echo "${NORMAL}"
+		echo " [1] - Change rTorrent user"
+		echo " [2] - Add another ruTorrent user"
+		echo " [c] - Show Changelog"
+		echo " [t] - Show TODO"
+		echo " ${CYAN}[cr]${NORMAL} - ${MAGENTA}Change rTorrent Port${NORMAL} | ${CYAN}[ch]${NORMAL} - ${MAGENTA}Change http Port${NORMAL}"
+		echo " [0] - Start installation"
+		echo " [q] - Quit"
+		echo
+		echo -n "${GREEN}>>${NORMAL} "
+		read case
+		
+		case "$case" in
+		1)
+			clear -x
+			SET_RTORRENT_USER;;
+		2)
+			clear -x
+			SET_WEB_USER;;
+		c)
+			clear -x
+			HEADER
+			head -n 15 Files/Changelog
+			read -rsp $'Press any key to continue...\n' -n1 ke;;
+		t)
+			clear -x
+			HEADER
+			head -n 15 Files/TODO
+			read -rsp $'Press any key to continue...\n' -n1 ke;;
+		cr)
+			SET_RT_PORT;;
+		ch)
+			SET_HTTP_PORT;;
+		0)
+			PREPARE_CONFIG_FILES
+			APT_DEPENDENCIES
+			INSTALL_SCGI
+			INSTALL_RTORRENT
+			INSTALL_RUTORRENT
+			CONFIGURE_APACHE
+			INSTALL_SYSTEMD_SERVICE
+			clear -x
+			INSTALL_COMPLETE
+			rm -rf Files
+			break;;
+		q)
+			rm -rf Files
+			break;;
+		esac
+	done
 }
 
-CHECK_ROOT
-APACHE_UTILS
-HEADER
-LICENSE
-#DETECTOS
-SET_RTORRENT_USER
-SET_WEB_USER
-CHANGELOG_TODO
-
-# command line options
-while true
-do
-	case $1 in
-	-d|--demo)
-		DEMO=1;;
-	-h|--help)
-		DISPLAY_HELP
-		exit;;
-	esac
-	shift || break
-done
-
-while true
-do
-	HEADER
-	echo " ${BOLD}    rTorrent version:${NORMAL} ${RED} $RTVERSION ${NORMAL}"
-	echo " ${BOLD}  libTorrent version:${NORMAL} ${RED} $LIBTORRENTVERSION ${NORMAL}"
-	echo " ${BOLD}   ruTorrent version:${NORMAL} ${RED} $RUTORRENTVERSION ${NORMAL}"
-	echo " ${BOLD}      Script version:${NORMAL} ${RED} $SCRIPTVERSION ${NORMAL}"
-	echo " ${BOLD}Script last modified:${NORMAL} ${RED} $LASTMODIFIED ${NORMAL}"
-	echo " Remember to visit https://github.com/Bercik1337/rt-auto-install ${NORMAL}"
+function START() {
+	CHECK_ROOT
+	APACHE_UTILS
+	LICENSE
+	SET_RTORRENT_USER
 	echo
-	echo " ${BOLD}rTorrent user:${NORMAL}${GREEN} $RTORRENT_USER${NORMAL}"
-	echo -n " ${BOLD}ruTorrent user(s):${NORMAL}${GREEN}"
-	LIST_WEB_USERS
-	echo
-	echo "${NORMAL}"
-	echo " [1] - Change rTorrent user"
-	echo " [2] - Add another ruTorrent user"
-	echo " [c] - Show Changelog"
-	echo " [t] - Show TODO"
-	echo " ${LBLUE}[cr]${NORMAL} - ${PURPLE}Change rTorrent Port${NORMAL} | ${LBLUE}[ch]${NORMAL} - ${PURPLE}Change http Port${NORMAL}"
-	echo " [0] - Start installation"
-	echo " [q] - Quit"
-	echo
-	echo -n "${GREEN}>>${NORMAL} "
-	read case
+	SET_WEB_USER
+	CHANGELOG_TODO
+	MENU
+	tput sgr0
+}
 
-	case "$case" in
-	1)
-		SET_RTORRENT_USER;;
-	2)
-		SET_WEB_USER;;
-	c)
-		#clear
-		HEADER
-		head -n 15 Files/Changelog
-		read -rsp $'Press any key to continue...\n' -n1 ke;;
-	t)
-		#clear
-		HEADER
-		head -n 15 Files/TODO
-		read -rsp $'Press any key to continue...\n' -n1 ke;;
-	cr)
-		SET_RT_PORT;;
-	ch)
-		SET_HTTP_PORT;;
-	0)
-		PREPARE_CONFIG_FILES
-		APT_DEPENDENCIES
-		INSTALL_SCGI
-		INSTALL_RTORRENT
-		INSTALL_RUTORRENT
-		CONFIGURE_APACHE
-		INSTALL_SYSTEMD_SERVICE
-		START_RTORRENT
-		INSTALL_COMPLETE
-		rm -rf Files
-		tput sgr0
-		break;;
-	q)
-		rm -rf Files
-		tput sgr0
-		break;;
-	esac
-done
+START
