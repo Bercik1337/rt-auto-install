@@ -22,8 +22,6 @@ RTORRENT_USER=""
 WEB_USER=""
 # Array with webusers including their hashed paswords
 WEB_USER_ARRAY=()
-# Array of downloaded plugins
-PLUGIN_ARRAY=()
 # rTorrent users home dir.
 HOMEDIR=""
 
@@ -158,11 +156,17 @@ function SET_WEB_USER {
 
 # Function to change rtorrent port
 function SET_RT_PORT {
-	echo -n " Please specify port range for rTorrent connections [eg 51000-51500]: "
+	ACT_RANGE=$(grep "port_range" Files/rtorrent.rc | cut -d' ' -f3)
+	echo -n " Please specify port range for rTorrent [act: $ACT_RANGE]: "
 	read RT_PORT
-	echo " Changing port in rtorrent.rc config file"
-	sed -i "s/port_range.*/port_range = $RT_PORT/" Files/rtorrent.rc
-	CHECKLASTRC
+	if [ -z "$RT_PORT" ]
+	then
+		echo " No changing in rtorrent.rc config file range is empty"
+	else
+		echo " Changing port in rtorrent.rc config file"
+		sed -i "s/port_range.*/port_range = $RT_PORT/" Files/rtorrent.rc
+		CHECKLASTRC
+	fi
 }
 
 # Function to change apache http port
@@ -174,7 +178,7 @@ function SET_HTTP_PORT {
 	CHECKLASTRC
 	
 	echo " Changing port in ports.conf config file"
-	sed -i  "0,/Listen/ s/Listen.*/Listen $HTTP_PORT/" Files/ports.conf
+	sed -i  "0,/Listen/ s/Listen.*/Listen $HTTP_PORT/" /etc/apache2/ports.conf
 	CHECKLASTRC
 }
 
@@ -431,7 +435,7 @@ function INSTALL_SYSTEMD_SERVICE {
 	[Install]
 	WantedBy=default.target
 EOF
-
+	
 	systemctl enable rtorrent.service
 	systemctl start rtorrent.service
 }
@@ -616,7 +620,7 @@ function MENU() {
 		echo " [2] - Add another ruTorrent user"
 		echo " [c] - Show Changelog"
 		echo " [t] - Show TODO"
-		echo " ${CYAN}[cr]${NORMAL} - ${MAGENTA}Change rTorrent Port${NORMAL} | ${CYAN}[ch]${NORMAL} - ${MAGENTA}Change http Port${NORMAL}"
+		echo " [p] - Change rTorrent Port-Range" # | ${CYAN}[ch]${NORMAL} - ${MAGENTA}Change http Port${NORMAL}"
 		echo " [0] - Start installation"
 		echo " [q] - Quit"
 		echo
@@ -640,12 +644,11 @@ function MENU() {
 			HEADER
 			head -n 15 Files/TODO
 			read -rsp $'Press any key to continue...\n' -n1 ke;;
-		cr)
+		cr|p)
 			SET_RT_PORT;;
 		ch)
 			SET_HTTP_PORT;;
 		0)
-			PREPARE_CONFIG_FILES
 			APT_DEPENDENCIES
 			INSTALL_SCGI
 			INSTALL_RTORRENT
@@ -671,6 +674,7 @@ function START() {
 	echo
 	SET_WEB_USER
 	CHANGELOG_TODO
+	PREPARE_CONFIG_FILES
 	MENU
 	tput sgr0
 }
