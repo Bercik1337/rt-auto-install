@@ -595,8 +595,19 @@ EOF
 
 function CHANGELOG_TODO {
 	mkdir -p Files
-	curl -sL https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/Changelog  -o Files/Changelog
-	curl -sL https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/TODO  -o Files/TODO
+	#curl -sL https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/Changelog  -o Files/Changelog
+	#curl -sL https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/TODO  -o Files/TODO
+	
+	#sed -i "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /g" Files/Changelog
+	#sed -i "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /g" Files/TODO
+	
+	FILES=("Changelog" "TODO")
+	for FILE in ${FILES[@]}
+	do
+		curl -sL https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/$FILE  -o Files/$FILE
+		sed -i "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /g" Files/$FILE
+	done
+	
 }
 
 function MENU() {
@@ -620,7 +631,8 @@ function MENU() {
 		echo " [2] - Add another ruTorrent user"
 		echo " [c] - Show Changelog"
 		echo " [t] - Show TODO"
-		echo " [p] - Change rTorrent Port-Range" # | ${CYAN}[ch]${NORMAL} - ${MAGENTA}Change http Port${NORMAL}"
+		ACT_RANGE=$(grep "port_range" Files/rtorrent.rc | cut -d' ' -f3)
+		echo " [p] - Change rTorrent Port-Range [act: ${GREEN}$ACT_RANGE${NORMAL}]" # | ${CYAN}[ch]${NORMAL} - ${MAGENTA}Change http Port${NORMAL}"
 		echo " [0] - Start installation"
 		echo " [q] - Quit"
 		echo
@@ -637,13 +649,13 @@ function MENU() {
 		c)
 			clear -x
 			HEADER
-			head -n 15 Files/Changelog
-			read -rsp $'Press any key to continue...\n' -n1 ke;;
+			head -n 17 Files/Changelog
+			read -rsp $'Press any key to continue...' -n1 ke;;
 		t)
 			clear -x
 			HEADER
-			head -n 15 Files/TODO
-			read -rsp $'Press any key to continue...\n' -n1 ke;;
+			head -n 17 Files/TODO
+			read -rsp $'Press any key to continue...' -n1 ke;;
 		cr|p)
 			SET_RT_PORT;;
 		ch)
