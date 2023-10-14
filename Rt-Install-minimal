@@ -71,8 +71,9 @@ function APACHE_UTILS {
 			apt-get update
 			apt-get -y install apache2-utils unzip curl wget
 		else
-			#clear
+			clear -x
 			exit
+			#:
 		fi
 	fi
 }
@@ -90,18 +91,17 @@ function LICENSE {
 	echo
 	echo "${BOLD}--------------------------------------------------------------------------${NORMAL}"
 	echo
-	read -p " Press any key to continue..." -n 1
+	read -n 1 -s -p ' Press any key to continue...'
 	echo
 }
 
 # Function to set the system user, rtorrent is going to run as
 function SET_RTORRENT_USER {
-	con=0
-	while [ $con -eq 0 ]
+	while true
 	do
 		echo -n " Please type a valid system user: ${GREEN}"
 		read RTORRENT_USER
-
+		
 		if [[ -z $(cat /etc/passwd | grep "^$RTORRENT_USER:") ]]
 		then
 			echo
@@ -117,7 +117,7 @@ function SET_RTORRENT_USER {
 		else
 			HOMEDIR=$(cat /etc/passwd | grep /"$RTORRENT_USER":/ | cut -d: -f6)
 			RTORRENT_GROUP=$(id -g $RTORRENT_USER)
-			con=1
+			break
 		fi
 	done
 }
@@ -169,19 +169,6 @@ function SET_RT_PORT {
 	fi
 }
 
-# Function to change apache http port
-function SET_HTTP_PORT {
-	echo -n " Please specify port for Apache HTTP rutorrent connections [eg 8080]: "
-	read HTTP_PORT
-	echo " Changing port in 001-default-rutorrent.conf config file"
-	sed -i  "s/<VirtualHost \*:.*/<VirtualHost *:$HTTP_PORT>/" Files/001-default-rutorrent.conf
-	CHECKLASTRC
-	
-	echo " Changing port in ports.conf config file"
-	sed -i  "0,/Listen/ s/Listen.*/Listen $HTTP_PORT/" /etc/apache2/ports.conf
-	CHECKLASTRC
-}
-
 # Function to list WebUI users in the menu
 function LIST_WEB_USERS {
 	for i in ${WEB_USER_ARRAY[@]}
@@ -193,7 +180,7 @@ function LIST_WEB_USERS {
 
 # Header for the menu
 function HEADER {
-	#clear -x
+	clear -x
 	echo "${WHITE}${BOLD}--------------------------------------------------------"
 	echo "        ${CYAN}Rtorrent + Rutorrent Auto Install"
 	echo "        Bercik https://github.com/Bercik1337 ${NORMAL}"
@@ -302,7 +289,6 @@ function INSTALL_RUTORRENT {
 	# Deactivate not supportet plugins
 	#         not supportet not supportet not supportet not possible by folder rights
 	PLUGINS=("_cloudflare" "screenshots" "spectrogram" "rutracker_check")
-	
 	for PLUGIN in ${PLUGINS[@]}
 	do
 		sed -i '$a['"$PLUGIN"']' rutorrent/conf/plugins.ini
@@ -442,7 +428,7 @@ EOF
 
 # Function for creating file structure before installation
 function PREPARE_CONFIG_FILES {
-	echo "${CYAN}Creating file structure"
+	echo "${CYAN}Prepare config files"
 	
 	cat > "Files/001-default-rutorrent.conf" << 'EOF'
 <VirtualHost *:80>
@@ -595,12 +581,6 @@ EOF
 
 function CHANGELOG_TODO {
 	mkdir -p Files
-	#curl -sL https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/Changelog  -o Files/Changelog
-	#curl -sL https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/TODO  -o Files/TODO
-	
-	#sed -i "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /g" Files/Changelog
-	#sed -i "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /g" Files/TODO
-	
 	FILES=("Changelog" "TODO")
 	for FILE in ${FILES[@]}
 	do
@@ -613,7 +593,6 @@ function CHANGELOG_TODO {
 function MENU() {
 	while true
 	do
-		clear -x
 		HEADER
 		echo " ${BOLD}    rTorrent version:${NORMAL} ${RED} $RTVERSION ${NORMAL}"
 		echo " ${BOLD}  libTorrent version:${NORMAL} ${RED} $LIBTORRENTVERSION ${NORMAL}"
@@ -632,7 +611,7 @@ function MENU() {
 		echo " [c] - Show Changelog"
 		echo " [t] - Show TODO"
 		ACT_RANGE=$(grep "port_range" Files/rtorrent.rc | cut -d' ' -f3)
-		echo " [p] - Change rTorrent Port-Range [act: ${GREEN}$ACT_RANGE${NORMAL}]" # | ${CYAN}[ch]${NORMAL} - ${MAGENTA}Change http Port${NORMAL}"
+		echo " [p] - Change rTorrent Port-Range [act: ${GREEN}$ACT_RANGE${NORMAL}]"
 		echo " [0] - Start installation"
 		echo " [q] - Quit"
 		echo
@@ -641,18 +620,16 @@ function MENU() {
 		
 		case "$case" in
 		1)
-			clear -x
+			HEADER
 			SET_RTORRENT_USER;;
 		2)
-			clear -x
+			HEADER
 			SET_WEB_USER;;
 		c)
-			clear -x
 			HEADER
 			head -n 17 Files/Changelog
 			read -rsp $'Press any key to continue...' -n1 ke;;
 		t)
-			clear -x
 			HEADER
 			head -n 17 Files/TODO
 			read -rsp $'Press any key to continue...' -n1 ke;;
@@ -682,6 +659,7 @@ function START() {
 	CHECK_ROOT
 	APACHE_UTILS
 	LICENSE
+	HEADER
 	SET_RTORRENT_USER
 	echo
 	SET_WEB_USER
