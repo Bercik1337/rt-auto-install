@@ -8,13 +8,16 @@ SCRIPTVERSION="2.0"
 NORMAL=$(tput sgr0)
 BOLD=$(tput bold)
 
+#BLACK=$(tput setaf 0)
 RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 YELLOW=$(tput setaf 3)
-BLUE=$(tput setaf 4)
+#BLUE=$(tput setaf 4)
 MAGENTA=$(tput setaf 5)
 CYAN=$(tput setaf 6)
 WHITE=$(tput setaf 7)
+#Not_used=$(tput setaf 8)
+#DEFAULT=$(tput setaf 9)
 
 # The system user rtorrent is going to run as
 RTORRENT_USER=""
@@ -29,6 +32,7 @@ HOMEDIR=""
 RTVERSION=$(apt-cache policy rtorrent | head -3 | tail -1 | cut -d' ' -f4 | cut -d'-' -f1)
 LIBTORRENTVERSION=$(apt-cache policy libtorrent?? | head -3 | tail -1 | cut -d' ' -f4 | cut -d':' -f2 | cut -d'-' -f1)
 RUTORRENTVERSION=$(wget -q https://api.github.com/repos/Novik/ruTorrent/tags -O - | grep name | cut -d'"' -f4 | grep -v 'rutorrent\|plugins\|beta' | head -1)
+
 # grep System architecture
 ARCHITECTURE=$(dpkg --print-architecture)
 
@@ -80,7 +84,7 @@ function APACHE_UTILS {
 
 # License
 function LICENSE {
-	clear -x
+	#clear -x
 	echo "${NORMAL}${BOLD}--------------------------------------------------------------------------"
 	echo " ${NORMAL}THE BEER-WARE LICENSE (Revision 42):"
 	echo " ${GREEN}Bercik${NORMAL} wrote this script. As long as you retain this notice you"
@@ -92,6 +96,17 @@ function LICENSE {
 	echo "${BOLD}--------------------------------------------------------------------------${NORMAL}"
 	echo
 	read -n 1 -s -p ' Press any key to continue...'
+	echo
+}
+
+function WAIT_A_MINUTE {
+	echo
+	echo "${NORMAL}${BOLD}--------------------------------------------------------------------------"
+	echo " ${NORMAL}Now you will be ask for a valid system user and an user for the ruTorrent"
+	echo " Webportal (any user possible, no bindings on system user present)"
+	echo " then you will hit the Menu for the Installation and other Options."
+	echo "${BOLD}--------------------------------------------------------------------------${NORMAL}"
+	sleep 10
 	echo
 }
 
@@ -159,6 +174,7 @@ function SET_RT_PORT {
 	ACT_RANGE=$(grep "port_range" Files/rtorrent.rc | cut -d' ' -f3)
 	echo -n " Please specify port range for rTorrent [act: $ACT_RANGE]: "
 	read RT_PORT
+	
 	if [ -z "$RT_PORT" ]
 	then
 		echo " No changing in rtorrent.rc config file range is empty"
@@ -181,10 +197,10 @@ function LIST_WEB_USERS {
 # Header for the menu
 function HEADER {
 	clear -x
-	echo "${WHITE}${BOLD}--------------------------------------------------------"
-	echo "        ${CYAN}Rtorrent + Rutorrent Auto Install"
-	echo "        Bercik https://github.com/Bercik1337 ${NORMAL}"
-	echo "${BOLD}--------------------------------------------------------${NORMAL}"
+	echo "${WHITE}${BOLD}--------------------------------------------------------------------------"
+	echo "                 ${CYAN}Rtorrent + Rutorrent Auto Install"
+	echo "                 Bercik https://github.com/Bercik1337 ${NORMAL}"
+	echo "${BOLD}--------------------------------------------------------------------------${NORMAL}"
 	echo
 }
 
@@ -272,11 +288,12 @@ function INSTALL_RUTORRENT {
 	echo "${YELLOW}Downloading package${NORMAL}"
 	curl -L https://github.com/Novik/ruTorrent/archive/refs/tags/$RUTORRENTVERSION.zip -o rutorrent.zip
 	CHECKLASTRC
+	
 	echo "${YELLOW}Unpacking${NORMAL}"
 	unzip -qq rutorrent.zip
 	CHECKLASTRC
-	echo "${YELLOW}Renaming${NORMAL}"
 	
+	echo "${YELLOW}Renaming${NORMAL}"
 	LATEST="ruTorrent-${RUTORRENTVERSION:1}"
 	mv $LATEST rutorrent
 	CHECKLASTRC
@@ -286,8 +303,8 @@ function INSTALL_RUTORRENT {
 		rm -r /var/www/rutorrent
 	fi
 	
-	# Deactivate not supportet plugins
-	#         not supportet not supportet not supportet not possible by folder rights
+	# Deactivate not supported plugins
+	#         not supported not supported not supported not possible by folder rights
 	PLUGINS=("_cloudflare" "screenshots" "spectrogram" "rutracker_check")
 	for PLUGIN in ${PLUGINS[@]}
 	do
@@ -299,9 +316,11 @@ function INSTALL_RUTORRENT {
 	echo "${YELLOW}Changing SCGI mount point${NORMAL}"
 	sed -i "s/\/RPC2/\/rutorrent\/RPC2/g" rutorrent/conf/config.php
 	CHECKLASTRC
+	
 	echo "${YELLOW}Moving to /var/www/ ${NORMAL}"
 	mv -f rutorrent /var/www/
 	CHECKLASTRC
+	
 	echo "${YELLOW}Cleanup${NORMAL}"
 	rm rutorrent.zip
 	CHECKLASTRC
@@ -330,19 +349,20 @@ SSLCONFIG
 		a2enmod ssl
 	fi
 	
-	if ! grep --quiet "^ServerName$" /etc/apache2/apache2.conf
+	if ! grep -q "^ServerName$" /etc/apache2/apache2.conf
 	then
 		echo "ServerName localhost" >> /etc/apache2/apache2.conf;
 	fi
 	
 	# Creating Apache virtual host
 	echo "${CYAN}Creating apache vhost${NORMAL}"
-	if [ ! -f /etc/apache2/sites-available/001-default-rutorrent.conf ]
+	if [ ! -f /etc/apache2/sites-available/rutorrent.conf ]
 	then
-		cp Files/001-default-rutorrent.conf /etc/apache2/sites-available/001-default-rutorrent.conf
+		cp Files/rutorrent.conf /etc/apache2/sites-available/rutorrent.conf
 		a2enmod rewrite
-		a2ensite 001-default-rutorrent.conf
+		a2ensite rutorrent.conf
 		CHECKLASTRC
+		
 		a2dissite 000-default.conf
 		systemctl restart apache2.service
 	fi
@@ -430,7 +450,7 @@ EOF
 function PREPARE_CONFIG_FILES {
 	echo "${CYAN}Prepare config files"
 	
-	cat > "Files/001-default-rutorrent.conf" << 'EOF'
+	cat > "Files/rutorrent.conf" << 'EOF'
 <VirtualHost *:80>
 	ServerAlias *
 	RewriteEngine on
@@ -460,7 +480,7 @@ function PREPARE_CONFIG_FILES {
 	</VirtualHost>
 </IfModule>
 EOF
-
+	
 	cat > "Files/rtorrent.rc" << 'EOF'
 	# This is an example resource file for rTorrent. Copy to
 	# ~/.rtorrent.rc and enable/modify the options as needed. Remember to
@@ -633,10 +653,9 @@ function MENU() {
 			HEADER
 			head -n 17 Files/TODO
 			read -rsp $'Press any key to continue...' -n1 ke;;
-		cr|p)
+		p)
+			HEADER
 			SET_RT_PORT;;
-		ch)
-			SET_HTTP_PORT;;
 		0)
 			APT_DEPENDENCIES
 			INSTALL_SCGI
@@ -658,7 +677,9 @@ function MENU() {
 function START() {
 	CHECK_ROOT
 	APACHE_UTILS
+	HEADER
 	LICENSE
+	WAIT_A_MINUTE
 	HEADER
 	SET_RTORRENT_USER
 	echo
