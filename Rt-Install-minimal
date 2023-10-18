@@ -304,8 +304,10 @@ function INSTALL_RUTORRENT {
 	fi
 	
 	# Deactivate not supported plugins
-	#         not supported not supported not supported not possible by folder rights
-	PLUGINS=("_cloudflare" "screenshots" "spectrogram" "rutracker_check")
+	# not supported: _cloudflare, screenshots, spectrogram
+	# not possible by folder rights: rutracker_check
+	# removed since geoip is deprecated
+	PLUGINS=("_cloudflare" "screenshots" "spectrogram" "rutracker_check" "geoip")
 	for PLUGIN in ${PLUGINS[@]}
 	do
 		sed -i '$a['"$PLUGIN"']' rutorrent/conf/plugins.ini
@@ -385,7 +387,7 @@ function INSTALL_COMPLETE {
 	echo "${MAGENTA}rtorrent's configuration file is ${CYAN}$HOMEDIR/.rtorrent.rc${NORMAL}"
 	echo
 	echo "${MAGENTA}If you want to change settings for rtorrent, such as download folder, etc.,"
-	echo "you need to edit the '.rtorrent.rc' file. E.g. 'nano $HOMEDIR/.rtorrent.rc'${NORMAL}"
+	echo "you need to edit the '${CYAN}.rtorrent.rc${MAGENTA}' file. E.g. '${CYAN}nano $HOMEDIR/.rtorrent.rc${MAGENTA}'${NORMAL}"
 	echo
 	
 	# The IPv6 local address, is not very used for now, anyway if needed, just change 'inet' to 'inet6'
