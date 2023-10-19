@@ -82,10 +82,20 @@ function APACHE_UTILS {
 	fi
 }
 
+# Header for the menu
+function HEADER {
+	clear -x
+	echo "${WHITE}${BOLD}--------------------------------------------------------------------------------"
+	echo "                       ${CYAN}Rtorrent + Rutorrent Auto Install"
+	echo "                       Bercik https://github.com/Bercik1337${NORMAL}"
+	echo "${BOLD}--------------------------------------------------------------------------------${NORMAL}"
+	echo
+}
+
 # License
 function LICENSE {
 	#clear -x
-	echo "${NORMAL}${BOLD}--------------------------------------------------------------------------"
+	#echo "${NORMAL}${BOLD}--------------------------------------------------------------------------------"
 	echo " ${NORMAL}THE BEER-WARE LICENSE (Revision 42):"
 	echo " ${GREEN}Bercik${NORMAL} wrote this script. As long as you retain this notice you"
 	echo " can do whatever you want with this stuff. If we meet some day, and you"
@@ -93,19 +103,18 @@ function LICENSE {
 	echo
 	echo " Contact? use Github https://github.com/Bercik1337"
 	echo
-	echo "${BOLD}--------------------------------------------------------------------------${NORMAL}"
+	echo "${BOLD}--------------------------------------------------------------------------------${NORMAL}"
 	echo
 	read -n 1 -s -p ' Press any key to continue...'
 	echo
 }
 
 function WAIT_A_MINUTE {
-	echo
-	echo "${NORMAL}${BOLD}--------------------------------------------------------------------------"
+	echo "${NORMAL}${BOLD}--------------------------------------------------------------------------------"
 	echo " ${NORMAL}Now you will be ask for a valid system user and an user for the ruTorrent"
 	echo " Webportal (any user possible, no bindings on system user present)"
 	echo " then you will hit the Menu for the Installation and other Options."
-	echo "${BOLD}--------------------------------------------------------------------------${NORMAL}"
+	echo "${BOLD}--------------------------------------------------------------------------------${NORMAL}"
 	sleep 10
 	echo
 }
@@ -194,16 +203,6 @@ function LIST_WEB_USERS {
 	done
 }
 
-# Header for the menu
-function HEADER {
-	clear -x
-	echo "${WHITE}${BOLD}--------------------------------------------------------------------------"
-	echo "                 ${CYAN}Rtorrent + Rutorrent Auto Install"
-	echo "                 Bercik https://github.com/Bercik1337 ${NORMAL}"
-	echo "${BOLD}--------------------------------------------------------------------------${NORMAL}"
-	echo
-}
-
 # Function for installing dependencies
 function APT_DEPENDENCIES {
 	echo "${CYAN}Installing dependencies${NORMAL}"
@@ -281,6 +280,29 @@ function INSTALL_RTORRENT {
 	chown "$RTORRENT_USER":"$RTORRENT_GROUP" $HOMEDIR/.rtorrent.rc
 }
 
+function INSTALL_SYSTEMD_SERVICE {
+	cat > "/etc/systemd/system/rtorrent.service" <<-EOF
+	[Unit]
+	Description=rtorrent (in tmux)
+
+	[Service]
+	Type=forking
+	RemainAfterExit=yes
+	User=$RTORRENT_USER
+	ExecStart=/usr/bin/tmux -2 new-session -d -s rtorrent rtorrent
+	ExecStop=/usr/bin/tmux send-keys -t rtorrent:rtorrent C-q
+	RemainAfterExit=no
+	Restart=on-failure
+	RestartSec=5s
+
+	[Install]
+	WantedBy=default.target
+EOF
+	
+	systemctl enable rtorrent.service
+	systemctl start rtorrent.service
+}
+
 # Function for installing rutorrent and plugins
 function INSTALL_RUTORRENT {
 	# Installing rutorrent.
@@ -306,7 +328,7 @@ function INSTALL_RUTORRENT {
 	# Deactivate not supported plugins
 	# not supported: _cloudflare, screenshots, spectrogram
 	# not possible by folder rights: rutracker_check
-	# removed since geoip is deprecated
+	# removed since it's deprecated: geoip
 	PLUGINS=("_cloudflare" "screenshots" "spectrogram" "rutracker_check" "geoip")
 	for PLUGIN in ${PLUGINS[@]}
 	do
@@ -337,19 +359,7 @@ function INSTALL_RUTORRENT {
 # Function for configuring apache
 function CONFIGURE_APACHE {
 	# Creating self-signed certs
-	if [ ! -f /etc/ssl/certs/apache-selfsigned.crt ]
-	then
-		openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/private/apache-selfsigned.key << SSLCONFIG > /etc/ssl/certs/apache-selfsigned.crt
-.
-.
-.
-.
-Bercik rt-auto-install seedbox
-.
-.
-SSLCONFIG
-		a2enmod ssl
-	fi
+	openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -subj "/OU=Bercik rt-auto-install seedbox"  -keyout /etc/ssl/private/rutorrent-selfsigned.key -out /etc/ssl/certs/rutorrent-selfsigned.crt
 	
 	if ! grep -q "^ServerName$" /etc/apache2/apache2.conf
 	then
@@ -361,11 +371,13 @@ SSLCONFIG
 	if [ ! -f /etc/apache2/sites-available/rutorrent.conf ]
 	then
 		cp Files/rutorrent.conf /etc/apache2/sites-available/rutorrent.conf
+		a2enmod ssl
 		a2enmod rewrite
+		
+		a2dissite 000-default.conf
 		a2ensite rutorrent.conf
 		CHECKLASTRC
 		
-		a2dissite 000-default.conf
 		systemctl restart apache2.service
 	fi
 	
@@ -425,27 +437,15 @@ function INSTALL_COMPLETE {
 	fi
 }
 
-function INSTALL_SYSTEMD_SERVICE {
-	cat > "/etc/systemd/system/rtorrent.service" <<-EOF
-	[Unit]
-	Description=rtorrent (in tmux)
-
-	[Service]
-	Type=forking
-	RemainAfterExit=yes
-	User=$RTORRENT_USER
-	ExecStart=/usr/bin/tmux -2 new-session -d -s rtorrent rtorrent
-	ExecStop=/usr/bin/tmux send-keys -t rtorrent:rtorrent C-q
-	RemainAfterExit=no
-	Restart=on-failure
-	RestartSec=5s
-
-	[Install]
-	WantedBy=default.target
-EOF
-	
-	systemctl enable rtorrent.service
-	systemctl start rtorrent.service
+# Fetch and modify changelog and todo list
+function CHANGELOG_TODO {
+	mkdir -p Files
+	FILES=("Changelog" "TODO")
+	for FILE in ${FILES[@]}
+	do
+		curl -sL https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/$FILE  -o Files/$FILE
+		sed -i "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /g" Files/$FILE
+	done
 }
 
 # Function for creating file structure before installation
@@ -477,8 +477,8 @@ function PREPARE_CONFIG_FILES {
 		</Directory>
 		
 		SSLEngine on
-		SSLCertificateFile /etc/ssl/certs/apache-selfsigned.crt
-		SSLCertificateKeyFile /etc/ssl/private/apache-selfsigned.key
+		SSLCertificateFile /etc/ssl/certs/rutorrent-selfsigned.crt
+		SSLCertificateKeyFile /etc/ssl/private/rutorrent-selfsigned.key
 	</VirtualHost>
 </IfModule>
 EOF
@@ -601,17 +601,6 @@ EOF
 EOF
 }
 
-function CHANGELOG_TODO {
-	mkdir -p Files
-	FILES=("Changelog" "TODO")
-	for FILE in ${FILES[@]}
-	do
-		curl -sL https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/$FILE  -o Files/$FILE
-		sed -i "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /g" Files/$FILE
-	done
-	
-}
-
 function MENU() {
 	while true
 	do
@@ -681,6 +670,7 @@ function START() {
 	APACHE_UTILS
 	HEADER
 	LICENSE
+	echo
 	WAIT_A_MINUTE
 	HEADER
 	SET_RTORRENT_USER
