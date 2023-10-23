@@ -143,11 +143,11 @@ function DETECTOS {
 	#https://www.baeldung.com/linux/check-bash-array-contains-value
 	if [[ ${SUPPORTED_OS[@]} =~ $ID ]]
 	then
-	  #echo "OS supported"
-	  :
+		#echo "OS supported"
+		:
 	else
-	  echo " OS not supported"
-	  exit
+		echo " OS not supported"
+		exit
 	fi
 
 	#https://stackoverflow.com/questions/8654051/how-can-i-compare-two-floating-point-numbers-in-bash
