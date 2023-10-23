@@ -3,6 +3,7 @@
 LASTMODIFIED="2023/10/10"
 SCRIPTVERSION="2.0"
 
+# https://linuxcommand.org/lc3_adv_tput.php
 # Formatting variables
 # colors
 NORMAL=$(tput sgr0)
@@ -55,6 +56,118 @@ function CHECK_ROOT {
 		echo "${RED}This script must be run as root.${NORMAL}" 1>&2
 		echo
 		exit 1
+	fi
+}
+
+#os-release
+#ID:       | NAME               | VERSION_ID             | /etc/debian_version          | /etc/issue                        | /etc/rpi-issue | ->Distribution
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------
+#linuxmint | LMDE               | release number         | (debian)point release number | NAME+VERSION \n \l                | -              | LMDE
+#          | Linux Mint         | point release number   | (debian)VERSION_CODENAME/sid | PRETTYNAME+VERSION_CODENAME \n \l | -              | Linux Mint
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------
+#debian    | Debian GNU/Linux   | release number         | point release number         | NAME+VERSION_ID \n \l             | -              | Debian
+#          | Debian GNU/Linux   | release number         | point release number         | NAME+VERSION_ID \n \l             | yes            | Raspberry Pi OS
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------
+#ubuntu    | Ubuntu             | point release number   | (debian)VERSION_CODENAME/sid | PRETTY_NAME \n \l                 | -              | Ubuntu
+#          | Ubuntu             | point release number   | (debian)VERSION_CODENAME/sid | PRETTY_NAME \n \l                 | -              | Ubuntu LTS 
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------
+#raspbian  | Raspbian GNU/Linux | (debian)release number | (debian)point release number | NAME+VERSION_ID \n \l             | yes            | Raspbian
+#
+
+function DETECTOS {
+	echo " Detecting Operating System..."
+	SUPPORTED_OS=("linuxmint" "debian" "ubuntu" "raspbian")
+
+	ID=$(cat /etc/os-release | grep ^ID= | cut -d'=' -f2)
+
+	case $ID in
+	linuxmint)
+		NAME=$(cat /etc/os-release | grep ^NAME= | cut -d'"' -f2);;
+	debian)
+		if [[ -e "/etc/rpi-issue" ]]
+		then
+			NAME="Raspberry Pi OS"
+		else
+			NAME=$ID
+		fi;;
+	ubuntu)
+		if cat /etc/issue | grep -cq "LTS"
+		then
+			NAME="$ID LTS"
+		else
+			NAME=$ID
+		fi;;
+	*)
+		NAME=$ID;;
+	esac
+
+	case $ID in
+	debian)
+		VERSION=$(cat /etc/debian_version);;
+	*)
+		VERSION=$(cat /etc/os-release | grep "VERSION_ID=" | cut -d'"' -f2);;
+	esac
+
+	#echo $NAME
+	#echo $VERSION
+
+	#EOLs
+	#https://wiki.debian.org/DebianReleases
+	#https://wiki.debian.org/LTS
+	#https://linuxmint.com/download_all.php
+	#https://wiki.ubuntu.com/Releases
+
+	debian_eol=9
+	#raspbian_eol=$debian_eol
+	#raspberry_pi_os_eol=$debian_eol
+	linux_mint_eol=19.3
+	lmde_eol=5
+	ubuntu_lts_eol=18.4
+	ubuntu_eol=22.10
+
+	case $NAME in
+	LMDE)
+		EOL=$lmde_eol;;
+	"Linux Mint")
+		EOL=$linux_mint_eol;;
+	ubuntu)
+		EOL=$ubuntu_eol;;
+	"ubuntu LTS")
+		EOL=$ubuntu_lts_eol;;
+	debian|"Raspberry Pi OS"|raspbian)
+		EOL=$debian_eol;;
+	esac
+
+	#echo $EOL
+	
+	#https://www.baeldung.com/linux/check-bash-array-contains-value
+	if [[ ${SUPPORTED_OS[@]} =~ $ID ]]
+	then
+	  #echo "OS supported"
+	  :
+	else
+	  echo " OS not supported"
+	  exit
+	fi
+
+	#https://stackoverflow.com/questions/8654051/how-can-i-compare-two-floating-point-numbers-in-bash
+	if awk "BEGIN {exit !($VERSION > $EOL)}"
+	then
+		echo " You are using $ID release: $VERSION"
+		sleep 3
+		#:
+	else
+		echo " You are using $ID release: $VERSION"
+		read -p " Your system has reached End Of Life, continue on own decision? [y/n] " -n 1
+		if [[ $REPLY =~ [Yy]$ ]]
+		then
+			echo
+		else
+			echo
+			#clear -x
+			exit
+			#:
+		fi		
 	fi
 }
 
@@ -250,7 +363,7 @@ function INSTALL_RTORRENT {
 	ldconfig
 	
 	# Creating session directory
-	echo "${CYAN}Creating session directory ${NORMAL}"
+	echo "${YELLOW}Creating session directory ${NORMAL}"
 	if [ ! -d "$HOMEDIR"/.rtorrent-session ]
 	then
 		mkdir "$HOMEDIR"/.rtorrent-session
@@ -262,7 +375,7 @@ function INSTALL_RTORRENT {
 	fi
 	
 	# Creating downloads folder
-	echo "${CYAN}Creating Downloads directory ${NORMAL}"
+	echo "${YELLOW}Creating Downloads directory ${NORMAL}"
 	if [ ! -d "$HOMEDIR"/Downloads ]
 	then
 		mkdir "$HOMEDIR"/Downloads
@@ -274,13 +387,15 @@ function INSTALL_RTORRENT {
 	fi
 	
 	# Copying rtorrent.rc file.
-	echo "${CYAN}Copying rtorrent.rc${NORMAL}"
+	echo "${YELLOW}Copying rtorrent.rc${NORMAL}"
 	cp Files/rtorrent.rc $HOMEDIR/.rtorrent.rc
 	CHECKLASTRC
 	chown "$RTORRENT_USER":"$RTORRENT_GROUP" $HOMEDIR/.rtorrent.rc
 }
 
 function INSTALL_SYSTEMD_SERVICE {
+	echo "${CYAN}Creating rtorrent systemd file${NORMAL}"
+	
 	cat > "/etc/systemd/system/rtorrent.service" <<-EOF
 	[Unit]
 	Description=rtorrent (in tmux)
@@ -325,6 +440,7 @@ function INSTALL_RUTORRENT {
 		rm -r /var/www/rutorrent
 	fi
 	
+	echo "${YELLOW}Deactivate not supported plugins${NORMAL}"
 	# Deactivate not supported plugins
 	# not supported: _cloudflare, screenshots, spectrogram
 	# not possible by folder rights: rutracker_check
@@ -350,7 +466,7 @@ function INSTALL_RUTORRENT {
 	CHECKLASTRC
 	
 	# Changing permissions for rutorrent and plugins.
-	echo "${CYAN}Changing permissions for rutorrent${NORMAL}"
+	echo "${YELLOW}Changing permissions for rutorrent${NORMAL}"
 	chown -R www-data:www-data /var/www/rutorrent
 	chmod -R 775 /var/www/rutorrent
 	CHECKLASTRC
@@ -358,7 +474,9 @@ function INSTALL_RUTORRENT {
 
 # Function for configuring apache
 function CONFIGURE_APACHE {
+	echo "${CYAN}Configuring apache${NORMAL}"
 	# Creating self-signed certs
+	echo "${YELLOW}Creating self-signed certificate${NORMAL}"
 	openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -subj "/OU=Bercik rt-auto-install seedbox"  -keyout /etc/ssl/private/rutorrent-selfsigned.key -out /etc/ssl/certs/rutorrent-selfsigned.crt
 	
 	if ! grep -q "^ServerName$" /etc/apache2/apache2.conf
@@ -366,14 +484,14 @@ function CONFIGURE_APACHE {
 		echo "ServerName localhost" >> /etc/apache2/apache2.conf;
 	fi
 	
+	a2enmod ssl
+	a2enmod rewrite
+	
 	# Creating Apache virtual host
-	echo "${CYAN}Creating apache vhost${NORMAL}"
+	echo "${YELLOW}Creating apache vhost${NORMAL}"
 	if [ ! -f /etc/apache2/sites-available/rutorrent.conf ]
 	then
 		cp Files/rutorrent.conf /etc/apache2/sites-available/rutorrent.conf
-		a2enmod ssl
-		a2enmod rewrite
-		
 		a2dissite 000-default.conf
 		a2ensite rutorrent.conf
 		CHECKLASTRC
@@ -382,6 +500,7 @@ function CONFIGURE_APACHE {
 	fi
 	
 	# Creating .htaccess file
+	echo "${YELLOW}Creating .htaccess file${NORMAL}"
 	printf "%s\n" "${WEB_USER_ARRAY[@]}" > /var/www/rutorrent/.htpasswd
 }
 
@@ -452,6 +571,7 @@ function CHANGELOG_TODO {
 function PREPARE_CONFIG_FILES {
 	echo "${CYAN}Prepare config files"
 	
+	echo "${YELLOW}Creating rutorrent.conf${NORMAL}"
 	cat > "Files/rutorrent.conf" << 'EOF'
 <VirtualHost *:80>
 	ServerAlias *
@@ -483,6 +603,7 @@ function PREPARE_CONFIG_FILES {
 </IfModule>
 EOF
 	
+	echo "${YELLOW}Creating rtorrent.rc${NORMAL}"
 	cat > "Files/rtorrent.rc" << 'EOF'
 	# This is an example resource file for rTorrent. Copy to
 	# ~/.rtorrent.rc and enable/modify the options as needed. Remember to
@@ -651,9 +772,9 @@ function MENU() {
 			APT_DEPENDENCIES
 			INSTALL_SCGI
 			INSTALL_RTORRENT
+			INSTALL_SYSTEMD_SERVICE
 			INSTALL_RUTORRENT
 			CONFIGURE_APACHE
-			INSTALL_SYSTEMD_SERVICE
 			clear -x
 			INSTALL_COMPLETE
 			rm -rf Files
@@ -667,6 +788,7 @@ function MENU() {
 
 function START() {
 	CHECK_ROOT
+	DETECTOS
 	APACHE_UTILS
 	HEADER
 	LICENSE
