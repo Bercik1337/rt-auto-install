@@ -77,9 +77,9 @@ function CHECK_ROOT {
 function DETECTOS {
 	echo " Detecting Operating System..."
 	SUPPORTED_OS=("linuxmint" "debian" "ubuntu" "raspbian")
-
+	
 	ID=$(cat /etc/os-release | grep ^ID= | cut -d'=' -f2)
-
+	
 	case $ID in
 	linuxmint)
 		NAME=$(cat /etc/os-release | grep ^NAME= | cut -d'"' -f2);;
@@ -100,23 +100,22 @@ function DETECTOS {
 	*)
 		NAME=$ID;;
 	esac
-
+	
 	case $ID in
 	debian)
 		VERSION=$(cat /etc/debian_version);;
 	*)
 		VERSION=$(cat /etc/os-release | grep "VERSION_ID=" | cut -d'"' -f2);;
 	esac
-
 	#echo $NAME
 	#echo $VERSION
-
+	
 	#EOLs
 	#https://wiki.debian.org/DebianReleases
 	#https://wiki.debian.org/LTS
 	#https://linuxmint.com/download_all.php
 	#https://wiki.ubuntu.com/Releases
-
+	
 	debian_eol=9
 	#raspbian_eol=$debian_eol
 	#raspberry_pi_os_eol=$debian_eol
@@ -124,7 +123,7 @@ function DETECTOS {
 	lmde_eol=5
 	ubuntu_lts_eol=18.4
 	ubuntu_eol=22.10
-
+	
 	case $NAME in
 	LMDE)
 		EOL=$lmde_eol;;
@@ -137,11 +136,11 @@ function DETECTOS {
 	debian|"Raspberry Pi OS"|raspbian)
 		EOL=$debian_eol;;
 	esac
-
 	#echo $EOL
 	
 	#https://www.baeldung.com/linux/check-bash-array-contains-value
-	if [[ ${SUPPORTED_OS[@]} =~ $ID ]]
+	#https://stackoverflow.com/questions/23086133/exact-match-using-if-statement-does-partial-match-as-well-need-to-do-exact-mat
+	if [[ ${SUPPORTED_OS[@]} =~ $ID( |$) ]]
 	then
 		#echo "OS supported"
 		:
@@ -149,7 +148,7 @@ function DETECTOS {
 		echo " OS not supported"
 		exit
 	fi
-
+	
 	#https://stackoverflow.com/questions/8654051/how-can-i-compare-two-floating-point-numbers-in-bash
 	if awk "BEGIN {exit !($VERSION > $EOL)}"
 	then
