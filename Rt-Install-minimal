@@ -362,7 +362,7 @@ function APT_DEPENDENCIES {
 echo "${CYAN}Installing dependencies${NORMAL}"
 	apt-get update
 	apt-get -y install openssl git apache2 apache2-utils libapache2-mod-scgi unrar-free \
-	php php-curl php-cli libapache2-mod-php tmux unzip curl mediainfo unrar-free
+	php php-curl php-cli libapache2-mod-php tmux unzip curl mediainfo
 	CHECKLASTRC
 }
 
@@ -370,7 +370,7 @@ function APT_DEPENDENCIES_NOSCGI {
 echo "${CYAN}Installing dependencies${NORMAL}"
 	apt-get update
 	apt-get -y install openssl git apache2 apache2-utils unrar-free \
-	php php-curl php-cli libapache2-mod-php tmux unzip curl mediainfo unrar-free
+	php php-curl php-cli libapache2-mod-php tmux unzip curl mediainfo
 	CHECKLASTRC
 }
 
