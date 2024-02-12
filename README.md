@@ -81,11 +81,11 @@ Installation
 
 Run the script with sudo or as root
 	
-	git clone https://github.com/Bercik1337/rt-auto-install.git
+	git clone https://github.com/MarkusLange/rt-auto-install.git
 	cd rt-auto-install
 	sudo ./Rt-Install-minimal
 	
-	or now you can simply wget https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/Rt-Install-minimal
+	or now you can simply wget https://raw.githubusercontent.com/MarkusLange/rt-auto-install/master/Rt-Install-minimal
 
 FAQ
 ------------
