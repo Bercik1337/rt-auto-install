@@ -184,8 +184,8 @@ function APACHE_UTILS {
 		if [[ $REPLY =~ [Yy]$ ]]
 		then
 			echo
-			apt-get update
-			apt-get -y install apache2-utils unzip curl wget
+			apt-get -qq update
+			apt-get -yqq install apache2-utils unzip curl wget
 		else
 			clear -x
 			exit
@@ -324,8 +324,8 @@ function LIST_WEB_USERS {
 # Function for installing dependencies
 function APT_DEPENDENCIES {
 	echo "${CYAN}Installing dependencies${NORMAL}"
-	apt-get update
-	apt-get -y install openssl git apache2 apache2-utils unrar-free php php-curl php-cli libapache2-mod-php tmux curl mediainfo unrar-free
+	apt-get -qq update
+	apt-get -yqq install openssl git apache2 apache2-utils unrar-free php php-curl php-cli libapache2-mod-php tmux curl mediainfo unrar-free
 	CHECKLASTRC
 }
 
@@ -353,32 +353,33 @@ function INSTALL_SCGI {
 		rm -f libapache2*.deb
 	else
 		echo "${CYAN}Install scgi${NORMAL}"
-		apt-get -y install libapache2-mod-scgi
+		apt-get -yqq install libapache2-mod-scgi
 	fi
 	CHECKLASTRC
 }
 
-# Function for setting up xmlrpc, libtorrent and rtorrent
+# Function rtorrent
 function INSTALL_RTORRENT {
 	# Download and install rtorrent
 	echo "${CYAN}Install rtorrent${NORMAL}"
-	apt-get -y install rtorrent
+	apt-get -yqq install rtorrent
 	CHECKLASTRC
 	
+	# create directories
 	mkdir -p $HOMEDIR/{Downloads,log,.rtorrent-session,watch/{load,start}}
 	
-	chown "$RTORRENT_USER":"$RTORRENT_GROUP" "$HOMEDIR"/Downloads
-	chown "$RTORRENT_USER":"$RTORRENT_GROUP" "$HOMEDIR"/log
-	chown "$RTORRENT_USER":"$RTORRENT_GROUP" "$HOMEDIR"/.rtorrent-session
-	chown "$RTORRENT_USER":"$RTORRENT_GROUP" "$HOMEDIR"/watch
-	chown "$RTORRENT_USER":"$RTORRENT_GROUP" "$HOMEDIR"/watch/load
-	chown "$RTORRENT_USER":"$RTORRENT_GROUP" "$HOMEDIR"/watch/start
+	chown $RTORRENT_USER:$RTORRENT_GROUP $HOMEDIR/Downloads
+	chown $RTORRENT_USER:$RTORRENT_GROUP $HOMEDIR/log
+	chown $RTORRENT_USER:$RTORRENT_GROUP $HOMEDIR/.rtorrent-session
+	chown $RTORRENT_USER:$RTORRENT_GROUP $HOMEDIR/watch
+	chown $RTORRENT_USER:$RTORRENT_GROUP $HOMEDIR/watch/load
+	chown $RTORRENT_USER:$RTORRENT_GROUP $HOMEDIR/watch/start
 	
 	# Copying rtorrent.rc file.
 	echo "${YELLOW}Copying rtorrent.rc${NORMAL}"
 	cp Files/rtorrent.rc $HOMEDIR/.rtorrent.rc
 	CHECKLASTRC
-	chown "$RTORRENT_USER":"$RTORRENT_GROUP" $HOMEDIR/.rtorrent.rc
+	chown $RTORRENT_USER:$RTORRENT_GROUP $HOMEDIR/.rtorrent.rc
 }
 
 function INSTALL_SYSTEMD_SERVICE {
@@ -414,7 +415,7 @@ function INSTALL_RUTORRENT {
 	CHECKLASTRC
 	
 	echo "${YELLOW}Unpacking${NORMAL}"
-	unzip -qq rutorrent.zip
+	unzip -qqo rutorrent.zip
 	CHECKLASTRC
 	
 	echo "${YELLOW}Renaming${NORMAL}"
@@ -496,11 +497,11 @@ function AUTODL-IRSSI {
 	IRSSI_USER=$(cat /etc/systemd/system/rtorrent.service | grep User | cut -d= -f2)
 	IRSSI_GROUP=$(id -g $IRSSI_USER)
 	
-    IRSSI_PORT=$(shuf -i 20000-30000 -n 1)
+	IRSSI_PORT=$(shuf -i 20000-30000 -n 1)
 	IRSSI_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 15 | head -n 1)
 	
 	#install irssi
-	apt-get -y install irssi libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl php-xml
+	apt-get -yqq install irssi libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl php-xml
 	
 	cat > "/etc/systemd/system/irssi.service" <<-EOF
 [Unit]
