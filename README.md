@@ -20,6 +20,8 @@
     * add autodl-irssi plugin (Rt-Install-minimal-new.bash)
     * update .rtorrent.rc to the new commands
     * fix changelog and todo view
+	* put functions together for more order
+	* make pre-installation packages fully silent
     * and a little bit there and there
 
 ## Features ##

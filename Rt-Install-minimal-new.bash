@@ -26,8 +26,10 @@ RTORRENT_USER=""
 WEB_USER=""
 # Array with webusers including their hashed paswords
 WEB_USER_ARRAY=()
-# rTorrent users home dir.
+# rTorrent users home dir
 HOMEDIR=""
+# rTorrent Port-Range
+PORT_RANGE="6790-6999"
 
 # grep the Software Versions
 RTVERSION=$(apt-cache policy rtorrent | head -3 | tail -1 | cut -d' ' -f4 | cut -d'-' -f1)
@@ -69,7 +71,7 @@ function CHECK_ROOT {
 #          | Debian GNU/Linux   | release number         | point release number         | NAME+VERSION_ID \n \l             | yes            | Raspberry Pi OS
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------
 #ubuntu    | Ubuntu             | point release number   | (debian)VERSION_CODENAME/sid | PRETTY_NAME \n \l                 | -              | Ubuntu
-#          | Ubuntu             | point release number   | (debian)VERSION_CODENAME/sid | PRETTY_NAME \n \l                 | -              | Ubuntu LTS 
+#          | Ubuntu             | point release number   | (debian)VERSION_CODENAME/sid | PRETTY_NAME \n \l                 | -              | Ubuntu LTS
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------
 #raspbian  | Raspbian GNU/Linux | (debian)release number | (debian)point release number | NAME+VERSION_ID \n \l             | yes            | Raspbian
 #
@@ -77,9 +79,9 @@ function CHECK_ROOT {
 function DETECTOS {
 	echo " Detecting Operating System..."
 	SUPPORTED_OS=("linuxmint" "debian" "ubuntu" "raspbian")
-	
+
 	ID=$(cat /etc/os-release | grep ^ID= | cut -d'=' -f2)
-	
+
 	case $ID in
 	linuxmint)
 		NAME=$(cat /etc/os-release | grep ^NAME= | cut -d'"' -f2);;
@@ -100,7 +102,7 @@ function DETECTOS {
 	*)
 		NAME=$ID;;
 	esac
-	
+
 	case $ID in
 	debian)
 		VERSION=$(cat /etc/debian_version);;
@@ -109,13 +111,13 @@ function DETECTOS {
 	esac
 	#echo $NAME
 	#echo $VERSION
-	
+
 	#EOLs
 	#https://wiki.debian.org/DebianReleases
 	#https://wiki.debian.org/LTS
 	#https://linuxmint.com/download_all.php
 	#https://wiki.ubuntu.com/Releases
-	
+
 	debian_eol=9
 	#raspbian_eol=$debian_eol
 	#raspberry_pi_os_eol=$debian_eol
@@ -123,7 +125,7 @@ function DETECTOS {
 	lmde_eol=5
 	ubuntu_lts_eol=18.4
 	ubuntu_eol=22.10
-	
+
 	case $NAME in
 	LMDE)
 		EOL=$lmde_eol;;
@@ -137,7 +139,7 @@ function DETECTOS {
 		EOL=$debian_eol;;
 	esac
 	#echo $EOL
-	
+
 	#https://www.baeldung.com/linux/check-bash-array-contains-value
 	#https://stackoverflow.com/questions/23086133/exact-match-using-if-statement-does-partial-match-as-well-need-to-do-exact-mat
 	if [[ ${SUPPORTED_OS[@]} =~ $ID( |$) ]]
@@ -148,7 +150,7 @@ function DETECTOS {
 		echo " OS not supported"
 		exit
 	fi
-	
+
 	#https://stackoverflow.com/questions/8654051/how-can-i-compare-two-floating-point-numbers-in-bash
 	if awk "BEGIN {exit !($VERSION > $EOL)}"
 	then
@@ -166,7 +168,7 @@ function DETECTOS {
 			#clear -x
 			exit
 			#:
-		fi		
+		fi
 	fi
 }
 
@@ -176,21 +178,41 @@ function APACHE_UTILS {
 	UNZIP_CHECK="$(dpkg-query -W -f='${Status}' unzip 2>/dev/null | grep -c "ok installed")"
 	CURL_CHECK="$(dpkg-query -W -f='${Status}' curl 2>/dev/null | grep -c "ok installed")"
 	WGET_CHECK="$(dpkg-query -W -f='${Status}' wget 2>/dev/null | grep -c "ok installed")"
-	
+
+	echo " Install for the script pre-installation needed packages"
+	echo " (apache2-utils, unzip, curl and wget) if not allready installed."
+
 	if [ "$AP_UT_CHECK" -ne 1 ] || [ "$UNZIP_CHECK" -ne 1 ] || [ "$CURL_CHECK" -ne 1 ] || [ "$WGET_CHECK" -ne 1 ]
 	then
-		echo " One or more of the packages apache2-utils, unzip, curl or wget is not installed and is needed for the setup."
-		read -p " Do you want to install it? [y/n] " -n 1
-		if [[ $REPLY =~ [Yy]$ ]]
-		then
-			echo
+#		echo " One or more of the packages apache2-utils, unzip, curl or wget is not installed and is needed for the setup."
+#		read -p " Do you want to install it? [y/n] " -n 1
+#		if [[ $REPLY =~ [Yy]$ ]]
+#		then
+#			echo
 			apt-get -qq update
-			apt-get -yqq install apache2-utils unzip curl wget
-		else
-			clear -x
-			exit
+			if [ "$AP_UT_CHECK" -ne 1 ];
+			then
+				base0=apache2-utils
+			fi
+			if [ "$UNZIP_CHECK" -ne 1 ];
+			then
+				base1=unzip
+			fi
+			if [ "$CURL_CHECK" -ne 1 ];
+			then
+				base2=curl
+			fi
+			if [ "$WGET_CHECK" -ne 1 ];
+			then
+				base3=wget
+			fi
+			#https://peteris.rocks/blog/quiet-and-unattended-installation-with-apt-get/
+			DEBIAN_FRONTEND=noninteractive apt-get install -qq $base0 $base1 $base2 $base3 < /dev/null > /dev/null
+#		else
+#			clear -x
+#			exit
 			#:
-		fi
+#		fi
 	fi
 }
 
@@ -243,7 +265,7 @@ function SET_RTORRENT_USER {
 	do
 		echo -n " Please type a valid system user: ${GREEN}"
 		read RTORRENT_USER
-		
+
 		if [[ -z $(cat /etc/passwd | grep "^$RTORRENT_USER:") ]]
 		then
 			echo
@@ -277,7 +299,7 @@ function SET_WEB_USER {
 		echo -n " ${NORMAL}Re-type Password: "
 		read -s PASSWORD2
 		echo
-		
+
 		if [ "$PASSWORD1" == "$PASSWORD2" ]
 		then
 			USER=$(echo "$PASSWORD1" | htpasswd -i -n "$WEB_USER")
@@ -298,16 +320,15 @@ function SET_WEB_USER {
 
 # Function to change rtorrent port
 function SET_RT_PORT {
-	ACT_RANGE=$(grep "network.port_range.set" Files/rtorrent.rc | cut -d' ' -f3)
-	echo -n " Please specify port range for rTorrent [act: $ACT_RANGE]: "
+	echo -n " Please specify port range for rTorrent [act: ${GREEN}$PORT_RANGE${NORMAL}]: "
 	read RT_PORT
-	
+
 	if [ -z "$RT_PORT" ]
 	then
 		echo " No changing in rtorrent.rc config file range is empty"
 	else
 		echo " Changing port in rtorrent.rc config file"
-		sed -i "s/network.port_range.set.*/network.port_range.set = $RT_PORT/" Files/rtorrent.rc
+		PORT_RANGE=$RT_PORT
 		CHECKLASTRC
 	fi
 }
@@ -325,18 +346,18 @@ function LIST_WEB_USERS {
 function APT_DEPENDENCIES {
 	echo "${CYAN}Installing dependencies${NORMAL}"
 	apt-get -qq update
-	apt-get -yqq install openssl git apache2 apache2-utils unrar-free php php-curl php-cli libapache2-mod-php tmux curl mediainfo unrar-free
+	apt-get -yqq install openssl git apache2 apache2-utils php php-curl php-cli libapache2-mod-php tmux mediainfo unrar-free
 	CHECKLASTRC
 }
 
 # SCGI installation because it isn't supported anymore after php7.4
 function INSTALL_SCGI {
 	SCGI=$(apt-cache show libapache2-mod-scgi 2>&1 | grep -cv "E: No packages found")
-	
+
 	if [ $SCGI -ne 1 ]
 	then
 		echo "${CYAN}Download scgi${NORMAL}"
-		
+
 		case $ARCHITECTURE in
 		armhf)
 			wget http://ftp.debian.org/debian/pool/main/s/scgi/libapache2-mod-scgi_1.13-1.1_armhf.deb;;
@@ -347,7 +368,7 @@ function INSTALL_SCGI {
 		amd64)
 			wget http://mirrors.kernel.org/ubuntu/pool/universe/s/scgi/libapache2-mod-scgi_1.13-1.1build1_amd64.deb;;
 		esac
-		
+
 		echo "${CYAN}Install scgi${NORMAL}"
 		dpkg -i libapache2*.deb
 		rm -f libapache2*.deb
@@ -364,299 +385,20 @@ function INSTALL_RTORRENT {
 	echo "${CYAN}Install rtorrent${NORMAL}"
 	apt-get -yqq install rtorrent
 	CHECKLASTRC
-	
+
 	# create directories
 	mkdir -p $HOMEDIR/{Downloads,log,.rtorrent-session,watch/{load,start}}
-	
+
 	chown $RTORRENT_USER:$RTORRENT_GROUP $HOMEDIR/Downloads
 	chown $RTORRENT_USER:$RTORRENT_GROUP $HOMEDIR/log
 	chown $RTORRENT_USER:$RTORRENT_GROUP $HOMEDIR/.rtorrent-session
 	chown $RTORRENT_USER:$RTORRENT_GROUP $HOMEDIR/watch
 	chown $RTORRENT_USER:$RTORRENT_GROUP $HOMEDIR/watch/load
 	chown $RTORRENT_USER:$RTORRENT_GROUP $HOMEDIR/watch/start
-	
+
 	# Copying rtorrent.rc file.
-	echo "${YELLOW}Copying rtorrent.rc${NORMAL}"
-	cp Files/rtorrent.rc $HOMEDIR/.rtorrent.rc
-	CHECKLASTRC
-	chown $RTORRENT_USER:$RTORRENT_GROUP $HOMEDIR/.rtorrent.rc
-}
-
-function INSTALL_SYSTEMD_SERVICE {
-	echo "${CYAN}Creating rtorrent systemd file${NORMAL}"
-	
-	cat > "/etc/systemd/system/rtorrent.service" <<-EOF
-[Unit]
-Description=rtorrent (in tmux)
-
-[Service]
-Type=forking
-RemainAfterExit=yes
-User=$RTORRENT_USER
-ExecStart=/usr/bin/tmux -2 new-session -d -s rtorrent-session rtorrent
-ExecStop=/usr/bin/tmux send-keys -t rtorrent-session C-q
-Restart=on-failure
-RestartSec=5s
-
-[Install]
-WantedBy=default.target
-EOF
-	
-	systemctl enable rtorrent.service
-	systemctl start rtorrent.service
-}
-
-# Function for installing rutorrent and plugins
-function INSTALL_RUTORRENT {
-	# Installing rutorrent.
-	echo "${CYAN}Installing rutorrent${NORMAL}"
-	echo "${YELLOW}Downloading package${NORMAL}"
-	curl -L https://github.com/Novik/ruTorrent/archive/refs/tags/$RUTORRENTVERSION.zip -o rutorrent.zip
-	CHECKLASTRC
-	
-	echo "${YELLOW}Unpacking${NORMAL}"
-	unzip -qqo rutorrent.zip
-	CHECKLASTRC
-	
-	echo "${YELLOW}Renaming${NORMAL}"
-	LATEST="ruTorrent-${RUTORRENTVERSION:1}"
-	mv $LATEST rutorrent
-	CHECKLASTRC
-	
-	if [ -d /var/www/rutorrent ]
-	then
-		rm -r /var/www/rutorrent
-	fi
-	
-	echo "${YELLOW}Deactivate not supported plugins${NORMAL}"
-	# Deactivate not supported plugins
-	# not supported: _cloudflare, screenshots, spectrogram
-	# not possible by folder rights: rutracker_check
-	# removed since it's deprecated: geoip
-	PLUGINS=("_cloudflare" "screenshots" "spectrogram" "rutracker_check" "geoip")
-	for PLUGIN in ${PLUGINS[@]}
-	do
-		sed -i '$a['"$PLUGIN"']' rutorrent/conf/plugins.ini
-		sed -i '$aenabled = no' rutorrent/conf/plugins.ini
-	done
-	
-	# Changeing SCGI mount point in rutorrent config.
-	echo "${YELLOW}Changing SCGI mount point${NORMAL}"
-	sed -i "s/\/RPC2/\/rutorrent\/RPC2/g" rutorrent/conf/config.php
-	CHECKLASTRC
-	
-	echo "${YELLOW}Moving to /var/www/ ${NORMAL}"
-	mv -f rutorrent /var/www/
-	CHECKLASTRC
-	
-	echo "${YELLOW}Cleanup${NORMAL}"
-	rm rutorrent.zip
-	CHECKLASTRC
-	
-	# Changing permissions for rutorrent and plugins.
-	echo "${YELLOW}Changing permissions for rutorrent${NORMAL}"
-	chown -R www-data:www-data /var/www/rutorrent
-	chmod -R 775 /var/www/rutorrent
-	CHECKLASTRC
-}
-
-# Function for configuring apache
-function CONFIGURE_APACHE {
-	echo "${CYAN}Configuring apache${NORMAL}"
-	# Creating self-signed certs
-	echo "${YELLOW}Creating self-signed certificate${NORMAL}"
-	openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -subj "/OU=Bercik rt-auto-install seedbox"  -keyout /etc/ssl/private/rutorrent-selfsigned.key -out /etc/ssl/certs/rutorrent-selfsigned.crt
-	
-	if ! grep -q "^ServerName$" /etc/apache2/apache2.conf
-	then
-		echo "ServerName localhost" >> /etc/apache2/apache2.conf;
-	fi
-	
-	a2enmod ssl
-	a2enmod rewrite
-	
-	# Creating Apache virtual host
-	echo "${YELLOW}Creating apache vhost${NORMAL}"
-	if [ ! -f /etc/apache2/sites-available/rutorrent.conf ]
-	then
-		cp Files/rutorrent.conf /etc/apache2/sites-available/rutorrent.conf
-		a2dissite 000-default.conf
-		a2ensite rutorrent.conf
-		CHECKLASTRC
-		
-		systemctl restart apache2.service
-	fi
-	
-	# Creating .htaccess file
-	echo "${YELLOW}Creating .htaccess file${NORMAL}"
-	printf "%s\n" "${WEB_USER_ARRAY[@]}" > /var/www/rutorrent/.htpasswd
-}
-
-function AUTODL-IRSSI {
-	#Set IRSSI_USER equal to RTORRENT_USER grep from rtorrent.service
-	IRSSI_USER=$(cat /etc/systemd/system/rtorrent.service | grep User | cut -d= -f2)
-	IRSSI_GROUP=$(id -g $IRSSI_USER)
-	
-	IRSSI_PORT=$(shuf -i 20000-30000 -n 1)
-	IRSSI_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 15 | head -n 1)
-	
-	#install irssi
-	apt-get -yqq install irssi libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl php-xml
-	
-	cat > "/etc/systemd/system/irssi.service" <<-EOF
-[Unit]
-Description=irssi (in tmux)
-After=network.target
-
-[Service]
-Type=forking
-RemainAfterExit=yes
-User=$IRSSI_USER
-ExecStart=/usr/bin/tmux -2 new-session -d -s irssi-session irssi
-ExecStop=/usr/bin/tmux send-keys -t irssi-session "/quit" KPEnter
-WorkingDirectory=/home/$IRSSI_USER/
-Restart=on-failure
-RestartSec=5s
-
-[Install]
-WantedBy=default.target
-EOF
-	
-	#install autodl-irssi a plugin for irssi that monitors IRC announce channels and downloads torrent files based on user-defined filters.
-	wget -q https://github.com/autodl-community/autodl-irssi/releases/download/2.6.2/autodl-irssi-v2.6.2.zip -O autodl-irssi.zip
-	
-	mkdir -p /home/$IRSSI_USER/.irssi/scripts/autorun/
-	unzip -qqo autodl-irssi.zip -d /home/$IRSSI_USER/.irssi/scripts/
-	mv /home/$IRSSI_USER/.irssi/scripts/autodl-irssi.pl /home/$IRSSI_USER/.irssi/scripts/autorun/
-	
-	mkdir -p /home/$IRSSI_USER/.autodl
-	
-	cat > "/home/$IRSSI_USER/.autodl/autodl.cfg" <<-EOF
-[options]
-gui-server-port = $IRSSI_PORT
-gui-server-password = $IRSSI_PASSWORD
-EOF
-    
-	chown -R $IRSSI_USER:$IRSSI_GROUP /home/$IRSSI_USER/.autodl/
-	chown -R $IRSSI_USER:$IRSSI_GROUP /home/$IRSSI_USER/.irssi/
-	
-	rm autodl-irssi.zip
-	
-	#install autodl-rutorrent is a plugin for ruTorrent to monitor and configure autodl-irssi
-	git clone -q https://github.com/stickz/autodl-rutorrent.git /var/www/rutorrent/plugins/autodl-irssi
-	chown -R www-data:www-data /var/www/rutorrent/plugins/autodl-irssi
-	chmod -R 775 /var/www/rutorrent/plugins/autodl-irssi
-	
-	sed -i '3i\\t$autodlPort = '"$IRSSI_PORT"';' /var/www/rutorrent/conf/config.php
-	sed -i '4i\\t$autodlPassword = \"'"$IRSSI_PASSWORD"'\";' /var/www/rutorrent/conf/config.php
-	
-	systemctl enable irssi.service
-	systemctl start irssi.service
-	
-	systemctl restart apache2.service
-}
-
-# Function for showing the end result when install is complete
-function INSTALL_COMPLETE {
-	HEADER
-	echo "${GREEN}Installation is complete.${NORMAL}"
-	echo
-	echo "${RED}Your default Apache2 vhost file has been disabled and replaced with a new one."
-	echo "If you were using it, combine the default and rutorrent vhost file and enable"
-	echo "it again.${NORMAL}"
-	echo
-	echo "${MAGENTA}Your downloads folder is in ${CYAN}$HOMEDIR/Downloads${NORMAL}"
-	echo "${MAGENTA}Sessions data is ${CYAN}$HOMEDIR/.rtorrent-session${NORMAL}"
-	echo "${MAGENTA}rtorrent's configuration file is ${CYAN}$HOMEDIR/.rtorrent.rc${NORMAL}"
-	echo
-	echo "${MAGENTA}If you want to change settings for rtorrent, such as download folder, etc.,"
-	echo "you need to edit the '${CYAN}.rtorrent.rc${MAGENTA}' file. E.g. '${CYAN}nano $HOMEDIR/.rtorrent.rc${MAGENTA}'${NORMAL}"
-	echo
-	
-	# The IPv6 local address, is not very used for now, anyway if needed, just change 'inet' to 'inet6'
-	lcl=$(ip addr | grep 'inet ' | awk '{print $2}' | cut -d/ -f1 | grep -v "127." | head -n 1)
-	ext=$(curl -s https://ipv4.icanhazip.com/)
-	
-	if [[ ! -z "$lcl" ]] && [[ ! -z "$ext" ]]
-	then
-		if [[ $HTTP_PORT != "" ]]
-		then
-			echo "${CYAN}LOCAL IP:${NORMAL} http://$lcl:$HTTP_PORT/rutorrent"
-		else
-			echo "${CYAN}LOCAL IP:${NORMAL} http://$lcl/rutorrent"
-		fi
-		echo "${CYAN}EXTERNAL IP:${NORMAL} http://$ext/rutorrent"
-		echo
-		echo "Visit rutorrent through the above address."
-		echo "${RED}Now available with HTTPS redirection!${NORMAL}"
-	else
-		if [[ -z "$lcl" ]]
-		then
-			echo "Can't detect the local IP address"
-			echo "Try visit rutorrent at http://127.0.0.1/rutorrent"
-			echo
-		elif [[ -z "$ext" ]]
-		then
-			echo "${CYAN}LOCAL:${NORMAL} http://$lcl/rutorrent"
-			echo "Visit rutorrent through your local network"
-			echo
-		else
-			echo "Can't detect the IP address"
-			echo "Try visit rutorrent at http://127.0.0.1/rutorrent"
-			echo
-		fi
-	fi
-}
-
-# Fetch and modify changelog and todo list
-function CHANGELOG_TODO {
-	mkdir -p Files
-	FILES=("Changelog" "TODO")
-	for FILE in ${FILES[@]}
-	do
-		curl -sL https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/$FILE  -o Files/$FILE
-		sed -i "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /g" Files/$FILE
-	done
-}
-
-# Function for creating file structure before installation
-function PREPARE_CONFIG_FILES {
-	echo "${CYAN}Prepare config files"
-	
-	echo "${YELLOW}Creating rutorrent.conf${NORMAL}"
-	cat > "Files/rutorrent.conf" <<-EOF
-<VirtualHost *:80>
-	ServerAlias *
-	RewriteEngine on
-	RewriteRule ^/(.*) https://%{HTTP_HOST}/$1 [NC,R=301,L]
-</VirtualHost>
-
-<IfModule mod_ssl.c>
-	<VirtualHost *:443>
-		#ServerName  www.example.com
-		DocumentRoot /var/www/
-		
-		LogLevel info ssl:warn
-		ErrorLog /var/log/apache2/ssl_error.log
-		CustomLog /var/log/apache2/ssl_access.log common
-		SCGIMount /rutorrent/RPC2 127.0.0.1:5000
-		
-		<Directory "/var/www/rutorrent">
-			AuthName "Tits or GTFO"
-			AuthType Basic
-			Require valid-user
-			AuthUserFile /var/www/rutorrent/.htpasswd
-		</Directory>
-		
-		SSLEngine on
-		SSLCertificateFile /etc/ssl/certs/rutorrent-selfsigned.crt
-		SSLCertificateKeyFile /etc/ssl/private/rutorrent-selfsigned.key
-	</VirtualHost>
-</IfModule>
-EOF
-	
-	echo "${YELLOW}Creating rtorrent.rc${NORMAL}"
-	cat > "Files/rtorrent.rc" <<-EOF
+	echo "${YELLOW}Copying .rtorrent.rc${NORMAL}"
+	cat > "$HOMEDIR/.rtorrent.rc" <<-EOF
 ################################################################################
 # A minimal rTorrent configuration that provides the basic features
 # you want to have in addition to the built-in defaults.
@@ -671,7 +413,7 @@ method.insert = cfg.session,  private|const|string, (cat,(cfg.basedir),".rtorren
 method.insert = cfg.watch,    private|const|string, (cat,(cfg.basedir),"watch/")
 
 ## Listening port for incoming peer traffic
-network.port_range.set = 6790-6999
+network.port_range.set = $PORT_RANGE
 ## Start opening ports at a random position within the port range
 network.port_random.set = yes
 
@@ -786,6 +528,267 @@ log.open_file = "log", (cfg.logfile)
 log.add_output = "info", "log"
 #log.add_output = "tracker_debug", "log"
 EOF
+
+	CHECKLASTRC
+	chown $RTORRENT_USER:$RTORRENT_GROUP $HOMEDIR/.rtorrent.rc
+
+	echo "${CYAN}Creating rtorrent systemd file${NORMAL}"
+	cat > "/etc/systemd/system/rtorrent.service" <<-EOF
+[Unit]
+Description=rtorrent (in tmux)
+
+[Service]
+Type=forking
+RemainAfterExit=yes
+User=$RTORRENT_USER
+ExecStart=/usr/bin/tmux -2 new-session -d -s session-rtorrent rtorrent
+ExecStop=/usr/bin/tmux send-keys -t session-rtorrent C-q
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=default.target
+EOF
+
+	systemctl enable rtorrent.service
+	systemctl start rtorrent.service
+}
+
+# Function for installing rutorrent and plugins
+function INSTALL_RUTORRENT {
+	# Installing rutorrent.
+	echo "${CYAN}Installing rutorrent${NORMAL}"
+	echo "${YELLOW}Downloading package${NORMAL}"
+	curl -L https://github.com/Novik/ruTorrent/archive/refs/tags/$RUTORRENTVERSION.zip -o rutorrent.zip
+	CHECKLASTRC
+
+	echo "${YELLOW}Unpacking${NORMAL}"
+	unzip -qqo rutorrent.zip
+	CHECKLASTRC
+
+	echo "${YELLOW}Renaming${NORMAL}"
+	LATEST="ruTorrent-${RUTORRENTVERSION:1}"
+	mv $LATEST rutorrent
+	CHECKLASTRC
+
+	if [ -d /var/www/rutorrent ]
+	then
+		rm -r /var/www/rutorrent
+	fi
+
+	echo "${YELLOW}Deactivate not supported plugins${NORMAL}"
+	# Deactivate not supported plugins
+	# not supported: _cloudflare, screenshots, spectrogram
+	# not possible by folder rights: rutracker_check
+	# removed since it's deprecated: geoip
+	# not used since XMLRPC is used: rpc, httprpc
+	PLUGINS=("_cloudflare" "screenshots" "spectrogram" "rutracker_check" "geoip" "rpc" "httprpc")
+	for PLUGIN in ${PLUGINS[@]}
+	do
+		sed -i '$a['"$PLUGIN"']' rutorrent/conf/plugins.ini
+		sed -i '$aenabled = no' rutorrent/conf/plugins.ini
+		sed -i '$a\\' rutorrent/conf/plugins.ini
+	done
+
+	# Changeing SCGI mount point in rutorrent config.
+	echo "${YELLOW}Changing SCGI mount point${NORMAL}"
+	sed -i "s/\/RPC2/\/rutorrent\/RPC2/g" rutorrent/conf/config.php
+	CHECKLASTRC
+
+	echo "${YELLOW}Moving to /var/www/ ${NORMAL}"
+	mv -f rutorrent /var/www/
+	CHECKLASTRC
+
+	echo "${YELLOW}Cleanup${NORMAL}"
+	rm rutorrent.zip
+	CHECKLASTRC
+
+	# Changing permissions for rutorrent and plugins.
+	echo "${YELLOW}Changing permissions for rutorrent${NORMAL}"
+	chown -R www-data:www-data /var/www/rutorrent
+	chmod -R 775 /var/www/rutorrent
+	CHECKLASTRC
+}
+
+# Function for configuring apache
+function CONFIGURE_APACHE {
+	echo "${CYAN}Configuring apache${NORMAL}"
+	# Creating self-signed certs
+	echo "${YELLOW}Creating self-signed certificate${NORMAL}"
+	openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -subj "/OU=Bercik rt-auto-install seedbox"  -keyout /etc/ssl/private/rutorrent-selfsigned.key -out /etc/ssl/certs/rutorrent-selfsigned.crt
+
+	if ! grep -q "^ServerName$" /etc/apache2/apache2.conf
+	then
+		echo "ServerName localhost" >> /etc/apache2/apache2.conf;
+	fi
+
+	a2enmod ssl
+	a2enmod rewrite
+
+	# Creating Apache virtual host
+	echo "${YELLOW}Creating apache vhost${NORMAL}"
+	if [ ! -f /etc/apache2/sites-available/rutorrent.conf ]
+	then
+		cat > "/etc/apache2/sites-available/rutorrent.conf" <<-EOF
+<VirtualHost *:80>
+    ServerAlias *
+    RewriteEngine on
+    RewriteRule ^/(.*) https://%{HTTP_HOST}/\$1 [NC,R=301,L]
+</VirtualHost>
+
+<IfModule mod_ssl.c>
+    <VirtualHost *:443>
+        #ServerName  www.example.com
+        DocumentRoot /var/www/
+
+        LogLevel info ssl:warn
+        ErrorLog /var/log/apache2/ssl_error.log
+        CustomLog /var/log/apache2/ssl_access.log common
+        SCGIMount /rutorrent/RPC2 127.0.0.1:5000
+
+        <Directory "/var/www/rutorrent">
+            AuthName "Tits or GTFO"
+            AuthType Basic
+            Require valid-user
+            AuthUserFile /var/www/rutorrent/.htpasswd
+        </Directory>
+
+        SSLEngine on
+        SSLCertificateFile /etc/ssl/certs/rutorrent-selfsigned.crt
+        SSLCertificateKeyFile /etc/ssl/private/rutorrent-selfsigned.key
+    </VirtualHost>
+</IfModule>
+EOF
+
+		a2dissite 000-default.conf
+		a2ensite rutorrent.conf
+		CHECKLASTRC
+
+		systemctl restart apache2.service
+	fi
+
+	# Creating .htaccess file
+	echo "${YELLOW}Creating .htaccess file${NORMAL}"
+	printf "%s\n" "${WEB_USER_ARRAY[@]}" > /var/www/rutorrent/.htpasswd
+}
+
+function AUTODL-IRSSI {
+	#Set IRSSI_USER equal to RTORRENT_USER grep from rtorrent.service
+	IRSSI_USER=$(cat /etc/systemd/system/rtorrent.service | grep User | cut -d= -f2)
+	IRSSI_GROUP=$(id -g $IRSSI_USER)
+
+	IRSSI_PORT=$(shuf -i 20000-30000 -n 1)
+	IRSSI_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 15 | head -n 1)
+
+	#install irssi
+	apt-get -yqq install irssi libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl php-xml
+
+	cat > "/etc/systemd/system/irssi.service" <<-EOF
+[Unit]
+Description=irssi (in tmux)
+After=network.target
+
+[Service]
+Type=forking
+RemainAfterExit=yes
+User=$IRSSI_USER
+ExecStart=/usr/bin/tmux -2 new-session -d -s session-irssi irssi
+ExecStop=/usr/bin/tmux send-keys -t session-irssi "/quit" KPEnter
+WorkingDirectory=/home/$IRSSI_USER/
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=default.target
+EOF
+
+	#install autodl-irssi a plugin for irssi that monitors IRC announce channels and downloads torrent files based on user-defined filters.
+	wget -q https://github.com/autodl-community/autodl-irssi/releases/download/2.6.2/autodl-irssi-v2.6.2.zip -O autodl-irssi.zip
+
+	mkdir -p /home/$IRSSI_USER/.irssi/scripts/autorun/
+	unzip -qqo autodl-irssi.zip -d /home/$IRSSI_USER/.irssi/scripts/
+	mv /home/$IRSSI_USER/.irssi/scripts/autodl-irssi.pl /home/$IRSSI_USER/.irssi/scripts/autorun/
+
+	mkdir -p /home/$IRSSI_USER/.autodl
+
+	cat > "/home/$IRSSI_USER/.autodl/autodl.cfg" <<-EOF
+[options]
+gui-server-port = $IRSSI_PORT
+gui-server-password = $IRSSI_PASSWORD
+EOF
+
+	chown -R $IRSSI_USER:$IRSSI_GROUP /home/$IRSSI_USER/.autodl/
+	chown -R $IRSSI_USER:$IRSSI_GROUP /home/$IRSSI_USER/.irssi/
+
+	rm autodl-irssi.zip
+
+	#install autodl-rutorrent is a plugin for ruTorrent to monitor and configure autodl-irssi
+	git clone -q https://github.com/stickz/autodl-rutorrent.git /var/www/rutorrent/plugins/autodl-irssi
+	rm -rf /var/www/rutorrent/plugins/autodl-irssi/.git*
+
+	chown -R www-data:www-data /var/www/rutorrent/plugins/autodl-irssi
+	chmod -R 775 /var/www/rutorrent/plugins/autodl-irssi
+
+	# Putting autodl-irssi login into config.php to make it usable on common ground
+	sed -i '3i\\t$autodlPort = '"$IRSSI_PORT"';' /var/www/rutorrent/conf/config.php
+	sed -i '4i\\t$autodlPassword = \"'"$IRSSI_PASSWORD"'\";' /var/www/rutorrent/conf/config.php
+
+	systemctl enable irssi.service
+	systemctl start irssi.service
+
+	systemctl restart apache2.service
+}
+
+# Function for showing the end result when install is complete
+function INSTALL_COMPLETE {
+	HEADER
+	echo "${GREEN}Installation is complete.${NORMAL}"
+	echo
+	echo "${RED}Your default Apache2 vhost file has been disabled and replaced with a new one."
+	echo "If you were using it, combine the default and rutorrent vhost file and enable"
+	echo "it again.${NORMAL}"
+	echo
+	echo "${MAGENTA}Your downloads folder is in ${CYAN}$HOMEDIR/Downloads${NORMAL}"
+	echo "${MAGENTA}Sessions data is ${CYAN}$HOMEDIR/.rtorrent-session${NORMAL}"
+	echo "${MAGENTA}rtorrent's configuration file is ${CYAN}$HOMEDIR/.rtorrent.rc${NORMAL}"
+	echo
+	echo "${MAGENTA}If you want to change settings for rtorrent, such as download folder, etc.,"
+	echo "you need to edit the '${CYAN}.rtorrent.rc${MAGENTA}' file. E.g. '${CYAN}nano $HOMEDIR/.rtorrent.rc${MAGENTA}'${NORMAL}"
+	echo
+
+	# The IPv6 local address, is not very used for now, anyway if needed, just change 'inet' to 'inet6'
+	lcl=$(ip addr | grep 'inet ' | awk '{print $2}' | cut -d/ -f1 | grep -v "127." | head -n 1)
+	ext=$(curl -s https://ipv4.icanhazip.com/)
+
+	if [[ ! -z "$lcl" ]] && [[ ! -z "$ext" ]]
+	then
+		if [[ $HTTP_PORT != "" ]]
+		then
+			echo "${CYAN}LOCAL IP:${NORMAL} http://$lcl:$HTTP_PORT/rutorrent"
+		else
+			echo "${CYAN}LOCAL IP:${NORMAL} http://$lcl/rutorrent"
+		fi
+		echo "${CYAN}EXTERNAL IP:${NORMAL} http://$ext/rutorrent"
+		echo
+		echo "Visit rutorrent through the above address."
+		echo "${RED}Now available with HTTPS redirection!${NORMAL}"
+	else
+		if [[ -z "$lcl" ]]
+		then
+			echo "Can't detect the local IP address"
+			echo "Try visit rutorrent at http://127.0.0.1/rutorrent"
+			echo
+		elif [[ -z "$ext" ]]
+		then
+			echo "${CYAN}LOCAL:${NORMAL} http://$lcl/rutorrent"
+			echo "Visit rutorrent through your local network"
+			echo
+		else
+			echo "Can't detect the IP address"
+			echo "Try visit rutorrent at http://127.0.0.1/rutorrent"
+			echo
+		fi
+	fi
 }
 
 function MENU() {
@@ -808,16 +811,15 @@ function MENU() {
 		echo " [2] - Add another ruTorrent user"
 		echo " [c] - Show Changelog"
 		echo " [t] - Show TODO"
-		ACT_RANGE=$(grep "network.port_range.set" Files/rtorrent.rc | cut -d' ' -f3)
-		echo " [p] - Change rTorrent Port-Range [act: ${GREEN}$ACT_RANGE${NORMAL}]"
+		echo " [p] - Change rTorrent Port-Range [act: ${GREEN}$PORT_RANGE${NORMAL}]"
 		echo " [0] - Start installation"
 		echo " [a] - Start installation with autodl-irssi"
 		echo " [q] - Quit"
 		echo
 		echo -n "${GREEN}>>${NORMAL} "
-		read case
-		
-		case "$case" in
+		read input
+
+		case "$input" in
 		1)
 			HEADER
 			SET_RTORRENT_USER;;
@@ -826,40 +828,29 @@ function MENU() {
 			SET_WEB_USER;;
 		c)
 			HEADER
-			head -n 17 Files/Changelog
+			curl -sL https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/Changelog | sed "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /" | head -n 17
 			read -rsp $'Press any key to continue...' -n1 ke;;
 		t)
 			HEADER
-			head -n 17 Files/TODO
+			curl -sL https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/TODO | sed "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /" | head -n 17
 			read -rsp $'Press any key to continue...' -n1 ke;;
 		p)
 			HEADER
 			SET_RT_PORT;;
-		0)
+		0|a)
 			APT_DEPENDENCIES
 			INSTALL_SCGI
 			INSTALL_RTORRENT
-			INSTALL_SYSTEMD_SERVICE
 			INSTALL_RUTORRENT
 			CONFIGURE_APACHE
+			if [[ $input == "a" ]]
+			then
+				AUTODL-IRSSI
+			fi
 			clear -x
 			INSTALL_COMPLETE
-			rm -rf Files
-			break;;
-		a)
-			APT_DEPENDENCIES
-			INSTALL_SCGI
-			INSTALL_RTORRENT
-			INSTALL_SYSTEMD_SERVICE
-			INSTALL_RUTORRENT
-			CONFIGURE_APACHE
-			clear -x
-			AUTODL-IRSSI
-			INSTALL_COMPLETE
-			rm -rf Files
 			break;;
 		q)
-			rm -rf Files
 			break;;
 		esac
 	done
@@ -877,8 +868,6 @@ function START() {
 	SET_RTORRENT_USER
 	echo
 	SET_WEB_USER
-	CHANGELOG_TODO
-	PREPARE_CONFIG_FILES
 	MENU
 	tput sgr0
 }
