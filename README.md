@@ -9,7 +9,7 @@
 
 **Current version** v2.0 released 2024/02/14
 
-    * allways use of the latest ruTorrent
+    * always use of the latest ruTorrent
     * no need to care about the distro version
     * remove unnecessary stuff
     * add support for arm* systems (scgi)
