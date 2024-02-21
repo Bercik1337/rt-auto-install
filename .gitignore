@@ -1,3 +1,4 @@
 Files/
 *.deb
 .rtorrent.rc
+Rt-Install-minimal-ngnix.bash

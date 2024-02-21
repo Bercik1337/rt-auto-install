@@ -7,7 +7,7 @@
 
 ## News
 
-**Current version** v2.0 released 2024/02/14
+**Current version** v2.1 released 2024/02/21
 
     * always use of the latest ruTorrent
     * no need to care about the distro version
@@ -21,14 +21,18 @@
     * update .rtorrent.rc to the new commands
     * fix changelog and todo view
 	* put functions together for more order
-	* make pre-installation packages fully silent
+	* ~~make pre-installation packages fully silent~~
     * and a little bit there and there
+	* now choose between apache2, nginx and lighttpd as webserver (Rt-Install-minimal-apache2_ngnix_lighttpd.bash)
+	* create htaccess passwords now with openssl
+	* remove ToDo-List from the Menu
 
 ## Features ##
 
 * This script performs automatic installation of rTorrent (BitTorrent client) and ruTorrent(web based GUI).
 * It detects your OS and uses most recent version of rT available in repository of your Linux distribution.
 * Gives menu-driven guidance when creating username.
+* This script is minimal inversiv to files and operating system
 
 ## Supported operating systems ##
 
@@ -53,3 +57,5 @@ Run the script with sudo or as root
 	wget https://raw.githubusercontent.com/MarkusLange/rt-auto-install/master/Rt-Install-minimal
 	for the version with autodl-irssi
 	wget https://raw.githubusercontent.com/MarkusLange/rt-auto-install/master/Rt-Install-minimal-new.bash
+	with all webservers to selection
+	wget https://raw.githubusercontent.com/MarkusLange/rt-auto-install/master/Rt-Install-minimal-apache2_ngnix_lighttpd.bash
