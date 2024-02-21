@@ -20,12 +20,12 @@
     * add autodl-irssi plugin (Rt-Install-minimal-new.bash)
     * update .rtorrent.rc to the new commands
     * fix changelog and todo view
-	* put functions together for more order
-	* ~~make pre-installation packages fully silent~~
+    * put functions together for more order
+    * make pre-installation packages fully silent
     * and a little bit there and there
-	* now choose between apache2, nginx and lighttpd as webserver (Rt-Install-minimal-apache2_ngnix_lighttpd.bash)
-	* create htaccess passwords now with openssl
-	* remove ToDo-List from the Menu
+    * now choose between apache2, nginx and lighttpd as webserver (Rt-Install-minimal-apache2_ngnix_lighttpd.bash)
+    * create htaccess passwords now with openssl
+    * remove ToDo-List from the Menu
 
 ## Features ##
 
@@ -33,6 +33,7 @@
 * It detects your OS and uses most recent version of rT available in repository of your Linux distribution.
 * Gives menu-driven guidance when creating username.
 * This script is minimal inversiv to files and operating system
+* Free choose between apache2, ngnix or lighttpd as webserver
 
 ## Supported operating systems ##
 
