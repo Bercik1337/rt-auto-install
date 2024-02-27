@@ -1,7 +1,7 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
-LASTMODIFIED="2024/02/21"
-SCRIPTVERSION="2.1"
+LASTMODIFIED="2024/02/27"
+SCRIPTVERSION="2.2"
 
 # https://linuxcommand.org/lc3_adv_tput.php
 # Formatting variables
@@ -40,9 +40,10 @@ WEBSERVER="apache2"
 #RTVERSION=$(apt-cache policy rtorrent | head -3 | tail -1 | cut -d' ' -f4 | cut -d'-' -f1)
 #LIBTORRENTVERSION=$(apt-cache policy libtorrent?? | head -3 | tail -1 | cut -d' ' -f4 | cut -d':' -f2 | cut -d'-' -f1)
 #RUTORRENTVERSION=$(wget -q https://api.github.com/repos/Novik/ruTorrent/tags -O - | grep name | cut -d'"' -f4 | grep -v 'rutorrent\|plugins\|beta' | head -1)
+#PHPVERSION=$(apt-cache policy php?.? | grep Candidate | grep -v none | cut -d" " -f4 | cut -d"." -f-2)
 
 # grep System architecture
-ARCHITECTURE=$(dpkg --print-architecture)
+#ARCHITECTURE=$(dpkg --print-architecture)
 
 # Pretty function to spit out ok/fail after each important step.
 function CHECKLASTRC {
@@ -208,6 +209,7 @@ function PRE_UTILS {
 			echo ")"
 			
 			apt-get update
+			apt-get -yqq dist-upgrade
 			APT_UDATE_NEEDED=false
 			apt-get install -yqq $base0 $base1
 			#https://peteris.rocks/blog/quiet-and-unattended-installation-with-apt-get/
@@ -224,6 +226,7 @@ function PRE_UTILS {
 	RTVERSION=$(apt-cache policy rtorrent | head -3 | tail -1 | cut -d' ' -f4 | cut -d'-' -f1)
 	LIBTORRENTVERSION=$(apt-cache policy libtorrent?? | head -3 | tail -1 | cut -d' ' -f4 | cut -d':' -f2 | cut -d'-' -f1)
 	RUTORRENTVERSION=$(wget -q https://api.github.com/repos/Novik/ruTorrent/tags -O - | grep name | cut -d'"' -f4 | grep -v 'rutorrent\|plugins\|beta' | head -1)
+	PHPVERSION=$(apt-cache policy php?.? | grep Candidate | grep -v none | cut -d" " -f4 | cut -d"." -f-2)
 }
 
 function INSTALL_COMMON {
@@ -232,7 +235,7 @@ function INSTALL_COMMON {
 		apt-get -qq update
 		apt-get -yqq dist-upgrade
 	fi
-	apt-get -yqq install curl unzip
+	apt-get install -yqq curl unzip
 }
 
 # Header for the menu
@@ -365,25 +368,36 @@ function LIST_WEB_USERS {
 # Function for installing dependencies
 function INSTALL_APACHE {
 	echo "${CYAN}Installing dependencies${NORMAL}"
-	apt-get -yqq install apache2 php-curl php-cli libapache2-mod-php
+	apt-get install -yqq apache2 php-curl php-cli libapache2-mod-php
 	CHECKLASTRC
+
+	#https://www.digitalocean.com/community/tutorials/apache-configuration-error-ah00558-could-not-reliably-determine-the-server-s-fully-qualified-domain-name
+	echo "ServerName 127.0.0.1" >> /etc/apache2/apache2.conf
+
+	#https://www.inmotionhosting.com/support/server/apache/hide-apache-version-and-linux-os/
+	#https://stackoverflow.com/questions/24889346/how-to-uncomment-a-line-that-contains-a-specific-string-using-sed
+	sed -i '/ServerTokens OS/  s/^/#/' /etc/apache2/conf-enabled/security.conf
+	sed -i '/#ServerTokens Full/a ServerTokens Prod' /etc/apache2/conf-enabled/security.conf
+
+	sed -i '/ServerSignature On/  s/^/#/' /etc/apache2/conf-enabled/security.conf
+	sed -i '/ServerSignature Off/  s/^#//' /etc/apache2/conf-enabled/security.conf
+
+	systemctl restart apache2.service 1>> $LOG_REDIRECTION
 }
 
 function INSTALL_NGINX {
 	echo "${CYAN}Installing dependencies${NORMAL}"
-	apt-get -yqq install nginx php-fpm php-cli php-curl php-mbstring
+	apt-get install -yqq nginx php-fpm php-cli php-curl php-mbstring
 	CHECKLASTRC
+
+	#https://www.inmotionhosting.com/support/server/nginx/hide-nginx-server-version/
+	sed -i 's/# server_tokens off;/server_tokens off;/' /etc/nginx/nginx.conf
 }
 
 function INSTALL_LIGHTTPD {
 	echo "${CYAN}Installing dependencies${NORMAL}"
 	apt-get install -yqq lighttpd php-cgi php-fpm php-curl php-mbstring
 	CHECKLASTRC
-	lighty-enable-mod fastcgi 
-	lighty-enable-mod fastcgi-php
-	lighty-enable-mod auth
-	
-	systemctl restart lighttpd.service
 }
 
 # SCGI installation because it isn't supported anymore after php7.4
@@ -410,7 +424,7 @@ function INSTALL_SCGI {
 		rm -f libapache2*.deb
 	else
 		echo "${CYAN}Install scgi${NORMAL}"
-		apt-get -yqq install libapache2-mod-scgi
+		apt-get install -yqq libapache2-mod-scgi
 	fi
 	CHECKLASTRC
 }
@@ -419,7 +433,7 @@ function INSTALL_SCGI {
 function INSTALL_RTORRENT {
 	# Download and install rtorrent
 	echo "${CYAN}Install rtorrent${NORMAL}"
-	apt-get -yqq install rtorrent tmux mediainfo unrar-free
+	apt-get install -yqq rtorrent tmux mediainfo unrar-free
 	CHECKLASTRC
 
 	# create directories
@@ -510,13 +524,13 @@ schedule2 = monitor_diskspace, 15, 60, ((close_low_diskspace, 1000M))
 
 ## SCGI Connectivity (for alternative rtorrent interfaces, XMLRPC)
 ## Use a IP socket with scgi_port
-network.scgi.open_port = 127.0.0.1:5000
+#network.scgi.open_port = 127.0.0.1:5000
 
 ## Run the rTorrent process as a daemon in the background
 ## (and control via XMLRPC sockets)
 #system.daemon.set = true
-#network.scgi.open_local = (cat,(session.path),rpc.socket)
-#execute.nothrow = chmod,770,(cat,(session.path),rpc.socket)
+network.scgi.open_local = /run/rtorrent/rpc.socket
+execute.nothrow = chmod,777,/run/rtorrent/rpc.socket
 
 ## Other operational settings (check & adapt)
 encoding.add = UTF-8
@@ -596,7 +610,7 @@ EOF
 	systemctl start rtorrent.service
 }
 
-# Function for installing rutorrent and plugins
+# Function for installing rutorrent
 function INSTALL_RUTORRENT {
 	# Installing rutorrent.
 	echo "${CYAN}Installing rutorrent${NORMAL}"
@@ -615,7 +629,7 @@ function INSTALL_RUTORRENT {
 
 	if [ -d /var/www/rutorrent ]
 	then
-		rm -r /var/www/rutorrent
+		rm -rf /var/www/rutorrent
 	fi
 
 	echo "${YELLOW}Deactivate not supported plugins${NORMAL}"
@@ -623,19 +637,18 @@ function INSTALL_RUTORRENT {
 	# not supported: _cloudflare, screenshots, spectrogram
 	# not possible by folder rights: rutracker_check
 	# removed since it's deprecated: geoip
-	# not used since XMLRPC is used: rpc, httprpc
+	# not used: rpc
 	PLUGINS=("_cloudflare" "screenshots" "spectrogram" "rutracker_check" "geoip" "rpc")
+	sed -i '$a\\' rutorrent/conf/plugins.ini
 	for PLUGIN in ${PLUGINS[@]}
 	do
 		sed -i '$a['"$PLUGIN"']' rutorrent/conf/plugins.ini
 		sed -i '$aenabled = no' rutorrent/conf/plugins.ini
-		sed -i '$a\\' rutorrent/conf/plugins.ini
 	done
 
-	# Changeing SCGI mount point in rutorrent config.
-	echo "${YELLOW}Changing SCGI mount point${NORMAL}"
-	sed -i "s/\/RPC2/\/rutorrent\/RPC2/g" rutorrent/conf/config.php
-	CHECKLASTRC
+	# Changeing SCGI mount to socket
+	sed -i 's#$scgi_port = 5000;#$scgi_port = 0;#' rutorrent/conf/config.php
+	sed -i 's#$scgi_host = "127.0.0.1";#$scgi_host = "unix:///run/rtorrent/rpc.socket";#' rutorrent/conf/config.php
 
 	echo "${YELLOW}Moving to /var/www/ ${NORMAL}"
 	mv -f rutorrent /var/www/
@@ -657,23 +670,31 @@ function CREATE_SELF_SIGNED_CERT {
 	# Creating self-signed certs
 	echo "${YELLOW}Creating self-signed certificate${NORMAL}"
 	openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -subj "/OU=Bercik rt-auto-install seedbox"  -keyout /etc/ssl/private/rutorrent-selfsigned.key -out /etc/ssl/certs/rutorrent-selfsigned.crt
-	
-	# pem for lighttpd
-	#cat /etc/ssl/private/rutorrent-selfsigned.key /etc/ssl/certs/rutorrent-selfsigned.crt >> /etc/ssl/certs/rutorrent-selfsigned.pem
+}
+
+# apache2 can't work from tmp so all work from run for the socket
+function CREATE_TMPFILES () {
+	#https://serverfault.com/questions/779634/create-a-directory-under-var-run-at-boot
+	cat > "/usr/lib/tmpfiles.d/rtorrent.conf" <<-EOF
+#Type Path            Mode UID      GID        Age Argument
+d     /run/rtorrent   0775 $RTORRENT_USER www-data   -   -
+EOF
+
+	# inital placement for the direct run
+	mkdir -p /run/rtorrent
+	chown -R $RTORRENT_USER:www-data /run/rtorrent
+	chmod -R 775 /run/rtorrent
 }
 
 # Function for configuring apache
 function CONFIGURE_APACHE {
 	echo "${CYAN}Configuring apache${NORMAL}"
-	if ! grep -q "^ServerName$" /etc/apache2/apache2.conf
-	then
-		echo "ServerName localhost" >> /etc/apache2/apache2.conf;
-	fi
 
 	a2enmod ssl
 	a2enmod rewrite
+	a2enmod proxy
 
-	# Creating Apache virtual host
+	#https://raymii.org/s/tutorials/Strong_SSL_Security_On_Apache2.html
 	echo "${YELLOW}Creating apache vhost${NORMAL}"
 	if [ ! -f /etc/apache2/sites-available/rutorrent.conf ]
 	then
@@ -682,7 +703,7 @@ function CONFIGURE_APACHE {
     ServerAlias *
     RewriteEngine on
     #RewriteRule ^/(.*) https://%{HTTP_HOST}/\$1 [NC,R=301,L]
-	RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTPS} !=on
     RewriteRule ^/?rutorrent https://%{SERVER_NAME}/rutorrent [NC,R=301,L]
 </VirtualHost>
 
@@ -694,10 +715,10 @@ function CONFIGURE_APACHE {
         LogLevel info ssl:warn
         ErrorLog /var/log/apache2/ssl_error.log
         CustomLog /var/log/apache2/ssl_access.log common
-        ProxyPass /rutorrent/RPC2 127.0.0.1:5000
+        ProxyPass /RPC2 unix:///run/rtorrent/rpc.socket|scgi://localhost
 
         <Directory "/var/www/rutorrent">
-            AuthName "Tits or GTFO"
+            AuthName "Restricted Area"
             AuthType Basic
             Require valid-user
             AuthUserFile /var/www/rutorrent/.htpasswd
@@ -706,11 +727,15 @@ function CONFIGURE_APACHE {
         SSLEngine on
         SSLCertificateFile /etc/ssl/certs/rutorrent-selfsigned.crt
         SSLCertificateKeyFile /etc/ssl/private/rutorrent-selfsigned.key
+        SSLProtocol -all +TLSv1.3 +TLSv1.2
+        SSLOpenSSLConfCmd Curves X25519:secp521r1:secp384r1:prime256v1
+        SSLCipherSuite EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH
+        SSLHonorCipherOrder on
     </VirtualHost>
 </IfModule>
 EOF
 
-		#a2dissite 000-default.conf
+		a2dissite 000-default.conf
 		a2ensite rutorrent.conf
 		CHECKLASTRC
 
@@ -720,40 +745,47 @@ EOF
 
 # modifed from https://gist.github.com/juniorh/30bce3317207d6b2a887
 function CONFIGURE_NGINX {
+	echo "${CYAN}Configuring nginx${NORMAL}"
+
+	#https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html
 	if [ ! -f /etc/nginx/sites-available/rutorrent ]
 	then
 		cat > "/etc/nginx/sites-available/rutorrent" <<-EOF
 upstream backendrutorrent {
-    server unix:/var/run/php/php8.2-fpm.sock;
+    server unix:/var/run/php/php$PHPVERSION-fpm.sock;
 }
+
 upstream backendrtorrent {
-    server 127.0.0.1:5000;
+    server unix:/run/rtorrent/rpc.socket;
 }
+
 server{
     listen 80;
     location /rutorrent {
         return 301 https://\$host\$request_uri;
     }
 }
+
 server{
     listen 443 ssl;
     ssl on;
     ssl_certificate /etc/ssl/certs/rutorrent-selfsigned.crt;
     ssl_certificate_key /etc/ssl/private/rutorrent-selfsigned.key;
-    ssl_ciphers HIGH:!kEDH:!aNULL:!MD5;
-    ssl_ecdh_curve secp521r1;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384;
     ssl_prefer_server_ciphers on;
-    ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
+    ssl_session_cache shared:SSL:10m;
+
     root /var/www;
-	
+
     auth_basic "Restricted";
     auth_basic_user_file /var/www/rutorrent/.htpasswd;
-	
-    location /rutorrent/RPC2 {
+
+    location /RPC2 {
         include scgi_params;
         scgi_pass backendrtorrent;
     }
-	
+
     location / {
         location ~ .php\$ {
             fastcgi_split_path_info ^(.+\.php)(.*)\$;
@@ -769,15 +801,20 @@ EOF
 		unlink /etc/nginx/sites-enabled/default
 		ln -s /etc/nginx/sites-available/rutorrent /etc/nginx/sites-enabled/
 
-		systemctl restart php8.2-fpm.service
+		systemctl restart php$PHPVERSION-fpm.service
 		systemctl restart nginx.service
 	fi
 }
 
 function CONFIGURE_LIGHTTPD {
-	# remeber lighttpd needs rpc or httprpc plugin from rutorrent to work with SCGI
+	echo "${CYAN}Configuring lighttpd${NORMAL}"
 	sed -i "s#/var/www/html#/var/www#" /etc/lighttpd/lighttpd.conf
 
+	lighty-enable-mod fastcgi 
+	lighty-enable-mod fastcgi-php
+	lighty-enable-mod auth
+
+	# https://raymii.org/s/tutorials/Strong_SSL_Security_On_lighttpd.html
 	if [ ! -f /etc/lighttpd/conf-available/30-rutorrent.conf ]
 	then
 		cat > "/etc/lighttpd/conf-available/30-rutorrent.conf" <<-EOF
@@ -791,12 +828,15 @@ server.modules += ( "mod_openssl" )
     ssl.privkey = "/etc/ssl/private/rutorrent-selfsigned.key"
     # or joined as pem for older versions from lighttpd
     # ssl.pemfile = "/etc/ssl/certs/rutorrent-selfsigned.pem"
+    ssl.openssl.ssl-conf-cmd = ("Protocol" => "-TLSv1.1, -TLSv1, -SSLv3")
+    ssl.cipher-list = "EECDH+AESGCM:EDH+AESGCM:AES128+EECDH:AES128+EDH"
+    ssl.use-compression = "disable"
 
-    scgi.server = ( "/rutorrent/RPC2" =>
+    scgi.server = ( "/RPC2" =>
         ( "127.0.0.1" =>
             (
-                "host"        => "127.0.0.1",
-                "port"        => 5000,
+                "socket" => "/run/rtorrent/rpc.socket",
+                "disable-time" => 0,
                 "check.local" => "disable"
             )
         )
@@ -818,13 +858,13 @@ server.modules += ( "mod_openssl" )
     # capture vhost name with regex conditional -> %0 in redirect pattern
     # must be the most inner block to the redirect rule
     \$HTTP["host"] =~ ".*" {
-        url.redirect = (".*" => "https://%0\$0")
+        url.redirect = (".*/rutorrent" => "https://%0\$0")
     }
 }
 EOF
-
+		unlink /etc/lighttpd/conf-enabled/99-unconfigured.conf
 		ln -s /etc/lighttpd/conf-available/30-rutorrent.conf /etc/lighttpd/conf-enabled/
-		
+
 		systemctl restart lighttpd.service
 	fi
 }
@@ -845,7 +885,7 @@ function AUTODL-IRSSI {
 	IRSSI_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 15 | head -n 1)
 
 	#install irssi
-	apt-get -yqq install git irssi libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl php-xml
+	apt-get install -yqq git irssi libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl php-xml
 
 	cat > "/etc/systemd/system/irssi.service" <<-EOF
 [Unit]
@@ -954,9 +994,9 @@ function INSTALL_COMPLETE {
 
 function CHOOSE_WEBSEVER {
 	echo " Change the Webserver [act: ${GREEN}$WEBSERVER${NORMAL}]"
-	echo " [a] - apache2"
-	echo " [l] - lighttpd"
-	echo " [n] - ngnix"
+	echo " [1] - lighttpd"
+	echo " [2] - nginx"
+	echo " [3] - apache2"
 	echo
 	echo -n "${GREEN}>>${NORMAL} "
 	read decision
@@ -965,9 +1005,84 @@ function CHOOSE_WEBSEVER {
 	1)
 		WEBSERVER="lighttpd";;
 	2)
-		WEBSERVER="ngnix";;
+		WEBSERVER="nginx";;
 	3|*)
 		WEBSERVER="apache2";;
+	esac
+}
+
+function UPDATE_RUTORRENT {
+	ACT_RUTORRENT=$(cat /var/www/rutorrent/js/webui.js | grep -m 1 version: | cut -d'"' -f2)
+	
+	if [[ $(find /etc/systemd/ -name lighttpd.service | wc -l) -ne 0 ]]
+	then
+		ACT_WEBSERVER=lighttpd
+	elif [[ $(find /etc/systemd/ -name nginx.service | wc -l) -ne 0 ]]
+	then
+		ACT_WEBSERVER=nginx
+	else
+		ACT_WEBSERVER=apache2
+	fi
+	
+	echo " Update ruTorrent from actual installed version ${GREEN}$ACT_RUTORRENT${NORMAL} to current ${GREEN}${RUTORRENTVERSION:1}${NORMAL}"
+	echo " When updating ruTorrent and autodl-irssi is installed the irrsi login"
+	echo " will transfered. Websiteprotection (htpasswd) would be reestablished."
+	echo
+	echo " Webserver is ${GREEN}$ACT_WEBSERVER${NORMAL}"
+	echo
+	echo " [u] - Update"
+	echo " [d] - Dismiss"
+	echo
+	echo -n "${GREEN}>>${NORMAL} "
+	read input
+	
+	case "$input" in
+	u)
+		case "$ACT_WEBSERVER" in
+		apache2)
+			systemctl stop apache2.service;;
+		lighttpd)
+			systemctl stop lighttpd.service;;
+		nginx)
+			systemctl stop php$PHPVERSION-fpm.service
+			systemctl stop nginx.service;;	
+		esac
+		
+		mapfile -t OLD_WEB_USER_ARRAY < /var/www/rutorrent/.htpasswd
+		
+		INSTALL_RUTORRENT
+		
+		printf "%s\n" "${OLD_WEB_USER_ARRAY[@]}" > /var/www/rutorrent/.htpasswd
+		
+		if [[ $(find /home/ -name autodl.cfg | wc -l) -ne 0 ]]
+		then
+			OLD_AUTODL_PORT=$(cat $(find /home/ -name autodl.cfg )| grep "gui-server-port" | cut -d" " -f3)
+			OLD_AUTODL_PASSWORD=$(cat $(find /home/ -name autodl.cfg )| grep "gui-server-password" | cut -d" " -f3)
+			
+			# Putting autodl-irssi login into config.php to make it usable on common ground
+			sed -i '3i\\t$autodlPort = '"$OLD_AUTODL_PORT"';' /var/www/rutorrent/conf/config.php
+			sed -i '4i\\t$autodlPassword = \"'"$OLD_AUTODL_PASSWORD"'\";' /var/www/rutorrent/conf/config.php
+			
+			#install autodl-rutorrent is a plugin for ruTorrent to monitor and configure autodl-irssi
+			git clone -q https://github.com/stickz/autodl-rutorrent.git /var/www/rutorrent/plugins/autodl-irssi
+			rm -rf /var/www/rutorrent/plugins/autodl-irssi/.git*
+			
+			chown -R www-data:www-data /var/www/rutorrent/plugins/autodl-irssi
+			chmod -R 775 /var/www/rutorrent/plugins/autodl-irssi
+		fi
+		
+		case "$ACT_WEBSERVER" in
+		apache2)
+			systemctl start apache2.service;;
+		lighttpd)
+			systemctl start lighttpd.service;;
+		nginx)
+			systemctl start php$PHPVERSION-fpm.service
+			systemctl start nginx.service;;	
+		esac
+		;;
+	d)
+		;;
 	esac
 }
 
@@ -975,27 +1090,38 @@ function MENU() {
 	while true
 	do
 		HEADER
-		echo " ${BOLD}    rTorrent version:${NORMAL} ${RED} $RTVERSION ${NORMAL}"
-		echo " ${BOLD}  libTorrent version:${NORMAL} ${RED} $LIBTORRENTVERSION ${NORMAL}"
-		echo " ${BOLD}   ruTorrent version:${NORMAL} ${RED} $RUTORRENTVERSION ${NORMAL}"
-		echo " ${BOLD}      Script version:${NORMAL} ${RED} $SCRIPTVERSION ${NORMAL}"
-		echo " ${BOLD}Script last modified:${NORMAL} ${RED} $LASTMODIFIED ${NORMAL}"
+		echo " ${BOLD}    rTorrent version:${NORMAL} ${GREEN} $RTVERSION ${NORMAL}"
+		echo " ${BOLD}  libTorrent version:${NORMAL} ${GREEN} $LIBTORRENTVERSION ${NORMAL}"
+		echo " ${BOLD}   ruTorrent version:${NORMAL} ${GREEN} ${RUTORRENTVERSION:1} ${NORMAL}"
+		echo " ${BOLD}      Script version:${NORMAL} ${GREEN} $SCRIPTVERSION ${NORMAL}"
+		#echo " ${BOLD}Script last modified:${NORMAL} ${GREEN} $LASTMODIFIED ${NORMAL}"
 		#echo " Remember to visit https://github.com/Bercik1337/rt-auto-install ${NORMAL}"
 		echo
-		echo " ${BOLD}rTorrent user:${NORMAL}${GREEN} $RTORRENT_USER${NORMAL}"
-		echo -n " ${BOLD}ruTorrent user(s):${NORMAL}${GREEN}"
-		LIST_WEB_USERS
+		#echo " ${BOLD}rTorrent user:${NORMAL}${GREEN} $RTORRENT_USER${NORMAL}"
+		#echo -n " ${BOLD}ruTorrent user(s):${NORMAL}${GREEN}"
+		#LIST_WEB_USERS
 		echo
+		echo " [1] - Add/Change rTorrent user: ${GREEN}$RTORRENT_USER${NORMAL}"
+		echo -n " [2] - Add ruTorrent user(s):${GREEN}"
+		LIST_WEB_USERS
 		echo "${NORMAL}"
-		echo " [1] - Change rTorrent user"
-		echo " [2] - Add another ruTorrent user"
 		echo " [w] - Change Webserver [act: ${GREEN}$WEBSERVER${NORMAL}]"
-		echo " [c] - Show Changelog"
-		#echo " [t] - Show TODO"
 		echo " [p] - Change rTorrent Port-Range [act: ${GREEN}$PORT_RANGE${NORMAL}]"
+		echo " [c] - Show Changelog"
+		echo " [t] - Show To-Do"
 		echo " [0] - Start installation"
 		echo " [a] - Start installation with autodl-irssi"
+		echo " [u] - Update ruTorrent"
 		echo " [q] - Quit"
+		
+#		if [[ -z "$RTORRENT_USER" ]]; then
+#			echo "rTorrent user is empty"
+#		fi
+#		if [[ -z "${WEB_USER_ARRAY[@]}" ]]; then
+#			echo "ruTorrent user is empty"
+#		fi
+
+		echo
 		echo
 		echo -n "${GREEN}>>${NORMAL} "
 		read input
@@ -1012,62 +1138,73 @@ function MENU() {
 			CHOOSE_WEBSEVER;;
 		c)
 			HEADER
-			#curl -sL https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/Changelog | sed "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /" | head -n 17
 			wget -q -O - https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/Changelog | sed "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /" | head -n 17
 			read -rsp $'Press any key to continue...' -n1 ke;;
 		t)
 			HEADER
-			#curl -sL https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/TODO | sed "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /" | head -n 17
 			wget -q -O - https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/TODO | sed "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /" | head -n 17
 			read -rsp $'Press any key to continue...' -n1 ke;;
 		p)
 			HEADER
 			SET_RT_PORT;;
 		0|a)
-			INSTALL_COMMON
-			
-			case "$WEBSERVER" in
-			apache2)
-				INSTALL_APACHE
-				INSTALL_SCGI;;
-			lighttpd)
-				INSTALL_LIGHTTPD;;
-			ngnix)
-				INSTALL_NGINX;;
-			esac
-			
-			INSTALL_RTORRENT
-			INSTALL_RUTORRENT
-			CREATE_SELF_SIGNED_CERT
-			
-			case "$WEBSERVER" in
-			apache2)
-				CONFIGURE_APACHE;;
-			lighttpd)
-				CONFIGURE_LIGHTTPD;;
-			ngnix)
-				CONFIGURE_NGINX;;
-			esac
-
-			CREATE_HTACCESS
-			if [[ $input == "a" ]]
+			if [[ -z "$RTORRENT_USER" ]] || [[ -z "${WEB_USER_ARRAY[@]}" ]]
 			then
-				AUTODL-IRSSI
+				HEADER
+				echo " rTorrent user and/or ruTorrent uses is/are missing installation aborted"
+				sleep 3
+			else
+				INSTALL_COMMON
 				
 				case "$WEBSERVER" in
 				apache2)
-					systemctl restart apache2.service;;
+					INSTALL_APACHE;;
+					#INSTALL_SCGI;;
 				lighttpd)
-					systemctl restart lighttpd.service;;
-				ngnix)
-					systemctl restart php8.2-fpm.service
-					systemctl restart nginx.service;;	
+					INSTALL_LIGHTTPD;;
+				nginx)
+					INSTALL_NGINX;;
 				esac
+				
+				CREATE_TMPFILES
+				INSTALL_RTORRENT
+				INSTALL_RUTORRENT
+				CREATE_SELF_SIGNED_CERT
+				
+				case "$WEBSERVER" in
+				apache2)
+					CONFIGURE_APACHE;;
+				lighttpd)
+					CONFIGURE_LIGHTTPD;;
+				nginx)
+					CONFIGURE_NGINX;;
+				esac
+				
+				CREATE_HTACCESS
+				if [[ $input == "a" ]]
+				then
+					AUTODL-IRSSI
+					
+					case "$WEBSERVER" in
+					apache2)
+						systemctl restart apache2.service;;
+					lighttpd)
+						systemctl restart lighttpd.service;;
+					nginx)
+						systemctl restart php$PHPVERSION-fpm.service
+						systemctl restart nginx.service;;	
+					esac
+				fi
+				
+				clear -x
+				HEADER
+				INSTALL_COMPLETE
+				break
 			fi
-			clear -x
+			;;
+		u)
 			HEADER
-			INSTALL_COMPLETE
-			break;;
+			UPDATE_RUTORRENT;;
 		q)
 			break;;
 		esac
@@ -1080,12 +1217,12 @@ function START() {
 	PRE_UTILS
 	HEADER
 	LICENSE
-	echo
-	WAIT_A_MINUTE
-	HEADER
-	SET_RTORRENT_USER
-	echo
-	SET_WEB_USER
+#	echo
+#	WAIT_A_MINUTE
+#	HEADER
+#	SET_RTORRENT_USER
+#	echo
+#	SET_WEB_USER
 	MENU
 	tput sgr0
 }

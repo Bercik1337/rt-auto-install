@@ -7,7 +7,7 @@
 
 ## News
 
-**Current version** v2.1 released 2024/02/21
+**Current version** v2.2 released 2024/02/21
 
     * always use of the latest ruTorrent
     * no need to care about the distro version
@@ -26,6 +26,11 @@
     * now choose between apache2, nginx and lighttpd as webserver (Rt-Install-minimal-apache2_ngnix_lighttpd.bash)
     * create htaccess passwords now with openssl
     * remove ToDo-List from the Menu
+	* move from SCGIMount to rpc.socket
+	* hardening the webserver basend on https://raymii.org/s/tutorials/Strong_SSL_Security_On_*.html
+	* reintegrade To-Do List
+	* putting rtorrent and rutorrent user determination inside the menu and prevent installation to start without
+	* add funtion to update ruTorrent
 
 ## Features ##
 
@@ -60,3 +65,15 @@ Run the script with sudo or as root
 	wget https://raw.githubusercontent.com/MarkusLange/rt-auto-install/master/Rt-Install-minimal-new.bash
 	with all webservers to selection
 	wget https://raw.githubusercontent.com/MarkusLange/rt-auto-install/master/Rt-Install-minimal-apache2_ngnix_lighttpd.bash
+	with autodl-irssi, rpc.socket (no SCGIMount anymore) and update function for Rutorrent
+	wget https://raw.githubusercontent.com/MarkusLange/Rt-Install-minimal-apache2_ngnix_lighttpd_prc-socket.bash
+
+## To-Do ##
+	* Add Wiki to explain what and why is something is done (only someone is interested)
+	* remove the SCGI code from the scrip is atm. deactivated
+	* remove other commented out parts from the script to clean it update
+	* put some effort in a wider testbase rewriting was done on debian 12.5 only (with countless VMs)
+	* may transfer naming and links to this fork so there is less confusion for users
+	* also transfer changelog and To-Do
+	* working out with Bercik when he is less busy what he liked to merged
+	* remove/deactivate webserver default pages
