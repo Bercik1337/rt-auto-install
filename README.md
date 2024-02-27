@@ -26,11 +26,11 @@
     * now choose between apache2, nginx and lighttpd as webserver (Rt-Install-minimal-apache2_ngnix_lighttpd.bash)
     * create htaccess passwords now with openssl
     * remove ToDo-List from the Menu
-	* move from SCGIMount to rpc.socket
-	* hardening the webserver basend on https://raymii.org/s/tutorials/Strong_SSL_Security_On_*.html
-	* reintegrade To-Do List
-	* putting rtorrent and rutorrent user determination inside the menu and prevent installation to start without
-	* add funtion to update ruTorrent
+    * move from SCGIMount to rpc.socket
+    * hardening the webserver basend on https://raymii.org/s/tutorials/Strong_SSL_Security_On_*.html
+    * reintegrade To-Do List
+    * putting rtorrent and rutorrent user determination inside the menu and prevent installation to start without
+    * add function to update ruTorrent
 
 ## Features ##
 
