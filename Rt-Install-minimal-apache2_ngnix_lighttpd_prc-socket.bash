@@ -1097,7 +1097,7 @@ function MENU() {
 		case "$input" in
 		1)
 			HEADER
-			SET_RTORRENT_USER2;;
+			SET_RTORRENT_USER;;
 		2)
 			HEADER
 			SET_WEB_USER;;
