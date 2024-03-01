@@ -1,7 +1,7 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
-LASTMODIFIED="2024/02/27"
-SCRIPTVERSION="2.2"
+LASTMODIFIED="2024/03/01"
+SCRIPTVERSION="2.3"
 
 # https://linuxcommand.org/lc3_adv_tput.php
 # Formatting variables
@@ -40,10 +40,7 @@ WEBSERVER="apache2"
 #RTVERSION=$(apt-cache policy rtorrent | head -3 | tail -1 | cut -d' ' -f4 | cut -d'-' -f1)
 #LIBTORRENTVERSION=$(apt-cache policy libtorrent?? | head -3 | tail -1 | cut -d' ' -f4 | cut -d':' -f2 | cut -d'-' -f1)
 #RUTORRENTVERSION=$(wget -q https://api.github.com/repos/Novik/ruTorrent/tags -O - | grep name | cut -d'"' -f4 | grep -v 'rutorrent\|plugins\|beta' | head -1)
-#PHPVERSION=$(apt-cache policy php?.? | grep Candidate | grep -v none | cut -d" " -f4 | cut -d"." -f-2)
-
-# grep System architecture
-#ARCHITECTURE=$(dpkg --print-architecture)
+#PHPVERSION=$(apt-cache policy php?.? | grep Candidate | grep -v none | cut -d' ' -f4 | cut -d'.' -f-2)
 
 # Pretty function to spit out ok/fail after each important step.
 function CHECKLASTRC {
@@ -183,50 +180,41 @@ function PRE_UTILS {
 	#AP_UT_CHECK="$(dpkg-query -W -f='${Status}' apache2-utils 2>/dev/null | grep -c "ok installed")"
 	OPENSSL_CHECK="$(dpkg-query -W -f='${Status}' openssl 2>/dev/null | grep -c "ok installed")"
 	#UNZIP_CHECK="$(dpkg-query -W -f='${Status}' unzip 2>/dev/null | grep -c "ok installed")"
-	CURL_CHECK="$(dpkg-query -W -f='${Status}' curl 2>/dev/null | grep -c "ok installed")"
+	#CURL_CHECK="$(dpkg-query -W -f='${Status}' curl 2>/dev/null | grep -c "ok installed")"
 	WGET_CHECK="$(dpkg-query -W -f='${Status}' wget 2>/dev/null | grep -c "ok installed")"
 
 	echo -n " Install for the script pre-installation needed packages: "
-	#echo " (apache2-utils, unzip, curl and wget) if not allready installed."
 
 	if [ "$OPENSSL_CHECK" -ne 1 ] || [ "$WGET_CHECK" -ne 1 ]
 	then
-#		echo " One or more of the packages apache2-utils, unzip, curl or wget is not installed and is needed for the setup."
-#		read -p " Do you want to install it? [y/n] " -n 1
-#		if [[ $REPLY =~ [Yy]$ ]]
-#		then
-			echo -n "("
-			if [ "$OPENSSL_CHECK" -ne 1 ];
-			then
-				base0=openssl
-				echo -n ""$base0" "
-			fi
-			if [ "$WGET_CHECK" -ne 1 ];
-			then
-				base1=wget
-				echo -n ""$base1" "
-			fi
-			echo ")"
-			
-			apt-get update
-			apt-get -yqq dist-upgrade
-			APT_UDATE_NEEDED=false
-			apt-get install -yqq $base0 $base1
-			#https://peteris.rocks/blog/quiet-and-unattended-installation-with-apt-get/
-			#DEBIAN_FRONTEND=noninteractive apt-get install -qq $base0 $base1 < /dev/null > /dev/null
+		echo -n "("
+		if [ "$OPENSSL_CHECK" -ne 1 ];
+		then
+			base0=openssl
+			echo -n ""$base0" "
+		fi
+		if [ "$WGET_CHECK" -ne 1 ];
+		then
+			base1=wget
+			echo -n ""$base1" "
+		fi
+		echo ")"
+		
+		apt-get update
+		apt-get -yqq dist-upgrade
+		APT_UDATE_NEEDED=false
+		apt-get install -yqq $base0 $base1
+		#https://peteris.rocks/blog/quiet-and-unattended-installation-with-apt-get/
+		#DEBIAN_FRONTEND=noninteractive apt-get install -qq $base0 $base1 < /dev/null > /dev/null
 	else
 		echo -n "(none)"
-#		else
-#			clear -x
-#			exit
-#		fi
 	fi
 	
 	# grep the Software Versions
 	RTVERSION=$(apt-cache policy rtorrent | head -3 | tail -1 | cut -d' ' -f4 | cut -d'-' -f1)
 	LIBTORRENTVERSION=$(apt-cache policy libtorrent?? | head -3 | tail -1 | cut -d' ' -f4 | cut -d':' -f2 | cut -d'-' -f1)
 	RUTORRENTVERSION=$(wget -q https://api.github.com/repos/Novik/ruTorrent/tags -O - | grep name | cut -d'"' -f4 | grep -v 'rutorrent\|plugins\|beta' | head -1)
-	PHPVERSION=$(apt-cache policy php?.? | grep Candidate | grep -v none | cut -d" " -f4 | cut -d"." -f-2)
+	PHPVERSION=$(apt-cache policy php?.? | grep Candidate | grep -v none | cut -d' ' -f4 | cut -d'.' -f-2)
 }
 
 function INSTALL_COMMON {
@@ -283,25 +271,25 @@ function WAIT_A_MINUTE {
 
 # Function to set the system user, rtorrent is going to run as
 function SET_RTORRENT_USER {
+	UID_MIN=$(awk '/^UID_MIN/ {print $2}' /etc/login.defs)
+	UID_MAX=$(awk '/^UID_MAX/ {print $2}' /etc/login.defs)
+	
 	while true
 	do
 		echo -n " Please type a valid system user: ${GREEN}"
 		read RTORRENT_USER
+		UID_USER=$(cat /etc/passwd | grep "^$RTORRENT_USER:" | cut -d':' -f3)
 
 		if [[ -z $(cat /etc/passwd | grep "^$RTORRENT_USER:") ]]
 		then
 			echo
 			echo " ${NORMAL}This user does not exist!"
-		elif [[ $(cat /etc/passwd | grep "^$RTORRENT_USER:" | cut -d: -f3) -lt 1 ]]
+		elif [[ $UID_USER -gt $UID_MAX ]] || [[ $UID_USER -lt $UID_MIN ]]
 		then
 			echo
-			echo " ${NORMAL}That user's UID is too low!"
-		elif [[ $RTORRENT_USER == nobody ]]
-		then
-			echo
-			echo " ${NORMAL}You cant use 'nobody' as user!"
+			echo " ${NORMAL}That user's is not regular user!"
 		else
-			HOMEDIR=$(cat /etc/passwd | grep /"$RTORRENT_USER":/ | cut -d: -f6)
+			HOMEDIR=$(cat /etc/passwd | grep /"$RTORRENT_USER":/ | cut -d':' -f6)
 			RTORRENT_GROUP=$(id -g $RTORRENT_USER)
 			break
 		fi
@@ -368,7 +356,7 @@ function LIST_WEB_USERS {
 # Function for installing dependencies
 function INSTALL_APACHE {
 	echo "${CYAN}Installing dependencies${NORMAL}"
-	apt-get install -yqq apache2 php-curl php-cli libapache2-mod-php
+	apt-get install -yqq apache2 libapache2-mod-php php-cli php-curl php-mbstring
 	CHECKLASTRC
 
 	#https://www.digitalocean.com/community/tutorials/apache-configuration-error-ah00558-could-not-reliably-determine-the-server-s-fully-qualified-domain-name
@@ -382,7 +370,7 @@ function INSTALL_APACHE {
 	sed -i '/ServerSignature On/  s/^/#/' /etc/apache2/conf-enabled/security.conf
 	sed -i '/ServerSignature Off/  s/^#//' /etc/apache2/conf-enabled/security.conf
 
-	systemctl restart apache2.service 1>> $LOG_REDIRECTION
+	systemctl restart apache2.service
 }
 
 function INSTALL_NGINX {
@@ -396,36 +384,7 @@ function INSTALL_NGINX {
 
 function INSTALL_LIGHTTPD {
 	echo "${CYAN}Installing dependencies${NORMAL}"
-	apt-get install -yqq lighttpd php-cgi php-fpm php-curl php-mbstring
-	CHECKLASTRC
-}
-
-# SCGI installation because it isn't supported anymore after php7.4
-function INSTALL_SCGI {
-	SCGI=$(apt-cache show libapache2-mod-scgi 2>&1 | grep -cv "E: No packages found")
-
-	if [ $SCGI -ne 1 ]
-	then
-		echo "${CYAN}Download scgi${NORMAL}"
-
-		case $ARCHITECTURE in
-		armhf)
-			wget http://ftp.debian.org/debian/pool/main/s/scgi/libapache2-mod-scgi_1.13-1.1_armhf.deb;;
-		armel)
-			wget http://ftp.debian.org/debian/pool/main/s/scgi/libapache2-mod-scgi_1.13-1.1_armel.deb;;
-		arm64)
-			wget http://ftp.debian.org/debian/pool/main/s/scgi/libapache2-mod-scgi_1.13-1.1_arm64.deb;;
-		amd64)
-			wget http://mirrors.kernel.org/ubuntu/pool/universe/s/scgi/libapache2-mod-scgi_1.13-1.1build1_amd64.deb;;
-		esac
-
-		echo "${CYAN}Install scgi${NORMAL}"
-		dpkg -i libapache2*.deb
-		rm -f libapache2*.deb
-	else
-		echo "${CYAN}Install scgi${NORMAL}"
-		apt-get install -yqq libapache2-mod-scgi
-	fi
+	apt-get install -yqq lighttpd php-fpm php-cgi php-curl php-mbstring
 	CHECKLASTRC
 }
 
@@ -433,7 +392,7 @@ function INSTALL_SCGI {
 function INSTALL_RTORRENT {
 	# Download and install rtorrent
 	echo "${CYAN}Install rtorrent${NORMAL}"
-	apt-get install -yqq rtorrent tmux mediainfo unrar-free
+	apt-get install -yqq rtorrent tmux
 	CHECKLASTRC
 
 	# create directories
@@ -614,6 +573,16 @@ EOF
 function INSTALL_RUTORRENT {
 	# Installing rutorrent.
 	echo "${CYAN}Installing rutorrent${NORMAL}"
+	
+	#ffmpeg: enable screenshots plugin
+	#sox: enable spectrogram plugin
+	#mediainfo: enable mediainfo plugin
+	#php-geoip: enable geoip plugin
+	#unrar: enable unpack plugin
+	#unzip: enable unpack plugin
+	#python-cloudscraper: cloudflare plugin requirement
+	apt-get install -yqq ffmpeg sox mediainfo unrar-free
+	
 	echo "${YELLOW}Downloading package${NORMAL}"
 	wget -q https://github.com/Novik/ruTorrent/archive/refs/tags/$RUTORRENTVERSION.zip -O rutorrent.zip
 	CHECKLASTRC
@@ -634,11 +603,11 @@ function INSTALL_RUTORRENT {
 
 	echo "${YELLOW}Deactivate not supported plugins${NORMAL}"
 	# Deactivate not supported plugins
-	# not supported: _cloudflare, screenshots, spectrogram
-	# not possible by folder rights: rutracker_check
-	# removed since it's deprecated: geoip
-	# not used: rpc
-	PLUGINS=("_cloudflare" "screenshots" "spectrogram" "rutracker_check" "geoip" "rpc")
+	# not supported: _cloudflare (not neede by now: https://github.com/Novik/ruTorrent/issues/1870#issuecomment-480913560)
+	# not possible by folder rights: rutracker_check (Updatechecker for the russiantracker rutrack)
+	# removed: geoip (it's deprecated since php 7.4)
+	# not used: rpc (httprpc is used instead)
+	PLUGINS=("_cloudflare" "rutracker_check" "geoip" "rpc")
 	sed -i '$a\\' rutorrent/conf/plugins.ini
 	for PLUGIN in ${PLUGINS[@]}
 	do
@@ -646,7 +615,7 @@ function INSTALL_RUTORRENT {
 		sed -i '$aenabled = no' rutorrent/conf/plugins.ini
 	done
 
-	# Changeing SCGI mount to socket
+	# Changeing SCGI mount to rpc.socket
 	sed -i 's#$scgi_port = 5000;#$scgi_port = 0;#' rutorrent/conf/config.php
 	sed -i 's#$scgi_host = "127.0.0.1";#$scgi_host = "unix:///run/rtorrent/rpc.socket";#' rutorrent/conf/config.php
 
@@ -695,6 +664,7 @@ function CONFIGURE_APACHE {
 	a2enmod proxy
 
 	#https://raymii.org/s/tutorials/Strong_SSL_Security_On_Apache2.html
+	#https://www.namecheap.com/support/knowledgebase/article.aspx/9821/38/apache-redirect-to-https/
 	echo "${YELLOW}Creating apache vhost${NORMAL}"
 	if [ ! -f /etc/apache2/sites-available/rutorrent.conf ]
 	then
@@ -862,6 +832,7 @@ server.modules += ( "mod_openssl" )
     }
 }
 EOF
+
 		unlink /etc/lighttpd/conf-enabled/99-unconfigured.conf
 		ln -s /etc/lighttpd/conf-available/30-rutorrent.conf /etc/lighttpd/conf-enabled/
 
@@ -1056,12 +1027,12 @@ function UPDATE_RUTORRENT {
 		
 		if [[ $(find /home/ -name autodl.cfg | wc -l) -ne 0 ]]
 		then
-			OLD_AUTODL_PORT=$(cat $(find /home/ -name autodl.cfg )| grep "gui-server-port" | cut -d" " -f3)
-			OLD_AUTODL_PASSWORD=$(cat $(find /home/ -name autodl.cfg )| grep "gui-server-password" | cut -d" " -f3)
+			ACT_AUTODL_PORT=$(cat $(find /home/ -name autodl.cfg )| grep "gui-server-port" | cut -d' ' -f3)
+			ACT_AUTODL_PASSWORD=$(cat $(find /home/ -name autodl.cfg )| grep "gui-server-password" | cut -d' ' -f3)
 			
 			# Putting autodl-irssi login into config.php to make it usable on common ground
-			sed -i '3i\\t$autodlPort = '"$OLD_AUTODL_PORT"';' /var/www/rutorrent/conf/config.php
-			sed -i '4i\\t$autodlPassword = \"'"$OLD_AUTODL_PASSWORD"'\";' /var/www/rutorrent/conf/config.php
+			sed -i '3i\\t$autodlPort = '"$ACT_AUTODL_PORT"';' /var/www/rutorrent/conf/config.php
+			sed -i '4i\\t$autodlPassword = \"'"$ACT_AUTODL_PASSWORD"'\";' /var/www/rutorrent/conf/config.php
 			
 			#install autodl-rutorrent is a plugin for ruTorrent to monitor and configure autodl-irssi
 			git clone -q https://github.com/stickz/autodl-rutorrent.git /var/www/rutorrent/plugins/autodl-irssi
@@ -1097,9 +1068,6 @@ function MENU() {
 		#echo " ${BOLD}Script last modified:${NORMAL} ${GREEN} $LASTMODIFIED ${NORMAL}"
 		#echo " Remember to visit https://github.com/Bercik1337/rt-auto-install ${NORMAL}"
 		echo
-		#echo " ${BOLD}rTorrent user:${NORMAL}${GREEN} $RTORRENT_USER${NORMAL}"
-		#echo -n " ${BOLD}ruTorrent user(s):${NORMAL}${GREEN}"
-		#LIST_WEB_USERS
 		echo
 		echo " [1] - Add/Change rTorrent user: ${GREEN}$RTORRENT_USER${NORMAL}"
 		echo -n " [2] - Add ruTorrent user(s):${GREEN}"
@@ -1129,7 +1097,7 @@ function MENU() {
 		case "$input" in
 		1)
 			HEADER
-			SET_RTORRENT_USER;;
+			SET_RTORRENT_USER2;;
 		2)
 			HEADER
 			SET_WEB_USER;;
@@ -1159,7 +1127,6 @@ function MENU() {
 				case "$WEBSERVER" in
 				apache2)
 					INSTALL_APACHE;;
-					#INSTALL_SCGI;;
 				lighttpd)
 					INSTALL_LIGHTTPD;;
 				nginx)
@@ -1217,12 +1184,6 @@ function START() {
 	PRE_UTILS
 	HEADER
 	LICENSE
-#	echo
-#	WAIT_A_MINUTE
-#	HEADER
-#	SET_RTORRENT_USER
-#	echo
-#	SET_WEB_USER
 	MENU
 	tput sgr0
 }

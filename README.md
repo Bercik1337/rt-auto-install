@@ -7,7 +7,7 @@
 
 ## News
 
-**Current version** v2.2 released 2024/02/21
+**Current version** v2.3 released 2024/03/01
 
     * always use of the latest ruTorrent
     * no need to care about the distro version
@@ -31,6 +31,8 @@
     * reintegrade To-Do List
     * putting rtorrent and rutorrent user determination inside the menu and prevent installation to start without
     * add function to update ruTorrent
+	* reactivate plugins screenshots, spectrogram
+    * some corrections
 
 ## Features ##
 
