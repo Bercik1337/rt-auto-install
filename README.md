@@ -29,7 +29,7 @@ For details, always go to Changelog.
 * **Debian 12    Bookworm**
 * **Debian 11    Bullseye**
 * **Debian 10    Buster**
-* **Raspbian 10  Buster**
+* ~~Raspbian 10  Buster~~ 
 * **Ubuntu 23.04 Lunar Lobster**
 * **Ubuntu 22.04 Jammy Jellyfish**
 * ~~Ubuntu 21.10 Impish Indri~~ 
