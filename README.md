@@ -8,12 +8,11 @@
 
 ## News
 
-**Current version** v2.0 released 2024/03/10
+**Current version** v1.9b released 2023/10/07
 
-	Disabled support for non x86_64 systems (like ARM). More under #66
-	Added support for Ubuntu 23.04 (Mantic Minotaur)
-	Fixed chown warning
-	
+	Rutorrent version upgraded from 4.1.6 to 4.2.6
+	Added info message about ignoring known errors (_cloudflare spectrogram screenshots plugin)
+
 For details, always go to Changelog.
 
 ## Features ##
@@ -29,8 +28,7 @@ For details, always go to Changelog.
 * **Debian 12    Bookworm**
 * **Debian 11    Bullseye**
 * **Debian 10    Buster**
-* ~~**Raspbian 10  Buster**~~
-* **Ubuntu 23.10 Mantic Minotaur**
+* **Raspbian 10  Buster**
 * **Ubuntu 23.04 Lunar Lobster**
 * **Ubuntu 22.04 Jammy Jellyfish**
 * ~~Ubuntu 21.10 Impish Indri~~ 
