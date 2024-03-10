@@ -43,6 +43,21 @@ while true; do
     shift || break
 done
 
+#detecting architecture
+function DETECTARCH {
+if [ $(uname -m) != "x86_64" ]; then
+
+  echo "You are running ${RED}unsupported architecture${NORMAL}. Currently we support only x86_64"
+  echo "For more information see issue #66. Consider donating $ or Raspberry because I have nowhere to test"
+  echo "Alternatively you could share access to you Rpi, I could do testing there"
+  echo ""
+  echo "https://github.com/Bercik1337/rt-auto-install/issues"
+  
+  exit 1
+fi
+}
+
+
 #detecting os
 function DETECTOS {
 echo "${PURPLE}Detecting Operating System" 
@@ -137,6 +152,7 @@ else
         exit 3
 fi
 }
+DETECTARCH
 DETECTOS
 
 #setup rT/libt/ruT version variables based on OS
