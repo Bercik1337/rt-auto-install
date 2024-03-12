@@ -36,7 +36,7 @@
 
 ## Features ##
 
-* This script performs automatic installation of rTorrent (BitTorrent client) and ruTorrent(web based GUI).
+* This script performs automatic installation of rTorrent (BitTorrent client) and ruTorrent (web based GUI).
 * It detects your OS and uses most recent version of rT available in repository of your Linux distribution.
 * Gives menu-driven guidance when creating username.
 * This script is minimal inversiv to files and operating system

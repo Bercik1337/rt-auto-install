@@ -271,6 +271,8 @@ function WAIT_A_MINUTE {
 
 # Function to set the system user, rtorrent is going to run as
 function SET_RTORRENT_USER {
+	#UID_MIN=$(cat /etc/login.defs | grep "^UID_MIN" | grep -o '[[:digit:]]*')
+	#UID_MAX=$(cat /etc/login.defs | grep "^UID_MAX" | grep -o '[[:digit:]]*')
 	UID_MIN=$(awk '/^UID_MIN/ {print $2}' /etc/login.defs)
 	UID_MAX=$(awk '/^UID_MAX/ {print $2}' /etc/login.defs)
 	
