@@ -9,30 +9,30 @@
 
 **Current version** v2.3 released 2024/03/01
 
-    * always use of the latest ruTorrent
-    * no need to care about the distro version
-    * remove unnecessary stuff
-    * add support for arm* systems (scgi)
-    * correcting external ipv4
-    * deactivate not supportet plugins
-    * redirect http to https
-    * correct terminal colors
-    * add autodl-irssi plugin (Rt-Install-minimal-new.bash)
-    * update .rtorrent.rc to the new commands
-    * fix changelog and todo view
-    * put functions together for more order
-    * make pre-installation packages fully silent
-    * and a little bit there and there
-    * now choose between apache2, nginx and lighttpd as webserver (Rt-Install-minimal-apache2_ngnix_lighttpd.bash)
-    * create htaccess passwords now with openssl
-    * remove ToDo-List from the Menu
-    * move from SCGIMount to rpc.socket
-    * hardening the webserver basend on https://raymii.org/s/tutorials/Strong_SSL_Security_On_*.html
-    * reintegrade To-Do List
-    * putting rtorrent and rutorrent user determination inside the menu and prevent installation to start without
-    * add function to update ruTorrent
+	* always use of the latest ruTorrent
+	* no need to care about the distro version
+	* remove unnecessary stuff
+	* add support for arm* systems (scgi)
+	* correcting external ipv4
+	* deactivate not supportet plugins
+	* redirect http to https
+	* correct terminal colors
+	* add autodl-irssi plugin (Rt-Install-minimal-new.bash)
+	* update .rtorrent.rc to the new commands
+	* fix changelog and todo view
+	* put functions together for more order
+	* make pre-installation packages fully silent
+	* and a little bit there and there
+	* now choose between apache2, nginx and lighttpd as webserver (Rt-Install-minimal-apache2_ngnix_lighttpd.bash)
+	* create htaccess passwords now with openssl
+	* remove ToDo-List from the Menu
+	* move from SCGIMount to rpc.socket
+	* hardening the webserver basend on https://raymii.org/s/tutorials/Strong_SSL_Security_On_*.html
+	* reintegrade To-Do List
+	* putting rtorrent and rutorrent user determination inside the menu and prevent installation to start without
+	* add function to update ruTorrent
 	* reactivate plugins screenshots, spectrogram
-    * some corrections
+	* some corrections
 
 ## Features ##
 
@@ -69,8 +69,8 @@ Run the script with sudo or as root
 
 ## To-Do ##
 * Add Wiki to explain what is, and why something is done (only someone is interested)
-* remove the SCGI code from the scrip is atm. deactivated
-* remove other commented out parts from the script to clean it update
+* ~~remove the SCGI code from the scrip is atm. deactivated~~
+* ~~remove other commented out parts from the script to clean it update~~
 * put some effort in a wider testbase rewriting was done on debian 12.5 only (with countless VMs)
 * may transfer naming and links to this fork so there is less confusion for users
 * also transfer changelog and To-Do
