@@ -37,10 +37,10 @@ PORT_RANGE="6790-6999"
 WEBSERVER="apache2"
 
 # grep the Software Versions
-#RTVERSION=$(apt-cache policy rtorrent | head -3 | tail -1 | cut -d' ' -f4 | cut -d'-' -f1)
-#LIBTORRENTVERSION=$(apt-cache policy libtorrent?? | head -3 | tail -1 | cut -d' ' -f4 | cut -d':' -f2 | cut -d'-' -f1)
+RTVERSION=$(apt-cache policy rtorrent | head -3 | tail -1 | cut -d' ' -f4 | cut -d'-' -f1)
+LIBTORRENTVERSION=$(apt-cache policy libtorrent?? | head -3 | tail -1 | cut -d' ' -f4 | cut -d':' -f2 | cut -d'-' -f1)
 #RUTORRENTVERSION=$(wget -q https://api.github.com/repos/Novik/ruTorrent/tags -O - | grep name | cut -d'"' -f4 | grep -v 'rutorrent\|plugins\|beta' | head -1)
-#PHPVERSION=$(apt-cache policy php?.? | grep Candidate | grep -v none | cut -d' ' -f4 | cut -d'.' -f-2)
+PHPVERSION=$(apt-cache policy php?.? | grep Candidate | grep -v none | cut -d' ' -f4 | cut -d'.' -f-2)
 
 # Pretty function to spit out ok/fail after each important step.
 function CHECKLASTRC {
@@ -121,7 +121,7 @@ function DETECTOS {
 	#https://linuxmint.com/download_all.php
 	#https://wiki.ubuntu.com/Releases
 
-	debian_eol=9
+	debian_eol=10
 	#raspbian_eol=$debian_eol
 	#raspberry_pi_os_eol=$debian_eol
 	linux_mint_eol=19.3
@@ -211,10 +211,7 @@ function PRE_UTILS {
 	fi
 	
 	# grep the Software Versions
-	RTVERSION=$(apt-cache policy rtorrent | head -3 | tail -1 | cut -d' ' -f4 | cut -d'-' -f1)
-	LIBTORRENTVERSION=$(apt-cache policy libtorrent?? | head -3 | tail -1 | cut -d' ' -f4 | cut -d':' -f2 | cut -d'-' -f1)
 	RUTORRENTVERSION=$(wget -q https://api.github.com/repos/Novik/ruTorrent/tags -O - | grep name | cut -d'"' -f4 | grep -v 'rutorrent\|plugins\|beta' | head -1)
-	PHPVERSION=$(apt-cache policy php?.? | grep Candidate | grep -v none | cut -d' ' -f4 | cut -d'.' -f-2)
 }
 
 function INSTALL_COMMON {
@@ -251,22 +248,6 @@ function LICENSE {
 	echo
 	read -n 1 -s -p ' Press any key to continue...'
 	echo
-}
-
-function WAIT_A_MINUTE {
-	echo "${NORMAL}${BOLD}--------------------------------------------------------------------------------"
-	echo " ${NORMAL}Now you will be ask for a valid system user and an user for the ruTorrent"
-	echo " Webportal (any user possible, no bindings on system user present)"
-	echo " then you will hit the Menu for the Installation and other Options."
-	echo "${BOLD}--------------------------------------------------------------------------------${NORMAL}"
-	#sleep 10
-	#echo
-	for i in {5..1}
-	do
-		echo -n "."
-		sleep 1
-	done
-	echo -e
 }
 
 # Function to set the system user, rtorrent is going to run as
