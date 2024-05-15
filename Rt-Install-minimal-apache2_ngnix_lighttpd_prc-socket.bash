@@ -339,7 +339,7 @@ function LIST_WEB_USERS {
 # Function for installing dependencies
 function INSTALL_APACHE {
 	echo "${CYAN}Installing dependencies${NORMAL}"
-	apt-get install -yqq apache2 libapache2-mod-php php-cli php-curl php-mbstring
+	apt-get install -yqq apache2 libapache2-mod-php php-cli php-curl php-mbstring php-xml
 	CHECKLASTRC
 
 	#https://www.digitalocean.com/community/tutorials/apache-configuration-error-ah00558-could-not-reliably-determine-the-server-s-fully-qualified-domain-name
