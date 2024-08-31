@@ -58,8 +58,8 @@ More to come, see TODO.
 In the installation process you have to choose a system user to run rtorrent.
 Also you will get the opportunity of installing a total of 46 plugins. See list further down.
 The script add a init script that makes rtorrent start, at a possible reboot, in the
-given username's screen/tmux session. Use "service rtorrent-init start" and
-"service rtorrent-init stop" to start and stop rtorrent respectively.
+given username's screen/tmux session. Use "service rtorrent start" and
+"service rtorrent stop" to start and stop rtorrent respectively.
 
 Promo
 ------------
