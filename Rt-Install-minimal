@@ -1,7 +1,7 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
-LASTMODIFIED="2024/03/10"
-SCRIPTVERSION="2.0"
+LASTMODIFIED="2024/10/05"
+SCRIPTVERSION="2.1"
 
 # Formatting variables
 #colors
@@ -76,7 +76,7 @@ OSRELEASE=$(grep PRETTY_NAME /etc/os-release)
 #checking distribution
 DISTRO=$(grep -i -o -e Debian -i -o -e Ubuntu -i -o -e Mint -i -o -e Raspbian -i -o -e LMDE <<< $OSRELEASE)
 #checking release
-DISTRONAMEVER=$(grep -i -o -e buster -i -o -e bullseye -i -o -e bookworm -i -o -e "18.04" -i -o -e "18.10" -i -o -e "19.04" -i -o -e "20.04" -i -o -e "20.10" -i -o -e "21.04" -i -o -e "21.10" -i -o -e "22.04" -i -o -e "23.04" -i -o -e "19.10"  -i -o -e "19.2"  -i -o -e "19.3" -i -o -e "19.1" -i -o -e "19" -i -o -e "20" -i -o -e "20.1"  -i -o -e "20.2" -i -o -e "20.3" -i -o -e "21"  -i -o -e "elsie" -i -o -e "23.10" <<< $OSRELEASE)
+DISTRONAMEVER=$(grep -i -o -e buster -i -o -e bullseye -i -o -e bookworm -i -o -e "18.04" -i -o -e "18.10" -i -o -e "19.04" -i -o -e "20.04" -i -o -e "20.10" -i -o -e "21.04" -i -o -e "21.10" -i -o -e "22.04" -i -o -e "23.04" -i -o -e "19.10"  -i -o -e "19.2"  -i -o -e "19.3" -i -o -e "19.1" -i -o -e "19" -i -o -e "20" -i -o -e "20.1"  -i -o -e "20.2" -i -o -e "20.3" -i -o -e "21"  -i -o -e "elsie" -i -o -e "23.10" -i -o -e "24.04" <<< $OSRELEASE)
 function EOL {
 echo 
 echo  "${RED}Your system has reached End Of Life - it is no longer usable, please change OS to newer release"
@@ -92,7 +92,7 @@ case $DISTRO in
 					case $DISTRONAMEVER in
 					buster) echo "${PURPLE}${BOLD}release:${GREEN} 10 (Buster)" ;				OSFINALNAME=deb10buster;	;;
 				  bullseye) echo "${PURPLE}${BOLD}release:${GREEN} 11 (Bullseye)" ;				OSFINALNAME=deb11bullseye;	;;
-				bookworm) echo "${PURPLE}${BOLD}release:${GREEN} 12 (Bookworm)" ;                             OSFINALNAME=deb12bookworm;      ;;
+				bookworm) echo "${PURPLE}${BOLD}release:${GREEN} 12 (Bookworm)" ;				OSFINALNAME=deb12bookworm;	;;
 					*) echo "${YELLOW}It seems you run Debian OS but unsupported release"; exit 4							;;
 					esac;;
 			Raspbian)
@@ -105,39 +105,40 @@ case $DISTRO in
 			Ubuntu)
 				echo "${BOLD}name: ${GREEN}Ubuntu"
 					case $DISTRONAMEVER in
-    				18.04) echo "${PURPLE}${BOLD}release:${GREEN} 18.04 (Bionic Beaver)" ;		OSFINALNAME=ubu1804			;;
-    				18.10) echo "${PURPLE}${BOLD}release:${GREEN} 18.10 (Cosmic Cuttlefish)" ; EOL ;	OSFINALNAME=ubu1810			;;
-    				19.04) echo "${PURPLE}${BOLD}release:${GREEN} 19.04 (Disco Dingo)" ; EOL ;		OSFINALNAME=ubu1904			;;
-	 				19.10) echo "${PURPLE}${BOLD}release:${GREEN} 19.10 (Eoan Ermine)" ; EOL ;		OSFINALNAME=ubu1910			;;
-	 				20.04) echo "${PURPLE}${BOLD}release:${GREEN} 20.04 (Focal Fossa)" ;		OSFINALNAME=ubu2004			;;
-					20.10) echo "${PURPLE}${BOLD}release:${GREEN} 20.10 (Groovy Gorilla)";  EOL ;         OSFINALNAME=ubu2010		;;
-					21.04) echo "${PURPLE}${BOLD}release:${GREEN} 21.04 (Hirsute Hippo)";  EOL ;        OSFINALNAME=ubu2104             ;;
-					21.10) echo "${PURPLE}${BOLD}release:${GREEN} 21.10 (Impish Indri)"; EOL ;        OSFINALNAME=ubu2110             ;;
-					22.04) echo "${PURPLE}${BOLD}release:${GREEN} 22.04 (Jammy Jellifish)";          OSFINALNAME=ubu2104             ;;
-					23.04) echo "${PURPLE}${BOLD}release:${GREEN} 23.04 (Lunar Lobster)";		 OSFINALNAME=ubu2104 ;;
-					23.10) echo "${PURPLE}${BOLD}release:${GREEN} 23.04 (Mantic Minotaur)";		 OSFINALNAME=ubu2104 ;;
+    				18.04) echo "${PURPLE}${BOLD}release:${GREEN} 18.04 (Bionic Beaver)" ;				OSFINALNAME=ubu1804	;;
+    				18.10) echo "${PURPLE}${BOLD}release:${GREEN} 18.10 (Cosmic Cuttlefish)" ; EOL ;	OSFINALNAME=ubu1810	;;
+    				19.04) echo "${PURPLE}${BOLD}release:${GREEN} 19.04 (Disco Dingo)" ; EOL ;			OSFINALNAME=ubu1904	;;
+	 				19.10) echo "${PURPLE}${BOLD}release:${GREEN} 19.10 (Eoan Ermine)" ; EOL ;			OSFINALNAME=ubu1910	;;
+	 				20.04) echo "${PURPLE}${BOLD}release:${GREEN} 20.04 (Focal Fossa)" ;				OSFINALNAME=ubu2004	;;
+					20.10) echo "${PURPLE}${BOLD}release:${GREEN} 20.10 (Groovy Gorilla)";  EOL ;		OSFINALNAME=ubu2010 ;;
+					21.04) echo "${PURPLE}${BOLD}release:${GREEN} 21.04 (Hirsute Hippo)";  EOL ;		OSFINALNAME=ubu2104 ;;
+					21.10) echo "${PURPLE}${BOLD}release:${GREEN} 21.10 (Impish Indri)"; EOL ;			OSFINALNAME=ubu2110 ;;
+					22.04) echo "${PURPLE}${BOLD}release:${GREEN} 22.04 (Jammy Jellifish)";				OSFINALNAME=ubu2104 ;;
+					23.04) echo "${PURPLE}${BOLD}release:${GREEN} 23.04 (Lunar Lobster)";				OSFINALNAME=ubu2104 ;;
+					23.10) echo "${PURPLE}${BOLD}release:${GREEN} 23.04 (Mantic Minotaur)";				OSFINALNAME=ubu2104 ;;
+					24.04) echo "${PURPLE}${BOLD}release:${GREEN} 24.04 (Noble Numbat)";				OSFINALNAME=ubu2104 ;;
 					*) echo "${YELLOW}It seems you run Ubuntu OS but unsupported release"; exit 4
 					esac;;
 			LMDE)
 				echo "${BOLD}name: ${GREEN}LMDE"
 					case $DISTRONAMEVER in
-					elsie) echo "${PURPLE}${BOLD}release:${GREEN} Elsie";          OSFINALNAME=ubu2010		;;
-    				*) echo "${YELLOW}It seems you run LMDE OS but unsupported release"; exit 4							;;
+					elsie) echo "${PURPLE}${BOLD}release:${GREEN} Elsie";         					 OSFINALNAME=ubu2010	;;
+    				*) echo "${YELLOW}It seems you run LMDE OS but unsupported release"; exit 4	;;
 					esac;;
 
 
 			Mint) 
 				echo "${BOLD}name: ${GREEN}Mint"
 					case $DISTRONAMEVER in
-    				19.3) echo "${PURPLE}${BOLD}release:${GREEN} 19.3 (Tricia)" ; OSFINALNAME=ubu1804 ;;
-    				19.2) echo "${PURPLE}${BOLD}release:${GREEN} 19.2 (Tina)" ; OSFINALNAME=ubu1804 ;;
-    				19.1) echo "${PURPLE}${BOLD}release:${GREEN} 19.1 (Tessa)" ; OSFINALNAME=ubu1804 ;;
-    				19) echo "${PURPLE}${BOLD}release:${GREEN} 19 (Tara)" ; OSFINALNAME=ubu1804 ;;
-				20.3) echo "${PURPLE}${BOLD}release:${GREEN} 20.3 (Una)" ; OSFINALNAME=ubu2010 ;;
-				20.2) echo "${PURPLE}${BOLD}release:${GREEN} 20.2 (Uma)" ; OSFINALNAME=ubu2010 ;;
-				20.1) echo "${PURPLE}${BOLD}release:${GREEN} 20.1 (Ulyssa)" ; OSFINALNAME=ubu2010 ;;
-				20) echo "${PURPLE}${BOLD}release:${GREEN} 20 (Ulyana)" ; OSFINALNAME=ubu2010 ;;
-				21) echo "${PURPLE}${BOLD}release:${GREEN} 21 (Vanessa)" ; OSFINALNAME=ubu2010 ;;
+    				19.3) echo "${PURPLE}${BOLD}release:${GREEN} 19.3 (Tricia)" ; 		OSFINALNAME=ubu1804 ;;
+    				19.2) echo "${PURPLE}${BOLD}release:${GREEN} 19.2 (Tina)" ;			OSFINALNAME=ubu1804 ;;
+    				19.1) echo "${PURPLE}${BOLD}release:${GREEN} 19.1 (Tessa)" ;		OSFINALNAME=ubu1804 ;;
+    				19) echo "${PURPLE}${BOLD}release:${GREEN} 19 (Tara)" ;				OSFINALNAME=ubu1804 ;;
+				20.3) echo "${PURPLE}${BOLD}release:${GREEN} 20.3 (Una)" ;				OSFINALNAME=ubu2010 ;;
+				20.2) echo "${PURPLE}${BOLD}release:${GREEN} 20.2 (Uma)" ;				OSFINALNAME=ubu2010 ;;
+				20.1) echo "${PURPLE}${BOLD}release:${GREEN} 20.1 (Ulyssa)" ;			OSFINALNAME=ubu2010 ;;
+				20) echo "${PURPLE}${BOLD}release:${GREEN} 20 (Ulyana)" ; 				OSFINALNAME=ubu2010 ;;
+				21) echo "${PURPLE}${BOLD}release:${GREEN} 21 (Vanessa)" ;				OSFINALNAME=ubu2010 ;;
 					*) echo "${YELLOW}It seems you run Mint OS but unsupported release"; exit 4 ;;
 					esac;;
  			*)
@@ -172,6 +173,7 @@ case $OSFINALNAME in
 					ubu2104)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
 					ubu2110)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
 					ubu2204)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
+					ubu2404)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
 esac
 }
 OSDETAILS

@@ -8,11 +8,9 @@
 
 ## News
 
-**Current version** v2.0 released 2024/03/10
+**Current version** v2.1 released 2024/10/05
 
-	Disabled support for non x86_64 systems (like ARM). More under #66
-	Added support for Ubuntu 23.10 (Mantic Minotaur)
-	Fixed chown warning
+	Added support for Ubuntu 24.04 (Noble Numbat)
 
 For details, always go to Changelog.
 
@@ -30,6 +28,7 @@ For details, always go to Changelog.
 * **Debian 11    Bullseye**
 * **Debian 10    Buster**
 * ~~Raspbian 10  Buster~~ 
+* **Ubuntu 24.04 Noble Numbat**
 * **Ubuntu 23.10 Mantic Minotaur**
 * **Ubuntu 23.04 Lunar Lobster**
 * **Ubuntu 22.04 Jammy Jellyfish**

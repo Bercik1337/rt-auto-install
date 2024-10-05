@@ -1,3 +1,6 @@
+VERSION 2.1   2024-10-05
+* Added support for Ubuntu 24.04 (Noble Numbat)
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 VERSION 2.0   2024-03-10
 * Disabled support for non x86_64 systems (like ARM). More under #66
 * Added support for Ubuntu 23.10 (Mantic Minotaur)
