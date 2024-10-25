@@ -1,7 +1,7 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
-LASTMODIFIED="2024/10/05"
-SCRIPTVERSION="2.1"
+LASTMODIFIED="2024/10/25"
+SCRIPTVERSION="2.2"
 
 # Formatting variables
 #colors
@@ -18,6 +18,24 @@ WHITE=$(tput setaf 7)
 #config
 FASTMODE='0'
 
+#CLEANUP OF SOME VARIABLES
+# The system user rtorrent is going to run as
+RTORRENT_USER=""
+# The user that is going to log into rutorrent (htaccess)
+WEB_USER=""
+RTORRENT_GROUP=""
+# Array with webusers including their hashed paswords
+WEB_USER_ARRAY=()
+# Temporary download folder for plugins
+TEMP_PLUGIN_DIR="rutorrentPlugins/"
+# Array of downloaded plugins
+PLUGIN_ARRAY=()
+#rTorrent users home dir.
+HOMEDIR=""
+
+
+
+
 # Brief usage in CLI
 function DISPLAY_HELP {
 echo "${PURPLE} Bercik's rt-auto-install script. Version $SCRIPTVERSION released $LASTMODIFIED${NORMAL}"
@@ -26,6 +44,14 @@ echo "   -h --help         - you are looking at it"
 echo "   -d --demo         - hides pubic IP at the end"
 echo "   -f --fast         - skip all fancy slowdowns, not useful when having problems"
 echo " "
+echo " Batch mode (for advanced users)"
+echo "   -b --batch        - enable batch mode processing (skips interactive menu)"
+echo "   -u --sysuser      - define linux user, must exist in /etc/passwd"
+echo "   -r --rtuser       - define rutorrent WebGUI user"
+echo "   -p --rtpass       - define rutorrent WebGUI password"
+echo "   -o --os           - select OS flavor"
+echo "   eg ./Rt-Install-minimal -f -b  -u ubuntu -u rt -p secret -o ubu2004"
+echo " "
 echo "All above are optional. No need to use them."
 echo "${GREEN}Remember to run as root or with sudo.${NORMAL}"
 echo ""
@@ -33,15 +59,28 @@ echo "${BOLD}Bugs, feature requests? Visit https://github.com/Bercik1337/rt-auto
 echo ""
 }
 
-#command line options
-while true; do
-   case $1 in
-        -f | --fast )           eval FASTMODE='1'  ;;
-        -d | --demo )           DEMO=1             ;;
-        -h | --help )           DISPLAY_HELP; exit ;;
-   esac 
-    shift || break
+#zero batchflag, by default users want interactive session
+batchflag=0
+VALID_ARGS=$(getopt -o bhdfu:r:p:o: --long help,demo,batch,fast,sysuser:,rtuser:,rtpass:,os: -- "$@")
+eval set -- "$VALID_ARGS"
+while [ $# -gt 0 ]
+do
+    case $1 in
+    -h|--help)		DISPLAY_HELP; exit 0; shift;;
+    -d|--demo)		DEMO="1" 			; shift;;
+	-u|--sysuser)	RTORRENT_USER="$2"			; shift;;
+	-r|--rtuser) 	USER="$2"	; shift;;
+	-p|--rtpass)	USER_PASS="$2"	; shift;;
+	-o|--os)		OSFINALNAME="$2" 	; shift;;
+    -f|--fast)		eval FASTMODE='1'	; shift;;
+	-b|--batch)		batchflag=1			; shift;;
+    (--) shift; break ;;
+    *) shift ;;
+    esac
+   
 done
+
+
 
 #detecting architecture
 function DETECTARCH {
@@ -60,6 +99,11 @@ fi
 
 #detecting os
 function DETECTOS {
+
+if [ "$batchflag" -eq 1 ]; then
+    return; #skip this step if batch mode is invoked
+fi
+
 echo "${PURPLE}Detecting Operating System" 
 if [[ "$FASTMODE" -ne "1" ]]; then for i in {5..1}; do echo -n ". " && sleep 1;  done ; echo -e ; fi
 
@@ -106,17 +150,17 @@ case $DISTRO in
 				echo "${BOLD}name: ${GREEN}Ubuntu"
 					case $DISTRONAMEVER in
     				18.04) echo "${PURPLE}${BOLD}release:${GREEN} 18.04 (Bionic Beaver)" ;				OSFINALNAME=ubu1804	;;
-    				18.10) echo "${PURPLE}${BOLD}release:${GREEN} 18.10 (Cosmic Cuttlefish)" ; EOL ;	OSFINALNAME=ubu1810	;;
-    				19.04) echo "${PURPLE}${BOLD}release:${GREEN} 19.04 (Disco Dingo)" ; EOL ;			OSFINALNAME=ubu1904	;;
-	 				19.10) echo "${PURPLE}${BOLD}release:${GREEN} 19.10 (Eoan Ermine)" ; EOL ;			OSFINALNAME=ubu1910	;;
+    				18.10) echo "${PURPLE}${BOLD}release:${GREEN} 18.10 (Cosmic Cuttlefish)" ;	EOL ;	OSFINALNAME=ubu1810	;;
+    				19.04) echo "${PURPLE}${BOLD}release:${GREEN} 19.04 (Disco Dingo)" ;		EOL ;	OSFINALNAME=ubu1904	;;
+	 				19.10) echo "${PURPLE}${BOLD}release:${GREEN} 19.10 (Eoan Ermine)" ;		EOL ;	OSFINALNAME=ubu1910	;;
 	 				20.04) echo "${PURPLE}${BOLD}release:${GREEN} 20.04 (Focal Fossa)" ;				OSFINALNAME=ubu2004	;;
-					20.10) echo "${PURPLE}${BOLD}release:${GREEN} 20.10 (Groovy Gorilla)";  EOL ;		OSFINALNAME=ubu2010 ;;
-					21.04) echo "${PURPLE}${BOLD}release:${GREEN} 21.04 (Hirsute Hippo)";  EOL ;		OSFINALNAME=ubu2104 ;;
-					21.10) echo "${PURPLE}${BOLD}release:${GREEN} 21.10 (Impish Indri)"; EOL ;			OSFINALNAME=ubu2110 ;;
-					22.04) echo "${PURPLE}${BOLD}release:${GREEN} 22.04 (Jammy Jellifish)";				OSFINALNAME=ubu2104 ;;
-					23.04) echo "${PURPLE}${BOLD}release:${GREEN} 23.04 (Lunar Lobster)";				OSFINALNAME=ubu2104 ;;
-					23.10) echo "${PURPLE}${BOLD}release:${GREEN} 23.04 (Mantic Minotaur)";				OSFINALNAME=ubu2104 ;;
-					24.04) echo "${PURPLE}${BOLD}release:${GREEN} 24.04 (Noble Numbat)";				OSFINALNAME=ubu2104 ;;
+					20.10) echo "${PURPLE}${BOLD}release:${GREEN} 20.10 (Groovy Gorilla)";		EOL ;	OSFINALNAME=ubu2010 ;;
+					21.04) echo "${PURPLE}${BOLD}release:${GREEN} 21.04 (Hirsute Hippo)";		EOL ;	OSFINALNAME=ubu2104 ;;
+					21.10) echo "${PURPLE}${BOLD}release:${GREEN} 21.10 (Impish Indri)";		EOL ;	OSFINALNAME=ubu2110 ;;
+					22.04) echo "${PURPLE}${BOLD}release:${GREEN} 22.04 (Jammy Jellifish)";				OSFINALNAME=ubu2204 ;;
+					23.04) echo "${PURPLE}${BOLD}release:${GREEN} 23.04 (Lunar Lobster)";				OSFINALNAME=ubu2304 ;;
+					23.10) echo "${PURPLE}${BOLD}release:${GREEN} 23.04 (Mantic Minotaur)";				OSFINALNAME=ubu2310 ;;
+					24.04) echo "${PURPLE}${BOLD}release:${GREEN} 24.04 (Noble Numbat)";				OSFINALNAME=ubu2404 ;;
 					*) echo "${YELLOW}It seems you run Ubuntu OS but unsupported release"; exit 4
 					esac;;
 			LMDE)
@@ -154,6 +198,7 @@ else
         exit 3
 fi
 }
+
 DETECTARCH
 DETECTOS
 
@@ -173,11 +218,13 @@ case $OSFINALNAME in
 					ubu2104)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
 					ubu2110)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
 					ubu2204)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
+					ubu2304)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
+					ubu2310)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
 					ubu2404)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
 esac
 }
 OSDETAILS
-clear
+#clear
 
 
 
@@ -192,23 +239,9 @@ function CHECKLASTRC {
   fi
 }
 
-# The system user rtorrent is going to run as
-RTORRENT_USER=""
 
-# The user that is going to log into rutorrent (htaccess)
-WEB_USER=""
 
-# Array with webusers including their hashed paswords
-WEB_USER_ARRAY=()
 
-# Temporary download folder for plugins
-TEMP_PLUGIN_DIR="rutorrentPlugins/"
-
-# Array of downloaded plugins
-PLUGIN_ARRAY=()
-
-#rTorrent users home dir.
-HOMEDIR=""
 
 # Function to check if running user is root
 function CHECK_ROOT {
@@ -242,6 +275,10 @@ function APACHE_UTILS {
 
 # License
 function LICENSE {
+if [ "$batchflag" -eq 1 ]; then
+    return; #skip this step if batch mode is invoked
+fi
+
 	clear
 	echo "${BOLD}--------------------------------------------------------------------------"
 	echo " THE BEER-WARE LICENSE (Revision 42):"
@@ -376,7 +413,7 @@ function DOWNLOAD_PLUGIN {
 
 
 # Function for installing dependencies
-clear
+#clear
 function APT_DEPENDENCIES {
 echo "${CYAN}Installing dependencies${NORMAL}"
 	apt-get update
@@ -671,7 +708,7 @@ function INSTALL_COMPLETE {
 
 	# The IPv6 local address, is not very used for now, anyway if needed, just change 'inet' to 'inet6'
 	lcl=$(ip addr | grep 'inet ' | awk '{print $2}' | cut -d/ -f1 | grep -v "127." | head -n 1)
-	ext=$(curl -s http://www.icanhazip.com)
+	ext=$(curl ifconfig.me)
     if [[ "$DEMO" -eq "1" ]]
     then
     ext="DEMO MODE! Public IP hidden"
@@ -921,7 +958,59 @@ EOF
 function START_RTORRENT {
 	systemctl start rtorrent.service	
 }
+########## End of function definitions ####################################
 
+
+function BATCH {
+# - - - - - - 
+##debuging options
+##echo 1 sysuser: $RTORRENT_USER rtuser: $USER rtpass: $USER_PASS WEB_USER_ARRAY: $WEB_USER_ARRAY WEB_USER: $WEB_USER 
+##echo homedir: $HOMEDIR 
+##sleep 10
+# - - - - - - 
+SET_RTORRENT_GROUP
+HOMEDIR=$(cat /etc/passwd | grep /"$RTORRENT_USER":/ | cut -d: -f6)
+# - - - - - - 
+##debuging options
+##echo 2 sysuser: $RTORRENT_USER rtuser: $USER rtpass: $USER_PASS WEB_USER_ARRAY: $WEB_USER_ARRAY WEB_USER: $WEB_USER  
+##echo homedir: $HOMEDIR 
+##sleep 10
+# - - - - - -
+PREPARE_CONFIG_FILES
+APT_DEPENDENCIES_NOSCGI
+USER=$(htpasswd -nb $USER $USER_PASS)
+WEB_USER_ARRAY+=($USER)
+INSTALL_RTORRENT_APT_R98
+INSTALL_SCGI
+INSTALL_RUTORRENT
+####
+##debuging options
+##echo 3 sysuser: $RTORRENT_USER rtuser: $USER rtpass: $USER_PASS WEB_USER_ARRAY: $WEB_USER_ARRAY WEB_USER: $WEB_USER  
+##echo homedir: $HOMEDIR 
+##sleep 10
+# - - - - - -
+CONFIGURE_APACHE
+printf "%s\n" "${WEB_USER_ARRAY[@]}" > /var/www/rutorrent/.htpasswd
+INSTALL_SYSTEMD_SERVICE
+START_RTORRENT
+INSTALL_COMPLETE
+# - - - - - - 
+##debuging options
+##echo 4 sysuser: $RTORRENT_USER rtuser: $USER rtpass: $USER_PASS WEB_USER_ARRAY: $WEB_USER_ARRAY WEB_USER: $WEB_USER 
+##echo homedir: $HOMEDIR 
+# - - - - - - 
+exit 0
+}
+
+if [ "$batchflag" -eq 1 ]; then
+    BATCH  # Call the BATCH function here if -b or --batch was set
+fi
+
+########## End of function definitions ####################################
+
+
+
+#####################
 PREPARE_CONFIG_FILES
 CHECK_ROOT
 LICENSE
@@ -993,11 +1082,15 @@ while true; do
                     ubu1910)  APT_DEPENDENCIES; INSTALL_RTORRENT_APT_R97; INSTALL_RUTORRENT								;;
 				#modern systems without scgi package ;(
 					deb11bullseye)  APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT	;;
-					deb12bookworm)  APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT      ;;
+					deb12bookworm)  APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT  ;;
                     ubu2004)  		APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT	;;
 		    ubu2010)            APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT      ;;
 		    ubu2104)            APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT      ;;
 		    ubu2110)            APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT      ;;
+			ubu2204)            APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT      ;;
+			ubu2304)            APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT      ;;
+			ubu2310)            APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT      ;;
+			ubu2404)            APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT      ;;
 			esac
 			CONFIGURE_APACHE
 			INSTALL_SYSTEMD_SERVICE

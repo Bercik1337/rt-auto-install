@@ -8,9 +8,9 @@
 
 ## News
 
-**Current version** v2.1 released 2024/10/05
+**Current version** v2.2 released 2024/12/25
 
-	Added support for Ubuntu 24.04 (Noble Numbat)
+	Added support for batch mode (unattended install)
 
 For details, always go to Changelog.
 
@@ -102,3 +102,22 @@ I might be the only person using this script - so be it. No containers for this 
 
 ### Support for more OSes? 
 See TODO
+
+
+## Batch mode for advanced users
+Since v2.2 script supports automatic deploment using batch mode. You can provide all necessary parameters to install entire environment. Excellent for deploying seedboxes or to combine with cloud-init.
+
+In future CI/CD pipeline for automated tests is planned (under GitLab).
+Automated installation has been CONFIRMED to be 100% working with these distros:
+
+| Distro    | Batch Support verified |
+| -------- | ------- |
+| Ubuntu 20.04  | ✅ |
+| Ubuntu 22.04 | ✅     |
+| Others    | in progress    |
+
+Try it yourself:
+`sudo ./Rt-Install-minimal -f -b  -u ubuntu -r rutorrent -p rupassword -o ubu2004`
+
+To see more info about batch parameters: `./Rt-Install-minimal -h`
+

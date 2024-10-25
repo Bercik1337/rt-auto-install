@@ -1,3 +1,6 @@
+VERSION 2.2   2024-10-25
+* Added support for batch mode (unattended install)
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 VERSION 2.1   2024-10-05
 * Added support for Ubuntu 24.04 (Noble Numbat)
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
