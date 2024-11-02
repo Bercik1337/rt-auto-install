@@ -106,7 +106,9 @@ Automated installation has been CONFIRMED to be 100% working with these distros:
 
 
 Try it yourself:
+
 `sudo ./Rt-Install-minimal -f -b  -u ubuntu -r rutorrent -p rupassword -o ubu2004`
+
 `sudo ./Rt-Install-minimal -f -b  -u ubuntu -r rutorrent -p rupassword -o deb11bullseye`
 
 To see more info about batch parameters: `./Rt-Install-minimal -h`
