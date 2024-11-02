@@ -24,32 +24,26 @@ For details, always go to Changelog.
 
 ## Supported operating systems ##
 
-* **Debian 12    Bookworm**
-* **Debian 11    Bullseye**
-* **Debian 10    Buster**
-* ~~Raspbian 10  Buster~~ 
-* **Ubuntu 24.04 Noble Numbat**
-* **Ubuntu 23.10 Mantic Minotaur**
-* **Ubuntu 23.04 Lunar Lobster**
-* **Ubuntu 22.04 Jammy Jellyfish**
-* ~~Ubuntu 21.10 Impish Indri~~ 
-* ~~Ubuntu 21.04 Hirsute Hippo~~ 
-* ~~Ubuntu 20.10 Groovy Gorilla~~ 
-* **Ubuntu 20.04 Focal Fossa**
-* ~~Ubuntu 19.10 Eoan Ermine~~ 
-* ~~Ubuntu 19.04 Disco Dingo~~ 
-* ~~Ubuntu 18.10 Cosmic Cuttlefish~~ 
-* **Ubuntu 18.04 Bionic Beaver**
-* **Mint   21    Vanessa**
-* **Mint   20.3  Una**
-* **Mint   20.2  Uma**
-* **Mint   20.1  Ulyssa**
-* **Mint   20    Ulyana**
-* **Mint   19.3  Tricia**
-* **Mint   19.2  Tina**
-* **Mint   19.1  Tessa**
-* **Mint   19    Tara**
-* **LMDE   5     Elsie**
+| Distro    | Manual installation (default) | Batch Support verified |
+| -------- | ------- | ------- |
+| Ubuntu 24.04 Noble Numbat | ✅ |  ✅ |
+| Ubuntu 23.10 Mantic Minotaur | ✅ | ✅ |
+| Ubuntu 23.04 Lunar Lobster | ✅ | ✅ |
+| Ubuntu 22.04 Jammy Jellyfish | ✅ | ✅ |
+| Ubuntu 20.04 Focal Fossa | ✅ | ✅ |
+| Debian 12    Bookworm | ✅ | ✅ |
+| Debian 11    Bullseye | ✅ | ✅ |
+| ~~Raspbian 10  Buster~~| see #66  |  |
+| Mint   22    Wilma | in progress |  |
+| Mint   21.3  Virginia | in progress |  |
+| Mint   21.2  Victoria | in progress |  |
+| Mint   21.1  Vera | in progress |  |
+| Mint   21    Vanessa | ✅ |  |
+| Mint   20.3  Una | ✅ |  |
+| Mint   20.2  Uma | ✅ |  |
+| Mint   20.1  Ulyssa | ✅ |  |
+| Mint   20    Ulyana | ✅ |  |
+| Others    | in progress    |
 
 More to come, see TODO.
 
@@ -110,14 +104,10 @@ Since v2.2 script supports automatic deploment using batch mode. You can provide
 In future CI/CD pipeline for automated tests is planned (under GitLab).
 Automated installation has been CONFIRMED to be 100% working with these distros:
 
-| Distro    | Batch Support verified |
-| -------- | ------- |
-| Ubuntu 20.04  | ✅ |
-| Ubuntu 22.04 | ✅     |
-| Others    | in progress    |
 
 Try it yourself:
 `sudo ./Rt-Install-minimal -f -b  -u ubuntu -r rutorrent -p rupassword -o ubu2004`
+`sudo ./Rt-Install-minimal -f -b  -u ubuntu -r rutorrent -p rupassword -o deb11bullseye`
 
 To see more info about batch parameters: `./Rt-Install-minimal -h`
 
