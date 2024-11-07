@@ -8,9 +8,10 @@
 
 ## News
 
-**Current version** v2.2 released 2024/12/25
+**Current version** v2.3 released 2024/11/07
 
-	Added support for batch mode (unattended install)
+	Added support for Ubuntu 24.10 Oracular Oriole
+	Help for batch mode is extended
 
 For details, always go to Changelog.
 
@@ -26,6 +27,7 @@ For details, always go to Changelog.
 
 | Distro    | Manual installation (default) | Batch Support verified |
 | -------- | ------- | ------- |
+| Ubuntu 24.10 Oracular Oriole | ✅ |  ✅ |
 | Ubuntu 24.04 Noble Numbat | ✅ |  ✅ |
 | Ubuntu 23.10 Mantic Minotaur | ✅ | ✅ |
 | Ubuntu 23.04 Lunar Lobster | ✅ | ✅ |
@@ -34,15 +36,15 @@ For details, always go to Changelog.
 | Debian 12    Bookworm | ✅ | ✅ |
 | Debian 11    Bullseye | ✅ | ✅ |
 | ~~Raspbian 10  Buster~~| see #66  |  |
-| Mint   22    Wilma | in progress |  |
-| Mint   21.3  Virginia | in progress |  |
-| Mint   21.2  Victoria | in progress |  |
-| Mint   21.1  Vera | in progress |  |
-| Mint   21    Vanessa | ✅ |  |
-| Mint   20.3  Una | ✅ |  |
-| Mint   20.2  Uma | ✅ |  |
-| Mint   20.1  Ulyssa | ✅ |  |
-| Mint   20    Ulyana | ✅ |  |
+| Mint   22    Wilma | ✅ | ✅|
+| Mint   21.3  Virginia | ✅ | ✅ |
+| Mint   21.2  Victoria | ✅ | ✅ |
+| Mint   21.1  Vera | ✅ | ✅ |
+| Mint   21    Vanessa | ✅ |✅ |
+| Mint   20.3  Una | ✅ | ✅ |
+| Mint   20.2  Uma | ✅ | ✅  |
+| Mint   20.1  Ulyssa | ✅ | ✅ |
+| Mint   20    Ulyana | ✅ | ✅ |
 | Others    | in progress    |
 
 More to come, see TODO.

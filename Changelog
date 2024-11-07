@@ -1,3 +1,7 @@
+VERSION 2.2   2024-11-07
+* Added support for Ubuntu 24.10 Oracular Oriole
+* Help for batch mode is extended
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 VERSION 2.2   2024-10-25
 * Added support for batch mode (unattended install)
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
