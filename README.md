@@ -35,7 +35,7 @@ For details, always go to Changelog.
 | Ubuntu 20.04 Focal Fossa | ✅ | ✅ |
 | Debian 12    Bookworm | https://github.com/Bercik1337/rt-auto-install/issues/72 |  |
 | Debian 11    Bullseye | https://github.com/Bercik1337/rt-auto-install/issues/72 |  |
-| ~~Raspbian 10  Buster~~| https://github.com/Bercik1337/rt-auto-install/issues/66 )  |  |
+| ~~Raspbian 10  Buster~~| https://github.com/Bercik1337/rt-auto-install/issues/66   |  |
 | Mint   22    Wilma | ✅ | ✅|
 | Mint   21.3  Virginia | ✅ | ✅ |
 | Mint   21.2  Victoria | ✅ | ✅ |

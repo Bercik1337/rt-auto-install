@@ -138,9 +138,9 @@ case $DISTRO in
 			Debian)
 				echo "${BOLD}name: ${GREEN}Debian"
 						case $DISTRONAMEVER in
-					buster) echo "${PURPLE}${BOLD}release:${GREEN} 10 (Buster)" ;	EOL ;				OSFINALNAME=deb10buster;	;;
-				 	bullseye) echo "${PURPLE}${BOLD}release:${GREEN} 11 (Bullseye)" ;				OSFINALNAME=deb11bullseye;	;;
-					bookworm) echo "${PURPLE}${BOLD}release:${GREEN} 12 (Bookworm)" ;				OSFINALNAME=deb12bookworm;	;;
+#					buster) echo "${PURPLE}${BOLD}release:${GREEN} 10 (Buster)" ;	EOL ;				OSFINALNAME=deb10buster;	;;
+#				 	bullseye) echo "${PURPLE}${BOLD}release:${GREEN} 11 (Bullseye)" ;				OSFINALNAME=deb11bullseye;	;;
+#					bookworm) echo "${PURPLE}${BOLD}release:${GREEN} 12 (Bookworm)" ;				OSFINALNAME=deb12bookworm;	;;
 					*) echo "${YELLOW}It seems you run Debian OS but unsupported release"; exit 4							;;
 					esac;;
 			Raspbian)
