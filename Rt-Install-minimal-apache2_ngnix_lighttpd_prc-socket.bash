@@ -1,7 +1,7 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
-LASTMODIFIED="2024/03/01"
-SCRIPTVERSION="2.3"
+LASTMODIFIED="2024/12/16"
+SCRIPTVERSION="2.4"
 
 # https://linuxcommand.org/lc3_adv_tput.php
 # Formatting variables
@@ -586,11 +586,12 @@ function INSTALL_RUTORRENT {
 
 	echo "${YELLOW}Deactivate not supported plugins${NORMAL}"
 	# Deactivate not supported plugins
-	# not supported: _cloudflare (not neede by now: https://github.com/Novik/ruTorrent/issues/1870#issuecomment-480913560)
+	# not supported: _cloudflare (not needed by now: https://github.com/Novik/ruTorrent/issues/1870#issuecomment-480913560)
 	# not possible by folder rights: rutracker_check (Updatechecker for the russiantracker rutrack)
 	# removed: geoip (it's deprecated since php 7.4)
 	# not used: rpc (httprpc is used instead)
-	PLUGINS=("_cloudflare" "rutracker_check" "geoip" "rpc")
+	# not activated in this setup: dump
+	PLUGINS=("_cloudflare" "rutracker_check" "geoip" "rpc" "dump")
 	sed -i '$a\\' rutorrent/conf/plugins.ini
 	for PLUGIN in ${PLUGINS[@]}
 	do
