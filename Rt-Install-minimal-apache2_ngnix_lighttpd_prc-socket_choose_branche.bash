@@ -1,7 +1,7 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
-LASTMODIFIED="2024/12/16"
-SCRIPTVERSION="2.4"
+LASTMODIFIED="2024/12/18"
+SCRIPTVERSION="2.5"
 
 # https://linuxcommand.org/lc3_adv_tput.php
 # Formatting variables
@@ -211,7 +211,9 @@ function PRE_UTILS {
 	fi
 	
 	# grep the Software Versions
-	RUTORRENTVERSION=$(wget -q https://api.github.com/repos/Novik/ruTorrent/tags -O - | grep name | cut -d'"' -f4 | grep -v 'rutorrent\|plugins\|beta\|v5.' | head -1)
+	RUTORRENTVERSION_v4=$(wget -q https://api.github.com/repos/Novik/ruTorrent/tags -O - | grep name | cut -d'"' -f4 | grep -v 'rutorrent\|plugins\|beta\|v5.' | head -1)
+	RUTORRENTVERSION_v5=$(wget -q https://api.github.com/repos/Novik/ruTorrent/tags -O - | grep name | cut -d'"' -f4 | grep -v 'rutorrent\|plugins\|beta\|v4.' | head -1)
+	#RUTORRENTVERSION=$RUTORRENTVERSION_v5
 }
 
 function INSTALL_COMMON {
@@ -228,7 +230,7 @@ function HEADER {
 	clear -x
 	echo "${WHITE}${BOLD}--------------------------------------------------------------------------------"
 	echo "                       ${CYAN}Rtorrent + Rutorrent Auto Install"
-	echo "                       Bercik https://github.com/Bercik1337${NORMAL}"
+	echo "                       Markus https://github.com/MarkusLange${NORMAL}"
 	echo "${BOLD}--------------------------------------------------------------------------------${NORMAL}"
 	echo
 }
@@ -238,16 +240,35 @@ function LICENSE {
 	#clear -x
 	#echo "${NORMAL}${BOLD}--------------------------------------------------------------------------------"
 	echo " ${NORMAL}THE BEER-WARE LICENSE (Revision 42):"
-	echo " ${GREEN}Bercik${NORMAL} wrote this script. As long as you retain this notice you"
+	echo " ${GREEN}I${NORMAL} wrote this script, a modified version of Berciks script what is a modified"
+	echo " version of Kerwoods script. As long as you retain this notice you"
 	echo " can do whatever you want with this stuff. If we meet some day, and you"
 	echo " think this stuff is worth it, you can buy me a beer in return.${NORMAL}"
 	echo
-	echo " Contact? use Github https://github.com/Bercik1337"
+	echo " Contact? use Github https://github.com/MarkusLange"
 	echo
 	echo "${BOLD}--------------------------------------------------------------------------------${NORMAL}"
 	echo
 	read -n 1 -s -p ' Press any key to continue...'
 	echo
+}
+
+function CHOOSE_BRANCHE {
+	echo " Choose the rutorrent branche, V4 supports autodl, in V5 autodl is"
+	echo " brocken by now, so the installation of autodl would be prohibited"
+	echo
+	echo " [4] - Long Term Support for Version 4 (Super Stable)"
+	echo " [5] - Long Term Support for Version 5 (Stable)"
+	echo
+	echo -n "${GREEN}>>${NORMAL} "
+	read input
+	
+	case "$input" in
+	4)
+		RUTORRENTVERSION=$RUTORRENTVERSION_v4;;
+	5)
+		RUTORRENTVERSION=$RUTORRENTVERSION_v5;;
+	esac
 }
 
 # Function to set the system user, rtorrent is going to run as
@@ -622,7 +643,7 @@ function INSTALL_RUTORRENT {
 function CREATE_SELF_SIGNED_CERT {
 	# Creating self-signed certs
 	echo "${YELLOW}Creating self-signed certificate${NORMAL}"
-	openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -subj "/OU=Bercik rt-auto-install seedbox"  -keyout /etc/ssl/private/rutorrent-selfsigned.key -out /etc/ssl/certs/rutorrent-selfsigned.crt
+	openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -subj "/OU=My own rt-auto-install seedbox"  -keyout /etc/ssl/private/rutorrent-selfsigned.key -out /etc/ssl/certs/rutorrent-selfsigned.crt
 }
 
 # apache2 can't work from tmp so all work from run for the socket
@@ -979,6 +1000,15 @@ function UPDATE_RUTORRENT {
 		ACT_WEBSERVER=apache2
 	fi
 	
+	PRE_CHOOSE=$RUTORRENTVERSION
+	
+	if [[ ${ACT_RUTORRENT:0:1} == 4 ]]
+	then
+		RUTORRENTVERSION=$RUTORRENTVERSION_v4
+	else
+		RUTORRENTVERSION=$RUTORRENTVERSION_v5
+	fi
+	
 	echo " Update ruTorrent from actual installed version ${GREEN}$ACT_RUTORRENT${NORMAL} to current ${GREEN}${RUTORRENTVERSION:1}${NORMAL}"
 	echo " When updating ruTorrent and autodl-irssi is installed the irrsi login"
 	echo " will transfered. Websiteprotection (htpasswd) would be reestablished."
@@ -1037,7 +1067,7 @@ function UPDATE_RUTORRENT {
 		esac
 		;;
 	d)
-		;;
+		RUTORRENTVERSION=$PRE_CHOOSE;;
 	esac
 }
 
@@ -1049,8 +1079,6 @@ function MENU() {
 		echo " ${BOLD}  libTorrent version:${NORMAL} ${GREEN} $LIBTORRENTVERSION ${NORMAL}"
 		echo " ${BOLD}   ruTorrent version:${NORMAL} ${GREEN} ${RUTORRENTVERSION:1} ${NORMAL}"
 		echo " ${BOLD}      Script version:${NORMAL} ${GREEN} $SCRIPTVERSION ${NORMAL}"
-		#echo " ${BOLD}Script last modified:${NORMAL} ${GREEN} $LASTMODIFIED ${NORMAL}"
-		#echo " Remember to visit https://github.com/Bercik1337/rt-auto-install ${NORMAL}"
 		echo
 		echo
 		echo " [1] - Add/Change rTorrent user: ${GREEN}$RTORRENT_USER${NORMAL}"
@@ -1062,7 +1090,10 @@ function MENU() {
 		echo " [c] - Show Changelog"
 		echo " [t] - Show To-Do"
 		echo " [0] - Start installation"
-		echo " [a] - Start installation with autodl-irssi"
+		if [ $RUTORRENTVERSION == $RUTORRENTVERSION_v4 ]
+		then
+			echo " [a] - Start installation with autodl-irssi"
+		fi
 		echo " [u] - Update ruTorrent"
 		echo " [q] - Quit"
 		
@@ -1075,8 +1106,20 @@ function MENU() {
 
 		echo
 		echo
+		if [ $RUTORRENTVERSION == $RUTORRENTVERSION_v5 ]
+		then
+			echo
+		fi
 		echo -n "${GREEN}>>${NORMAL} "
 		read input
+		
+		if [ $RUTORRENTVERSION == $RUTORRENTVERSION_v5 ]
+		then
+			if [[ $input == "a" ]]
+			then
+				input="0"
+			fi
+		fi
 
 		case "$input" in
 		1)
@@ -1090,11 +1133,11 @@ function MENU() {
 			CHOOSE_WEBSEVER;;
 		c)
 			HEADER
-			wget -q -O - https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/Changelog | sed "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /" | head -n 17
+			wget -q -O - https://raw.githubusercontent.com/MarkusLange/rt-auto-install/master/Changelog | sed "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /" | head -n 17
 			read -rsp $'Press any key to continue...' -n1 ke;;
 		t)
 			HEADER
-			wget -q -O - https://raw.githubusercontent.com/Bercik1337/rt-auto-install/master/TODO | sed "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /" | head -n 17
+			wget -q -O - https://raw.githubusercontent.com/MarkusLange/rt-auto-install/master/TODO | sed "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /" | head -n 17
 			read -rsp $'Press any key to continue...' -n1 ke;;
 		p)
 			HEADER
@@ -1168,6 +1211,8 @@ function START() {
 	PRE_UTILS
 	HEADER
 	LICENSE
+	HEADER
+	CHOOSE_BRANCHE
 	MENU
 	tput sgr0
 }

@@ -1,5 +1,5 @@
 
-# Rtorrent + Rutorrent Auto Install Script by Bercik
+# Rtorrent + Rutorrent Auto Install Script by me, a modified version of Bercik's scipt what is a modified version of Kerwood's script
 ### Modern script for automatic rtorrent, rutorrent installation under Linux.
 	Makes your system seedbox ready in minutes!
 
@@ -7,7 +7,7 @@
 
 ## News
 
-**Current version** v2.3 released 2024/03/01
+**Current version** v2.5 released 2024/12/18
 
 	* always use of the latest ruTorrent
 	* no need to care about the distro version
@@ -33,6 +33,7 @@
 	* add function to update ruTorrent
 	* reactivate plugins screenshots, spectrogram
 	* some corrections
+	* adopt the actual ruTorrent branches (v4 & v5) since autodl is brocken in v5
 
 ## Features ##
 
@@ -59,20 +60,17 @@ Run the script with sudo or as root
 	
 	git clone https://github.com/MarkusLange/rt-auto-install.git
 	cd rt-auto-install
-	sudo ./Rt-Install-minimal
+	sudo ./Rt-Install-minimal-apache2_ngnix_lighttpd_prc-socket_choose_branche.bash
 	
-	or now you can simply
-	wget https://raw.githubusercontent.com/MarkusLange/rt-auto-install/master/Rt-Install-minimal
- 	
- 	with autodl-irssi, rpc.socket (no SCGIMount anymore) and update function for ruTorrent
-	wget https://raw.githubusercontent.com/MarkusLange/rt-auto-install/master/Rt-Install-minimal-apache2_ngnix_lighttpd_prc-socket.bash
+ 	with autodl-irssi, rpc.socket (no SCGIMount anymore) and update function for ruTorrent and options to choose the ruTorrent branche
+	wget https://raw.githubusercontent.com/MarkusLange/rt-auto-install/master/Rt-Install-minimal-apache2_ngnix_lighttpd_prc-socket_choose_branche.bash
 
 ## To-Do ##
 * Add Wiki to explain what is, and why something is done (only someone is interested)
 * ~~remove the SCGI code from the scrip is atm. deactivated~~
 * ~~remove other commented out parts from the script to clean it update~~
 * put some effort in a wider testbase rewriting was done on debian 12.5 only (with countless VMs)
-* may transfer naming and links to this fork so there is less confusion for users
-* also transfer changelog and To-Do
+* ~~may transfer naming and links to this fork so there is less confusion for users~~
+* ~~also transfer changelog and To-Do~~
 * working out with Bercik when he is less busy what he liked to merged
 * remove/deactivate webserver default pages

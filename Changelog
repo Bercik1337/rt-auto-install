@@ -1,129 +1,40 @@
+----------------------------------------------------------------
+taken after Version 1.7 done so far:
+* always use of the latest ruTorrent
+* no need to care about the distro version
+* remove unnecessary stuff
+* add support for arm* systems (scgi)
+* correcting external ipv4
+* deactivate not supportet plugins
+* redirect http to https
+* correct terminal colors
+* add autodl-irssi plugin (Rt-Install-minimal-new.bash)
+* update .rtorrent.rc to the new commands
+* fix changelog and todo view
+* put functions together for more order
+* make pre-installation packages fully silent
+* and a little bit there and there
+* now choose between apache2, nginx and lighttpd as webserver
+  (Rt-Install-minimal-apache2_ngnix_lighttpd.bash)
+* create htaccess passwords now with openssl
+* remove ToDo-List from the Menu
+* move from SCGIMount to rpc.socket
+* hardening the webserver basend on
+  https://raymii.org/s/tutorials/Strong_SSL_Security_On_*.html
+* reintegrade To-Do List
+* putting rtorrent and rutorrent user determination inside the
+  menu and prevent installation to start without
+* add function to update ruTorrent
+* reactivate plugins screenshots, spectrogram
+* some corrections
+* adopt the actual ruTorrent branches (v4 & v5) since autodl is
+  brocken in v5
+* transfer naming from Bercik to me for less confusion
+* redirect Todo and Changelog
+
+----------------------------------------------------------------
 VERSION 1.7   2022-10-15
-* Added self signed SSL cert generation for HTTPS (thx @tbennett6421)
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-VERSION 1.6   2022-08-05
-* Added support for Linux Mint 21  (Vanessa)
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-VERSION 1.5   2022-07-24
-* Added support for Linux Mint 19.1 (Tessa)
-* Added support for Linux Mint 19.2 (Tina)
-* Added support for Linux Mint 19.3 (Tricia)
-* Added support for Linux Mint 20.1 (Ulyssa)
-* Added support for Linux Mint 20.2 (Uma)
-* Added support for Linux Mint 20.3 (Una)
-* Add function EOL
-* Remove support for all EOL systems
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-VERSION 1.4   2022-06-19
-* Added support for LMDE 5 (Elsie)
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-VERSION 1.3   2022-05-15
-* Added support for Ubutnu 22.04 (Jammy Jellyfish)
-* Disabled rehash after download
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-VERSION 1.2   2022-01-16
-* Fixed #19 Fixed rare case if wget is missing
-* Added support for Ubuntu 21.10 (Impish Indri)
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-VERSION 1.1   2021-11-20
-* Fixed #15 error if usergroup is not the same as username
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-VERSION 1.0   2021-06-17
-* Added support for Ubuntu 21.04 Hirsute Hippo
-* Added support for Linux Mint 20 Ulyana
-* Added support for Linux Mint 20.1 Ulyssa
-* Wow! v1.0 at last
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-VERSION 0.9   2020-12-16
-* Added support for Ubuntu 20.10 Groovy Gorilla
-* Tmux stop function has been set to send-keys so it now tries to gracefully close rt instead of killing it
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-VERSION 0.8   2020-09-04
-* Added support for Ubuntu 20.04 Focal Fossa
-* Added support for Debian 11 Bullseye
-* New function INSTALL_SCGI
-* Cleanup of few old comments
-* Cleanup of tabbing and spacing in DISTRO section
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-VERSION 0.7   2020-01-01
-* Added support for Ubuntu 19.10 Eoan Ermine
-* Files/ folder removed, everything merged into single file now! You can literally wget entire thing. 
-* Fix display custom port for http connection. When [ch] option used, script didn't show proper link in summary for local IP.
-* Removed obsolete rtorrent-init file
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-VERSION 0.6   2019-10-14
-* Added support for Debian 11 Bullseye
-* Added option cr - change rTorrent port 
-* Added option ch - change http rutorrent port 
-* Added functions SET_RT_PORT and SET_HTTP_PORT
-* Virtualhost file is no longer dynamically created
-* Created 001-default-rutorrent.conf and ports.conf in Files/
-* Removed rutorrent plugins from main menu
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-VERSION 0.5   2019-08-01
-* Added -h --help, -d --demo, -f --fast CLI parameters.
-* Changed display method of TODO and Changelog to show only 15 newest lines.
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-VERSION 0.4   2019-07-22
-* Added Raspberry support (Raspbian buster)
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-VERSION 0.3   2019-06-28
-* Script merged into _single_ file. Now maintanance will be easier.
-* Added DETECTOS function.
-* Added OSDETAILS function.
-* Added INSTALL_RTORRENT_APT_R96 and INSTALL_RTORRENT_APT_R97 functions.
-* Main menu shows rt/libt versions based on OS you run.
-* Added few return codes (3,4).
-* Filename changed to Rt-Install-minimal, no version numbers or OS names.
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-VERSION 0.2   2019-06-16
-* Removed plugin selection section.
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-VERSION 0.1   2019-04-20
-Updated packages:
-* xmlrpc-c-1.51.03
-* libtorrent-0.13.7
-* rtorrent-0.9.7
-* rutorrent-3.7
-
-Misc:
-* Added TODO and Changelog
-* Added more colors
-* Added new options in menu (Changelog and TODO)
-* Introducing new types of installation: minimal(from repo), sources(build from source)
-* Dropped support for old Debian versions <10
-* changed apache2 rutorrent path from /var/www/html/rutorrent -> /var/www/rutorrent
-* installer uses package names WITHOUT version numbers for instance: php-geoip instead php5-geoip
-* changed name structure for installer: 
-	Rtorrent-Auto-Install-<version>-<OS_release>-<OS_codename>-<type>
-eg:	Rtorrent-Auto-Install-0.1-Debian10-Buster-minimal
-	OS release includes numeric value because sometimes it's hard to remember Toy Story characters
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
+* Added self signed SSL cert generation for HTTPS
+  (thx @tbennett6421)
+  
+----------------------------------------------------------------
