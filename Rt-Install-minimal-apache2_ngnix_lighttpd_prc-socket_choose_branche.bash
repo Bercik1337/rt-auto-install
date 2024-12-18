@@ -1067,8 +1067,10 @@ function UPDATE_RUTORRENT {
 		esac
 		;;
 	d)
-		RUTORRENTVERSION=$PRE_CHOOSE;;
+		;;
 	esac
+ 	
+	RUTORRENTVERSION=$PRE_CHOOSE 
 }
 
 function MENU() {
