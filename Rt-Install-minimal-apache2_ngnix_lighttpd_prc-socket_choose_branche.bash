@@ -1133,11 +1133,11 @@ function MENU() {
 			CHOOSE_WEBSEVER;;
 		c)
 			HEADER
-			wget -q -O - https://raw.githubusercontent.com/MarkusLange/rt-auto-install/master/Changelog | sed "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /" | head -n 17
+			wget -q -O - https://raw.githubusercontent.com/MarkusLange/rt-auto-install/master/Changelog | head -n 17
 			read -rsp $'Press any key to continue...' -n1 ke;;
 		t)
 			HEADER
-			wget -q -O - https://raw.githubusercontent.com/MarkusLange/rt-auto-install/master/TODO | sed "s/- - -.*/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /" | head -n 17
+			wget -q -O - https://raw.githubusercontent.com/MarkusLange/rt-auto-install/master/TODO | head -n 17
 			read -rsp $'Press any key to continue...' -n1 ke;;
 		p)
 			HEADER

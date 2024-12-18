@@ -1,4 +1,3 @@
-----------------------------------------------------------------
 taken after Version 1.7 done so far:
 * always use of the latest ruTorrent
 * no need to care about the distro version
@@ -22,19 +21,17 @@ taken after Version 1.7 done so far:
 * hardening the webserver basend on
   https://raymii.org/s/tutorials/Strong_SSL_Security_On_*.html
 * reintegrade To-Do List
-* putting rtorrent and rutorrent user determination inside the
-  menu and prevent installation to start without
+* putting rtorrent and rutorrent user determination inside the menu and prevent
+  installation to start without
 * add function to update ruTorrent
 * reactivate plugins screenshots, spectrogram
 * some corrections
-* adopt the actual ruTorrent branches (v4 & v5) since autodl is
-  brocken in v5
+* adopt the actual ruTorrent branches (v4 & v5) since autodl is brocken in v5
 * transfer naming from Bercik to me for less confusion
 * redirect Todo and Changelog
 
-----------------------------------------------------------------
+--------------------------------------------------------------------------------
 VERSION 1.7   2022-10-15
-* Added self signed SSL cert generation for HTTPS
-  (thx @tbennett6421)
+* Added self signed SSL cert generation for HTTPS (thx @tbennett6421)
   
-----------------------------------------------------------------
+--------------------------------------------------------------------------------

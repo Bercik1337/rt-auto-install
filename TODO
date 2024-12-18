@@ -1,11 +1,9 @@
-----------------------------------------------------------------
-TODO:
+To-do:
 * Add Wiki to explain what is, and why something is done
   (only someone is interested)
-* put some effort in a wider testbase rewriting was done on
-  debian 12.5 only (with countless VMs)
-* working out with Bercik when he is less busy what he liked
-  to merged
+* put some effort in a wider testbase rewriting was done on debian 12.5 only
+ (with countless VMs)
+* working out with Bercik when he is less busy what he liked to merged
 * remove/deactivate webserver default pages
 
-----------------------------------------------------------------
+--------------------------------------------------------------------------------
