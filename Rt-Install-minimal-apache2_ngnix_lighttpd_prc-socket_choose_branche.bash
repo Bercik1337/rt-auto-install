@@ -621,8 +621,8 @@ function INSTALL_RUTORRENT {
 	done
 
 	# Changeing SCGI mount to rpc.socket
-	sed -i 's#$scgi_port = 5000;#$scgi_port = 0;#' rutorrent/conf/config.php
-	sed -i 's#$scgi_host = "127.0.0.1";#$scgi_host = "unix:///run/rtorrent/rpc.socket";#' rutorrent/conf/config.php
+	sed -i '/scgi_port/ s|5000|0|g' rutorrent/conf/config.php
+	sed -i '/scgi_host/ s|127.0.0.1|unix:///run/rtorrent/rpc.socket|g' rutorrent/conf/config.php
 
 	echo "${YELLOW}Moving to /var/www/ ${NORMAL}"
 	mv -f rutorrent /var/www/
