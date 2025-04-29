@@ -623,6 +623,9 @@ function INSTALL_RUTORRENT {
 	# Changeing SCGI mount to rpc.socket
 	sed -i '/scgi_port/ s|5000|0|g' rutorrent/conf/config.php
 	sed -i '/scgi_host/ s|127.0.0.1|unix:///run/rtorrent/rpc.socket|g' rutorrent/conf/config.php
+	
+	# Move ruTorrent errorlog to a folder writeable by www-data
+	sed -i '/log_file/ s|/tmp/errors.log|/var/log/apache2/rutorrent-errors.log|g' rutorrent/conf/config.php
 
 	echo "${YELLOW}Moving to /var/www/ ${NORMAL}"
 	mv -f rutorrent /var/www/
