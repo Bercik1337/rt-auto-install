@@ -8,10 +8,14 @@
 
 ## News
 
-**Current version** v2.3 released 2024/11/07
+**Current version** v2.4 released 2025/05/06
 
-	Added support for Ubuntu 24.10 Oracular Oriole
-	Help for batch mode is extended
+	Added support for Ubuntu 25.04 Plucky Puffin
+	Bumped RuTorrent version from 4.2.6 to 5.1.7
+	Removed support for Mint 20
+	Removed support for Ubuntu 23.10
+	Removed support for Ubuntu 23.04
+	Fixed issue with rutracker_check plugin
 
 For details, always go to Changelog.
 
@@ -27,24 +31,19 @@ For details, always go to Changelog.
 
 | Distro    | Manual installation (default) | Batch Support verified |
 | -------- | ------- | ------- |
+| Ubuntu 25.04 Plucky Puffin | ✅ |  ✅ |
 | Ubuntu 24.10 Oracular Oriole | ✅ |  ✅ |
 | Ubuntu 24.04 Noble Numbat | ✅ |  ✅ |
-| Ubuntu 23.10 Mantic Minotaur | ✅ | ✅ |
-| Ubuntu 23.04 Lunar Lobster | ✅ | ✅ |
 | Ubuntu 22.04 Jammy Jellyfish | ✅ | ✅ |
 | Ubuntu 20.04 Focal Fossa | ✅ | ✅ |
-| Debian 12    Bookworm | https://github.com/Bercik1337/rt-auto-install/issues/72 |  |
-| Debian 11    Bullseye | https://github.com/Bercik1337/rt-auto-install/issues/72 |  |
+| Debian 12    Bookworm | ✅ | ✅ |
+| Debian 11    Bullseye | ✅ | ✅ |
 | ~~Raspbian 10  Buster~~| https://github.com/Bercik1337/rt-auto-install/issues/66   |  |
 | Mint   22    Wilma | ✅ | ✅|
 | Mint   21.3  Virginia | ✅ | ✅ |
 | Mint   21.2  Victoria | ✅ | ✅ |
 | Mint   21.1  Vera | ✅ | ✅ |
 | Mint   21    Vanessa | ✅ |✅ |
-| Mint   20.3  Una | ✅ | ✅ |
-| Mint   20.2  Uma | ✅ | ✅  |
-| Mint   20.1  Ulyssa | ✅ | ✅ |
-| Mint   20    Ulyana | ✅ | ✅ |
 | Others    | in progress    |
 
 More to come, see TODO.

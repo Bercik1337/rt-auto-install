@@ -1,4 +1,12 @@
-VERSION 2.2   2024-11-07
+VERSION 2.4   2025-05-06
+* Added support for Ubuntu 25.04 Plucky Puffin
+* Bumped RuTorrent version from 4.2.6 to 5.1.7
+* Removed support for Mint 20
+* Removed support for Ubuntu 23.10
+* Removed support for Ubuntu 23.04
+* Fixed issue with rutracker_check plugin
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+VERSION 2.3   2024-11-07
 * Added support for Ubuntu 24.10 Oracular Oriole
 * Help for batch mode is extended
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

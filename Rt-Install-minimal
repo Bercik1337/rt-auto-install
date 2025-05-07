@@ -1,7 +1,9 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
-LASTMODIFIED="2024/11/07"
-SCRIPTVERSION="2.3"
+# OR PROVIDE THEM WITH BATCH SWITCHES
+LASTMODIFIED="2025/05/07"
+SCRIPTVERSION="2.4"
+RUTORRENTVERSION=5.1.7
 
 # Formatting variables
 #colors
@@ -32,9 +34,6 @@ TEMP_PLUGIN_DIR="rutorrentPlugins/"
 PLUGIN_ARRAY=()
 #rTorrent users home dir.
 HOMEDIR=""
-
-
-
 
 # Brief usage in CLI
 function DISPLAY_HELP {
@@ -84,8 +83,6 @@ do
    
 done
 
-
-
 #detecting architecture
 function DETECTARCH {
 if [ $(uname -m) != "x86_64" ]; then
@@ -99,7 +96,6 @@ if [ $(uname -m) != "x86_64" ]; then
   exit 1
 fi
 }
-
 
 #detecting os
 function DETECTOS {
@@ -124,7 +120,7 @@ OSRELEASE=$(grep PRETTY_NAME /etc/os-release)
 #checking distribution
 DISTRO=$(grep -i -o -e Debian -i -o -e Ubuntu -i -o -e Mint -i -o -e Raspbian -i -o -e LMDE <<< $OSRELEASE)
 #checking release
-DISTRONAMEVER=$(grep -i -o -e buster -i -o -e bullseye -i -o -e bookworm -i -o -e "18.04" -i -o -e "18.10" -i -o -e "19.04" -i -o -e "20.04" -i -o -e "20.10" -i -o -e "21.04" -i -o -e "21.10" -i -o -e "22.04" -i -o -e "23.04" -i -o -e "19.10"  -i -o -e "19.2"  -i -o -e "19.3" -i -o -e "19.1" -i -o -e "19" -i -o -e "20" -i -o -e "20.1"  -i -o -e "20.2" -i -o -e "20.3" -i -o -e "21" -i -o -e "21.1"  -i -o -e "21.2" -i -o -e "21.3" -i -o -e "22" -i -o -e "elsie" -i -o -e "23.10" -i -o -e "24.04" -i -o -e "24.10"<<< $OSRELEASE)
+DISTRONAMEVER=$(grep -i -o -e buster -i -o -e bullseye -i -o -e bookworm -i -o -e "18.04" -i -o -e "18.10" -i -o -e "19.04" -i -o -e "20.04" -i -o -e "20.10" -i -o -e "21.04" -i -o -e "21.10" -i -o -e "22.04" -i -o -e "23.04" -i -o -e "19.10"  -i -o -e "19.2"  -i -o -e "19.3" -i -o -e "19.1" -i -o -e "19" -i -o -e "20" -i -o -e "20.1"  -i -o -e "20.2" -i -o -e "20.3" -i -o -e "21" -i -o -e "21.1"  -i -o -e "21.2" -i -o -e "21.3" -i -o -e "22" -i -o -e "elsie" -i -o -e "23.10" -i -o -e "24.04" -i -o -e "24.10" -i -o -e "25.04"<<< $OSRELEASE)
 function EOL {
 echo 
 echo  "${RED}Your system has reached End Of Life - it is no longer usable, please change OS to newer release"
@@ -138,9 +134,9 @@ case $DISTRO in
 			Debian)
 				echo "${BOLD}name: ${GREEN}Debian"
 						case $DISTRONAMEVER in
-#					buster) echo "${PURPLE}${BOLD}release:${GREEN} 10 (Buster)" ;	EOL ;				OSFINALNAME=deb10buster;	;;
-#				 	bullseye) echo "${PURPLE}${BOLD}release:${GREEN} 11 (Bullseye)" ;				OSFINALNAME=deb11bullseye;	;;
-#					bookworm) echo "${PURPLE}${BOLD}release:${GREEN} 12 (Bookworm)" ;				OSFINALNAME=deb12bookworm;	;;
+					buster) echo "${PURPLE}${BOLD}release:${GREEN} 10 (Buster)" ;	EOL ;				OSFINALNAME=deb10buster;	;;
+				 	bullseye) echo "${PURPLE}${BOLD}release:${GREEN} 11 (Bullseye)" ;				OSFINALNAME=deb11bullseye;	;;
+					bookworm) echo "${PURPLE}${BOLD}release:${GREEN} 12 (Bookworm)" ;				OSFINALNAME=deb12bookworm;	;;
 					*) echo "${YELLOW}It seems you run Debian OS but unsupported release"; exit 4							;;
 					esac;;
 			Raspbian)
@@ -162,10 +158,11 @@ case $DISTRO in
 					21.04) echo "${PURPLE}${BOLD}release:${GREEN} 21.04 (Hirsute Hippo)";		EOL ;		OSFINALNAME=ubu2104 ;;
 					21.10) echo "${PURPLE}${BOLD}release:${GREEN} 21.10 (Impish Indri)";		EOL ;		OSFINALNAME=ubu2110 ;;
 					22.04) echo "${PURPLE}${BOLD}release:${GREEN} 22.04 (Jammy Jellifish)";				OSFINALNAME=ubu2204 ;;
-					23.04) echo "${PURPLE}${BOLD}release:${GREEN} 23.04 (Lunar Lobster)";				OSFINALNAME=ubu2304 ;;
-					23.10) echo "${PURPLE}${BOLD}release:${GREEN} 23.04 (Mantic Minotaur)";				OSFINALNAME=ubu2310 ;;
+					23.04) echo "${PURPLE}${BOLD}release:${GREEN} 23.04 (Lunar Lobster)";		EOL ;	OSFINALNAME=ubu2304 ;;
+					23.10) echo "${PURPLE}${BOLD}release:${GREEN} 23.10 (Mantic Minotaur)";		EOL ;	OSFINALNAME=ubu2310 ;;
 					24.04) echo "${PURPLE}${BOLD}release:${GREEN} 24.04 (Noble Numbat)";				OSFINALNAME=ubu2404 ;;
-					24.10) echo "${PURPLE}${BOLD}release:${GREEN} 24.04 (Noble Numbat)";				OSFINALNAME=ubu2410 ;;
+					24.10) echo "${PURPLE}${BOLD}release:${GREEN} 24.10 (Oracular Oriole)";				OSFINALNAME=ubu2410 ;;
+					25.04) echo "${PURPLE}${BOLD}release:${GREEN} 25.04 (Plucky Puffin)";               OSFINALNAME=ubu2504 ;;
 					*) echo "${YELLOW}It seems you run Ubuntu OS but unsupported release"; exit 4
 					esac;;
 			LMDE)
@@ -183,10 +180,10 @@ case $DISTRO in
     					19.2) echo "${PURPLE}${BOLD}release:${GREEN} 19.2 (Tina)" ;   EOL ;				OSFINALNAME=ubu1804 ;;
     					19.1) echo "${PURPLE}${BOLD}release:${GREEN} 19.1 (Tessa)" ;  EOL ;				OSFINALNAME=ubu1804 ;;
     					19) echo "${PURPLE}${BOLD}release:${GREEN} 19 (Tara)" ;		  EOL ;				OSFINALNAME=ubu1804 ;;
-					20) echo "${PURPLE}${BOLD}release:${GREEN} 20 (Ulyana)" ; 					OSFINALNAME=mint20 ;;
-					20.1) echo "${PURPLE}${BOLD}release:${GREEN} 20.1 (Ulyssa)" ; 					OSFINALNAME=mint201 ;;
-					20.2) echo "${PURPLE}${BOLD}release:${GREEN} 20.2 (Uma)" ; 					OSFINALNAME=mint202 ;;
-					20.3) echo "${PURPLE}${BOLD}release:${GREEN} 20.3 (Una)" ; 					OSFINALNAME=mint203 ;;
+					20) echo "${PURPLE}${BOLD}release:${GREEN} 20 (Ulyana)" ; 		  EOL ;			OSFINALNAME=mint20 ;;
+					20.1) echo "${PURPLE}${BOLD}release:${GREEN} 20.1 (Ulyssa)" ; 	  EOL ;				OSFINALNAME=mint201 ;;
+					20.2) echo "${PURPLE}${BOLD}release:${GREEN} 20.2 (Uma)" ; 		  EOL ;		OSFINALNAME=mint202 ;;
+					20.3) echo "${PURPLE}${BOLD}release:${GREEN} 20.3 (Una)" ; 		  EOL ;			OSFINALNAME=mint203 ;;
 					21) echo "${PURPLE}${BOLD}release:${GREEN} 21 (Vanessa)" ;					OSFINALNAME=mint21 ;;
 					21.1) echo "${PURPLE}${BOLD}release:${GREEN} 21.1 (Vera)" ;					OSFINALNAME=mint211 ;;
 					21.2) echo "${PURPLE}${BOLD}release:${GREEN} 21.2 (Victoria)" ;					OSFINALNAME=mint212 ;;
@@ -215,31 +212,30 @@ DETECTOS
 function OSDETAILS {
 
 case $OSFINALNAME in
-				    deb10buster)  RTVERSION=0.9.7; LIBTORRENTVERSION=0.13.7; RUTORRENTVERSION=4.2.6  ;;
-				  deb11bullseye)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
- 				  deb12bookworm)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
-    					ubu1804)  RTVERSION=0.9.6; LIBTORRENTVERSION=0.13.6; RUTORRENTVERSION=4.2.6  ;;
-    					ubu1810)  RTVERSION=0.9.7; LIBTORRENTVERSION=0.13.7; RUTORRENTVERSION=4.2.6  ;;
-	    				ubu1904)  RTVERSION=0.9.7; LIBTORRENTVERSION=0.13.7; RUTORRENTVERSION=4.2.6  ;;
-					ubu1910)  RTVERSION=0.9.7; LIBTORRENTVERSION=0.13.7; RUTORRENTVERSION=4.2.6  ;;
-					ubu2004)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
-					ubu2010)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
-					ubu2104)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
-					ubu2110)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
-					ubu2204)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
-					ubu2304)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
-					ubu2310)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
-					ubu2404)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
-					ubu2410)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
-					mint20)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
-					mint21)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
-					mint22)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8; RUTORRENTVERSION=4.2.6  ;;
+				    deb10buster)  RTVERSION=0.9.7; LIBTORRENTVERSION=0.13.7;  ;;
+				  deb11bullseye)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;  ;;
+ 				  deb12bookworm)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;  ;;
+    					ubu1804)  RTVERSION=0.9.6; LIBTORRENTVERSION=0.13.6;  ;;
+    					ubu1810)  RTVERSION=0.9.7; LIBTORRENTVERSION=0.13.7;  ;;
+	    				ubu1904)  RTVERSION=0.9.7; LIBTORRENTVERSION=0.13.7;  ;;
+					ubu1910)  RTVERSION=0.9.7; LIBTORRENTVERSION=0.13.7;   ;;
+					ubu2004)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;   ;;
+					ubu2010)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;   ;;
+					ubu2104)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;   ;;
+					ubu2110)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;   ;;
+					ubu2204)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;   ;;
+					ubu2304)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;   ;;
+					ubu2310)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;   ;;
+					ubu2404)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;   ;;
+					ubu2410)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;   ;;
+					ubu2504)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;   ;;
+					mint20)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;   ;;
+					mint21)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;   ;;
+					mint22)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;   ;;
 esac
 }
 OSDETAILS
 #clear
-
-
 
 # Pretty function to spit out ok/fail after each important step.
 function CHECKLASTRC {
@@ -251,10 +247,6 @@ function CHECKLASTRC {
    if [[ "$FASTMODE" -ne "1" ]]; then sleep 5; fi
   fi
 }
-
-
-
-
 
 # Function to check if running user is root
 function CHECK_ROOT {
@@ -334,9 +326,6 @@ function SET_RTORRENT_GROUP {
 		RTORRENT_GROUP=$(id -g $RTORRENT_USER)
 }
 
-
-
-
 # Function to  create users for the webinterface
 function SET_WEB_USER {
 	while true; do
@@ -375,8 +364,6 @@ function SET_HTTP_PORT {
 		sed -i  "0,/Listen/ s/Listen.*/Listen $HTTP_PORT/" Files/ports.conf 
 		CHECKLASTRC
 	}
-
-
 	
 # Function to list WebUI users in the menu
 function LIST_WEB_USERS {
@@ -423,7 +410,6 @@ function DOWNLOAD_PLUGIN {
 			return 1
 		fi
 }
-
 
 # Function for installing dependencies
 #clear
@@ -486,6 +472,9 @@ function INSTALL_RTORRENT_APT_R96 {
 		CHECKLASTRC
 	fi
 
+    #Make $HOME readable for rutorrent_check plugin
+    chmod a+x $HOMEDIR
+
 	# Copying rtorrent.rc file.
 	echo "${CYAN}Copying rtorrent.rc${NORMAL}"
 	cp Files/rtorrent.rc $HOMEDIR/.rtorrent.rc
@@ -534,6 +523,9 @@ function INSTALL_RTORRENT_APT_R97 {
 		chown "$RTORRENT_USER":"$RTORRENT_GROUP" "$HOMEDIR"/Downloads
 		CHECKLASTRC
 	fi
+
+    #Make $HOME readable for rutorrent_check plugin
+    chmod a+x $HOMEDIR
 
 	# Copying rtorrent.rc file.
 	echo "${CYAN}Copying rtorrent.rc${NORMAL}"
@@ -584,6 +576,9 @@ function INSTALL_RTORRENT_APT_R98 {
 		CHECKLASTRC
 	fi
 
+    #Make $HOME readable for rutorrent_check plugin
+    chmod a+x $HOMEDIR
+
 	# Copying rtorrent.rc file.
 	echo "${CYAN}Copying rtorrent.rc${NORMAL}"
 	cp Files/rtorrent.rc $HOMEDIR/.rtorrent.rc
@@ -607,7 +602,7 @@ function INSTALL_RUTORRENT {
 	# Installing rutorrent.
 	echo "${CYAN}Installing rutorrent${NORMAL}"
 	echo "${YELLOW}Downloading package${NORMAL}"
-	curl -L https://github.com/Novik/ruTorrent/archive/refs/tags/v4.2.6.zip -o rutorrent.zip
+	curl -L https://github.com/Novik/ruTorrent/archive/refs/tags/v$RUTORRENTVERSION.zip -o rutorrent.zip
 	CHECKLASTRC
 	echo "${YELLOW}Unpacking${NORMAL}"
 	unzip -qq rutorrent.zip
@@ -721,7 +716,7 @@ function INSTALL_COMPLETE {
 
 	# The IPv6 local address, is not very used for now, anyway if needed, just change 'inet' to 'inet6'
 	lcl=$(ip addr | grep 'inet ' | awk '{print $2}' | cut -d/ -f1 | grep -v "127." | head -n 1)
-	ext=$(curl ifconfig.me)
+	ext=$(curl -s ifconfig.me)
     if [[ "$DEMO" -eq "1" ]]
     then
     ext="DEMO MODE! Public IP hidden"
@@ -1105,6 +1100,7 @@ while true; do
 			ubu2310)            APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT      		;;
 			ubu2404)            APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT     		;;
 			ubu2410)            APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT		      	;;
+			ubu2504)            APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT                  ;;
 			mint20)            APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT      		;;
 			mint201)           APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT      		;;
 			mint202)           APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT      		;;
@@ -1126,4 +1122,3 @@ while true; do
 			;;
 	esac
 done
- 
