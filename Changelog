@@ -1,3 +1,7 @@
+VERSION 2.5   2025-11-01
+* Added support for Debian 13 Trixie
+* Added support for Debian 13 Trixie on Raspberry Pi 3
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 VERSION 2.4   2025-05-06
 * Added support for Ubuntu 25.04 Plucky Puffin
 * Bumped RuTorrent version from 4.2.6 to 5.1.7

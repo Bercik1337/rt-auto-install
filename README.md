@@ -8,14 +8,10 @@
 
 ## News
 
-**Current version** v2.4 released 2025/05/06
+**Current version** v2.5 released 2025/11/01
 
-	Added support for Ubuntu 25.04 Plucky Puffin
-	Bumped RuTorrent version from 4.2.6 to 5.1.7
-	Removed support for Mint 20
-	Removed support for Ubuntu 23.10
-	Removed support for Ubuntu 23.04
-	Fixed issue with rutracker_check plugin
+	Added support for Debian 13 Trixie
+	Added support for Debian 13 Trixie on Raspberry Pi 3
 
 For details, always go to Changelog.
 
@@ -36,9 +32,9 @@ For details, always go to Changelog.
 | Ubuntu 24.04 Noble Numbat | ✅ |  ✅ |
 | Ubuntu 22.04 Jammy Jellyfish | ✅ | ✅ |
 | Ubuntu 20.04 Focal Fossa | ✅ | ✅ |
+| Debian 13    Trixie | ✅ | ✅ |
 | Debian 12    Bookworm | ✅ | ✅ |
 | Debian 11    Bullseye | ✅ | ✅ |
-| ~~Raspbian 10  Buster~~| https://github.com/Bercik1337/rt-auto-install/issues/66   |  |
 | Mint   22    Wilma | ✅ | ✅|
 | Mint   21.3  Virginia | ✅ | ✅ |
 | Mint   21.2  Victoria | ✅ | ✅ |

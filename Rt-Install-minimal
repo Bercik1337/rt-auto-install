@@ -85,16 +85,7 @@ done
 
 #detecting architecture
 function DETECTARCH {
-if [ $(uname -m) != "x86_64" ]; then
-
-  echo "You are running ${RED}unsupported architecture${NORMAL}. Currently we support only x86_64"
-  echo "For more information see issue #66. Consider donating $ or Raspberry because I have nowhere to test"
-  echo "Alternatively you could share access to you Rpi, I could do testing there"
-  echo ""
-  echo "https://github.com/Bercik1337/rt-auto-install/issues"
-  
-  exit 1
-fi
+ARCH=$(uname -m)
 }
 
 #detecting os
@@ -120,7 +111,7 @@ OSRELEASE=$(grep PRETTY_NAME /etc/os-release)
 #checking distribution
 DISTRO=$(grep -i -o -e Debian -i -o -e Ubuntu -i -o -e Mint -i -o -e Raspbian -i -o -e LMDE <<< $OSRELEASE)
 #checking release
-DISTRONAMEVER=$(grep -i -o -e buster -i -o -e bullseye -i -o -e bookworm -i -o -e "18.04" -i -o -e "18.10" -i -o -e "19.04" -i -o -e "20.04" -i -o -e "20.10" -i -o -e "21.04" -i -o -e "21.10" -i -o -e "22.04" -i -o -e "23.04" -i -o -e "19.10"  -i -o -e "19.2"  -i -o -e "19.3" -i -o -e "19.1" -i -o -e "19" -i -o -e "20" -i -o -e "20.1"  -i -o -e "20.2" -i -o -e "20.3" -i -o -e "21" -i -o -e "21.1"  -i -o -e "21.2" -i -o -e "21.3" -i -o -e "22" -i -o -e "elsie" -i -o -e "23.10" -i -o -e "24.04" -i -o -e "24.10" -i -o -e "25.04"<<< $OSRELEASE)
+DISTRONAMEVER=$(grep -i -o -e buster -i -o -e bullseye -i -o -e bookworm -i -o -e trixie -i -o -e "18.04" -i -o -e "18.10" -i -o -e "19.04" -i -o -e "20.04" -i -o -e "20.10" -i -o -e "21.04" -i -o -e "21.10" -i -o -e "22.04" -i -o -e "23.04" -i -o -e "19.10"  -i -o -e "19.2"  -i -o -e "19.3" -i -o -e "19.1" -i -o -e "19" -i -o -e "20" -i -o -e "20.1"  -i -o -e "20.2" -i -o -e "20.3" -i -o -e "21" -i -o -e "21.1"  -i -o -e "21.2" -i -o -e "21.3" -i -o -e "22" -i -o -e "elsie" -i -o -e "23.10" -i -o -e "24.04" -i -o -e "24.10" -i -o -e "25.04"<<< $OSRELEASE)
 function EOL {
 echo 
 echo  "${RED}Your system has reached End Of Life - it is no longer usable, please change OS to newer release"
@@ -137,6 +128,7 @@ case $DISTRO in
 					buster) echo "${PURPLE}${BOLD}release:${GREEN} 10 (Buster)" ;	EOL ;				OSFINALNAME=deb10buster;	;;
 				 	bullseye) echo "${PURPLE}${BOLD}release:${GREEN} 11 (Bullseye)" ;				OSFINALNAME=deb11bullseye;	;;
 					bookworm) echo "${PURPLE}${BOLD}release:${GREEN} 12 (Bookworm)" ;				OSFINALNAME=deb12bookworm;	;;
+					trixie) echo "${PURPLE}${BOLD}release:${GREEN} 13 (Trixie)" ;				OSFINALNAME=deb13trixie;	;;
 					*) echo "${YELLOW}It seems you run Debian OS but unsupported release"; exit 4							;;
 					esac;;
 			Raspbian)
@@ -215,6 +207,7 @@ case $OSFINALNAME in
 				    deb10buster)  RTVERSION=0.9.7; LIBTORRENTVERSION=0.13.7;  ;;
 				  deb11bullseye)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;  ;;
  				  deb12bookworm)  RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;  ;;
+ 				  deb13trixie)    RTVERSION=0.9.8; LIBTORRENTVERSION=0.13.8;  ;;
     					ubu1804)  RTVERSION=0.9.6; LIBTORRENTVERSION=0.13.6;  ;;
     					ubu1810)  RTVERSION=0.9.7; LIBTORRENTVERSION=0.13.7;  ;;
 	    				ubu1904)  RTVERSION=0.9.7; LIBTORRENTVERSION=0.13.7;  ;;
@@ -544,7 +537,7 @@ function INSTALL_RTORRENT_APT_R98 {
 	
 	# Download and install libtorrent
  	echo "${CYAN}Install libtorrent ${NORMAL}" 	
-	apt-get -y install libtorrent21
+	apt-get -y install libtorrent21*
 	CHECKLASTRC
 
 	# Download and install rtorrent
@@ -590,8 +583,15 @@ function INSTALL_RTORRENT_APT_R98 {
 #Manual SCGI installation because some evil people removed it from main repository
 function INSTALL_SCGI {
 
-	echo "${CYAN}Download scgi${NORMAL}"
-	wget http://mirrors.kernel.org/ubuntu/pool/universe/s/scgi/libapache2-mod-scgi_1.13-1.1build1_amd64.deb
+case $ARCH in
+			x86_64) 
+				echo "${CYAN}Download scgi${NORMAL}" ;
+				wget http://mirrors.kernel.org/ubuntu/pool/universe/s/scgi/libapache2-mod-scgi_1.13-1.1build1_amd64.deb ;;
+			aarch64) 
+				wget https://ports.ubuntu.com/ubuntu-ports/pool/universe/s/scgi/libapache2-mod-scgi_1.13-1.1build1_arm64.deb ;;
+			*)
+				echo "Unsupported architecture"; exit 5 ;;
+				esac
 	echo "${CYAN}Install scgi${NORMAL}"
 	dpkg -i libapache2*.deb
 	CHECKLASTRC
@@ -1091,6 +1091,7 @@ while true; do
 				#modern systems without scgi package ;(
 					deb11bullseye)  APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT	;;
 					deb12bookworm)  APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT 	;;
+					deb13trixie)  APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT 	;;
                     	ubu2004)  		APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT		;;
 			ubu2010)            APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT      		;;
 			ubu2104)            APT_DEPENDENCIES_NOSCGI; INSTALL_RTORRENT_APT_R98; INSTALL_SCGI; INSTALL_RUTORRENT      		;;
