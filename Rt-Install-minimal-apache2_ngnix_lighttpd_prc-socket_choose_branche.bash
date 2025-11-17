@@ -1,7 +1,7 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
-LASTMODIFIED="2024/12/18"
-SCRIPTVERSION="2.5"
+LASTMODIFIED="2015/11/17"
+SCRIPTVERSION="2.6"
 
 # https://linuxcommand.org/lc3_adv_tput.php
 # Formatting variables
@@ -35,6 +35,10 @@ HOMEDIR=""
 PORT_RANGE="6790-6999"
 # Webserver
 WEBSERVER="apache2"
+# SSL encryption
+SSL_ENCRYPTION="Self Signed"
+# Domain-name
+DOMAINNAME=""
 
 # grep the Software Versions
 RTVERSION=$(apt-cache policy rtorrent | head -3 | tail -1 | cut -d' ' -f4 | cut -d'-' -f1)
@@ -199,7 +203,7 @@ function PRE_UTILS {
 			echo -n ""$base1" "
 		fi
 		echo ")"
-		
+
 		apt-get update
 		apt-get -yqq dist-upgrade
 		APT_UDATE_NEEDED=false
@@ -209,10 +213,25 @@ function PRE_UTILS {
 	else
 		echo -n "(none)"
 	fi
-	
-	# grep the Software Versions
-	RUTORRENTVERSION_v4=$(wget -q https://api.github.com/repos/Novik/ruTorrent/tags -O - | grep name | cut -d'"' -f4 | grep -v 'rutorrent\|plugins\|beta\|v5.' | head -1)
-	RUTORRENTVERSION_v5=$(wget -q https://api.github.com/repos/Novik/ruTorrent/tags -O - | grep name | cut -d'"' -f4 | grep -v 'rutorrent\|plugins\|beta\|v4.' | head -1)
+
+	# grep the rutorrent Software Versions
+	p=0
+	while true
+	do
+		p=$(($p + 1))
+		PARTS=$(wget -q https://api.github.com/repos/Novik/ruTorrent/tags?page=$p -O - | grep name | cut -d'"' -f4 | grep -v 'rutorrent\|plugins\|beta')
+
+		if [ -z $(echo $PARTS | cut -d' ' -f1) ]
+		then
+			break
+		else
+			RUTORRENTVERSION="$RUTORRENTVERSION $PARTS"
+			#echo $RUTORRENTVERSION
+		fi
+	done
+
+	RUTORRENTVERSION_v4=$(echo "$RUTORRENTVERSION" | grep -v 'v5.' | head -1 | sed 's/ //g')
+	RUTORRENTVERSION_v5=$(echo "$RUTORRENTVERSION" | grep -v 'v4.' | head -1 | sed 's/ //g')
 	#RUTORRENTVERSION=$RUTORRENTVERSION_v5
 }
 
@@ -644,9 +663,18 @@ function INSTALL_RUTORRENT {
 
 # create self-signed cert
 function CREATE_SELF_SIGNED_CERT {
-	# Creating self-signed certs
+	# Creating Self-Signed certs
 	echo "${YELLOW}Creating self-signed certificate${NORMAL}"
-	openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -subj "/OU=My own rt-auto-install seedbox"  -keyout /etc/ssl/private/rutorrent-selfsigned.key -out /etc/ssl/certs/rutorrent-selfsigned.crt
+	openssl req -x509 -nodes -days 3650 -newkey rsa:4096 -subj "/OU=My own rt-auto-install seedbox"  -keyout /etc/ssl/private/rutorrent-selfsigned.key -out /etc/ssl/certs/rutorrent-selfsigned.crt
+}
+
+# create let's encrypt cert
+function CREATE_LETS_ENCRYPT_SIGNED_CERT {
+	# Creating Let's Encrypt Signed certs
+	echo "${YELLOW}Creating Let's Encrypt certificate${NORMAL}"
+	apt-get install -yqq certbot
+	
+	certbot certonly --standalone --rsa-key-size 4096 --staple-ocsp --preferred-challenges dns --register-unsafely-without-email --agree-tos -d "$DOMAINNAME"
 }
 
 # apache2 can't work from tmp so all work from run for the socket
@@ -848,7 +876,6 @@ EOF
 	fi
 }
 
-
 function CREATE_HTACCESS {
 	# Creating .htaccess file
 	echo "${YELLOW}Creating .htaccess file${NORMAL}"
@@ -990,6 +1017,36 @@ function CHOOSE_WEBSEVER {
 	esac
 }
 
+# https://stackoverflow.com/questions/2642585/read-a-variable-in-bash-with-a-default-value
+function CHOOSE_SSL_ENCRYPTION {
+	echo " Change SSL Encyption [act: ${GREEN}$SSL_ENCRYPTION${NORMAL}]"
+	echo " [L] - Let's Encrypt"
+	echo " [S] - Self Signed"
+	echo
+	echo -n "${GREEN}>>${NORMAL} "
+	read decision
+	
+	case "$decision" in
+	L|l)
+		SSL_ENCRYPTION="Lets Encrypt"
+		HEADER
+		CHECK_YOUR_HOSTNAME;;
+	S|s|*)
+		SSL_ENCRYPTION="Self Signed";;
+	esac
+}
+
+function CHECK_YOUR_HOSTNAME {
+	DOMAINNAME=$(wget -q -O - ipinfo.io/json | grep "hostname" | cut -d'"' -f4)
+	echo -n " "
+	read -e -i "$DOMAINNAME" -p "Please enter/verify your domainname: " input
+	DOMAINNAME="${input:-$DOMAINNAME}"
+
+	#echo
+	#echo "the name is"
+	#echo $DOMAINNAME
+}
+
 function UPDATE_RUTORRENT {
 	ACT_RUTORRENT=$(cat /var/www/rutorrent/js/webui.js | grep -m 1 version: | cut -d'"' -f2)
 	
@@ -1085,17 +1142,17 @@ function MENU() {
 		echo " ${BOLD}   ruTorrent version:${NORMAL} ${GREEN} ${RUTORRENTVERSION:1} ${NORMAL}"
 		echo " ${BOLD}      Script version:${NORMAL} ${GREEN} $SCRIPTVERSION ${NORMAL}"
 		echo
-		echo
 		echo " [1] - Add/Change rTorrent user: ${GREEN}$RTORRENT_USER${NORMAL}"
 		echo -n " [2] - Add ruTorrent user(s):${GREEN}"
 		LIST_WEB_USERS
 		echo "${NORMAL}"
 		echo " [w] - Change Webserver [act: ${GREEN}$WEBSERVER${NORMAL}]"
 		echo " [p] - Change rTorrent Port-Range [act: ${GREEN}$PORT_RANGE${NORMAL}]"
+		echo " [s] - Change SSL Encyption [act: ${GREEN}$SSL_ENCRYPTION${NORMAL}]"
 		echo " [c] - Show Changelog"
 		echo " [t] - Show To-Do"
 		echo " [0] - Start installation"
-		if [ $RUTORRENTVERSION == $RUTORRENTVERSION_v4 ]
+		if [[ $RUTORRENTVERSION == $RUTORRENTVERSION_v4 ]]
 		then
 			echo " [a] - Start installation with autodl-irssi"
 		fi
@@ -1111,14 +1168,14 @@ function MENU() {
 
 		echo
 		echo
-		if [ $RUTORRENTVERSION == $RUTORRENTVERSION_v5 ]
+		if [[ $RUTORRENTVERSION == $RUTORRENTVERSION_v5 ]]
 		then
 			echo
 		fi
 		echo -n "${GREEN}>>${NORMAL} "
 		read input
 		
-		if [ $RUTORRENTVERSION == $RUTORRENTVERSION_v5 ]
+		if [[ $RUTORRENTVERSION == $RUTORRENTVERSION_v5 ]]
 		then
 			if [[ $input == "a" ]]
 			then
@@ -1147,6 +1204,9 @@ function MENU() {
 		p)
 			HEADER
 			SET_RT_PORT;;
+		s)
+			HEADER
+			CHOOSE_SSL_ENCRYPTION;;
 		0|a)
 			if [[ -z "$RTORRENT_USER" ]] || [[ -z "${WEB_USER_ARRAY[@]}" ]]
 			then
@@ -1155,6 +1215,13 @@ function MENU() {
 				sleep 3
 			else
 				INSTALL_COMMON
+				
+				case $SSL_ENCRYPTION in
+				"Self Signed")
+					CREATE_SELF_SIGNED_CERT;;
+				"Lets Encrypt")
+					CREATE_LETS_ENCRYPT_SIGNED_CERT;;
+				esac
 				
 				case "$WEBSERVER" in
 				apache2)
@@ -1168,7 +1235,6 @@ function MENU() {
 				CREATE_TMPFILES
 				INSTALL_RTORRENT
 				INSTALL_RUTORRENT
-				CREATE_SELF_SIGNED_CERT
 				
 				case "$WEBSERVER" in
 				apache2)
@@ -1179,21 +1245,40 @@ function MENU() {
 					CONFIGURE_NGINX;;
 				esac
 				
+				if [[ $SSL_ENCRYPTION == "Lets Encrypt" ]]
+				then
+					case "$WEBSERVER" in
+					apache2)
+						sed -i 's#/etc/ssl/certs/rutorrent-selfsigned.crt#/etc/letsencrypt/live/'"$DOMAINNAME"'/fullchain.pem#' /etc/apache2/sites-available/rutorrent.conf
+						sed -i 's#/etc/ssl/private/rutorrent-selfsigned.key#/etc/letsencrypt/live/'"$DOMAINNAME"'/privkey.pem#' /etc/apache2/sites-available/rutorrent.conf
+						;;
+					lighttpd)
+						sed -i 's#/etc/ssl/certs/rutorrent-selfsigned.crt#/etc/letsencrypt/live/'"$DOMAINNAME"'/fullchain.pem#' /etc/lighttpd/conf-available/30-rutorrent.conf
+						sed -i 's#/etc/ssl/private/rutorrent-selfsigned.key#/etc/letsencrypt/live/'"$DOMAINNAME"'/privkey.pem#' /etc/lighttpd/conf-available/30-rutorrent.conf
+						;;
+					nginx)
+						sed -i 's#/etc/ssl/certs/rutorrent-selfsigned.crt#/etc/letsencrypt/live/'"$DOMAINNAME"'/fullchain.pem#' /etc/nginx/sites-available/rutorrent
+						sed -i 's#/etc/ssl/private/rutorrent-selfsigned.key#/etc/letsencrypt/live/'"$DOMAINNAME"'/privkey.pem#' /etc/nginx/sites-available/rutorrent
+						;;
+					esac
+				fi
+				
 				CREATE_HTACCESS
+				
 				if [[ $input == "a" ]]
 				then
 					AUTODL-IRSSI
-					
-					case "$WEBSERVER" in
-					apache2)
-						systemctl restart apache2.service;;
-					lighttpd)
-						systemctl restart lighttpd.service;;
-					nginx)
-						systemctl restart php$PHPVERSION-fpm.service
-						systemctl restart nginx.service;;	
-					esac
 				fi
+				
+				case "$WEBSERVER" in
+				apache2)
+					systemctl restart apache2.service;;
+				lighttpd)
+					systemctl restart lighttpd.service;;
+				nginx)
+					systemctl restart php$PHPVERSION-fpm.service
+					systemctl restart nginx.service;;	
+				esac
 				
 				clear -x
 				HEADER

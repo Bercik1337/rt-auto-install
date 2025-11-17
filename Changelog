@@ -1,3 +1,10 @@
+VERSION 1.7   2025-17-11
+* Added lets encrypt support
+* Fix some functions missing double bracket
+* Fixed ruTorrent versions read out from github
+
+------------------------------------------------------------------------------
+
 taken after Version 1.7 done so far:
 * always use of the latest ruTorrent
 * no need to care about the distro version
