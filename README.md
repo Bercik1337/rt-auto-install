@@ -34,6 +34,7 @@
 	* reactivate plugins screenshots, spectrogram
 	* some corrections
 	* adopt the actual ruTorrent branches (v4 & v5) since autodl is brocken in v5
+	* option to choose between Self-Signed and Let's Encrypt
 
 ## Features ##
 
@@ -74,3 +75,4 @@ Run the script with sudo or as root
 * ~~also transfer changelog and To-Do~~
 * working out with Bercik when he is less busy what he liked to merged
 * remove/deactivate webserver default pages
+
