@@ -379,7 +379,7 @@ function LIST_WEB_USERS {
 # Function for installing dependencies
 function INSTALL_APACHE {
 	echo "${CYAN}Installing dependencies${NORMAL}"
-	apt-get install -yqq apache2 libapache2-mod-php php-cli php-curl php-mbstring php-xml
+	apt-get install -yqq apache2 libapache2-mod-php php-cli php-curl php-mbstring php-xml php-zip
 	CHECKLASTRC
 
 	#https://www.digitalocean.com/community/tutorials/apache-configuration-error-ah00558-could-not-reliably-determine-the-server-s-fully-qualified-domain-name
@@ -392,7 +392,10 @@ function INSTALL_APACHE {
 
 	sed -i '/ServerSignature On/  s/^/#/' /etc/apache2/conf-enabled/security.conf
 	sed -i '/ServerSignature Off/  s/^#//' /etc/apache2/conf-enabled/security.conf
-
+	
+	#enabling argc argv in PHP
+	sed -i 's/;register_argc_argv = Off/register_argc_argv = On/' /etc/php/$PHPVERSION/apache2/php.ini
+	
 	systemctl restart apache2.service
 }
 
