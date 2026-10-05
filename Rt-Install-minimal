@@ -1,9 +1,9 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
 # OR PROVIDE THEM WITH BATCH SWITCHES
-LASTMODIFIED="2026/04/30"
-SCRIPTVERSION="2.5"
-RUTORRENTVERSION=5.3.3
+LASTMODIFIED="2026/10/05"
+SCRIPTVERSION="2.7"
+RUTORRENTVERSION=5.3.16
 
 # Formatting variables
 #colors
@@ -126,7 +126,7 @@ case $DISTRO in
 				echo "${BOLD}name: ${GREEN}Debian"
 						case $DISTRONAMEVER in
 					buster) echo "${PURPLE}${BOLD}release:${GREEN} 10 (Buster)" ;			EOL ;		OSFINALNAME=deb10buster;	;;
-				 	bullseye) echo "${PURPLE}${BOLD}release:${GREEN} 11 (Bullseye)" ;				OSFINALNAME=deb11bullseye;	;;
+				 	bullseye) echo "${PURPLE}${BOLD}release:${GREEN} 11 (Bullseye)" ;		EOL ;		OSFINALNAME=deb11bullseye;	;;
 					bookworm) echo "${PURPLE}${BOLD}release:${GREEN} 12 (Bookworm)" ;				OSFINALNAME=deb12bookworm;	;;
 					trixie) echo "${PURPLE}${BOLD}release:${GREEN} 13 (Trixie)" ;					OSFINALNAME=deb13trixie;	;;
 					*) echo "${YELLOW}It seems you run Debian OS but unsupported release"; exit 4							;;
@@ -154,7 +154,7 @@ case $DISTRO in
 					23.10) echo "${PURPLE}${BOLD}release:${GREEN} 23.10 (Mantic Minotaur)";		EOL ;		OSFINALNAME=ubu2310 ;;
 					24.04) echo "${PURPLE}${BOLD}release:${GREEN} 24.04 (Noble Numbat)";				OSFINALNAME=ubu2404 ;;
 					24.10) echo "${PURPLE}${BOLD}release:${GREEN} 24.10 (Oracular Oriole)";		EOL ;		OSFINALNAME=ubu2410 ;;
-					25.04) echo "${PURPLE}${BOLD}release:${GREEN} 25.04 (Plucky Puffin)";               		OSFINALNAME=ubu2504 ;;
+					25.04) echo "${PURPLE}${BOLD}release:${GREEN} 25.04 (Plucky Puffin)";           EOL ;  		OSFINALNAME=ubu2504 ;;
 					26.04) echo "${PURPLE}${BOLD}release:${GREEN} 26.04 (Resolute Raccoon)";               		OSFINALNAME=ubu2604 ;;
 					*) echo "${YELLOW}It seems you run Ubuntu OS but unsupported release"; exit 4
 					esac;;

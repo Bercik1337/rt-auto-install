@@ -8,10 +8,11 @@
 
 ## News
 
-**Current version** v2.6 released 2026/05/03
+**Current version** v2.7 released 2026/10/05
 
-	Added support for Ubuntu 26.04 (Resolute Raccoon)
-	Added new function ENABLE_PHP_ARGC_ARGV
+	Removed support for Ubuntu 25.04 Plucky Puffin
+	Removed support for Debian 11 (Bullseye)
+	Upgrade rutorrent version from 5.3.3 to 5.3.16
 
 For details, always go to Changelog.
 

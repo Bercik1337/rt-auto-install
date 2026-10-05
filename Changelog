@@ -1,3 +1,8 @@
+VERSION 2.7   2026-10-05
+* Removed support for Ubuntu 25.04 Plucky Puffin
+* Removed support for Debian 11 (Bullseye)
+* Upgrade rutorrent version from 5.3.3 to 5.3.16
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 VERSION 2.6   2026-05-03
 * Added support for Ubuntu 26.04 Resolute Raccoon
 * Added new function ENABLE_PHP_ARGC_ARGV used by Ubuntu 26.04 to enable some PHP functions. Ignore for others
