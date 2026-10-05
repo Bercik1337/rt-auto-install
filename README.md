@@ -29,14 +29,14 @@ For details, always go to Changelog.
 | Distro    | Manual installation (default) | Batch Support verified |
 | -------- | ------- | ------- |
 | Ubuntu 26.04 Resolute Raccoon | ✅ |  ✅ |
-| Ubuntu 25.04 Plucky Puffin | ✅ |  ✅ |
-| Ubuntu 24.10 Oracular Oriole | ✅ |  ✅ |
+| Ubuntu 25.04 Plucky Puffin | EOL |  EOL |
+| Ubuntu 24.10 Oracular Oriole | EOL |  EOL |
 | Ubuntu 24.04 Noble Numbat | ✅ |  ✅ |
 | Ubuntu 22.04 Jammy Jellyfish | ✅ | ✅ |
 | Ubuntu 20.04 Focal Fossa | ✅ | ✅ |
 | Debian 13    Trixie | ✅ | ✅ |
 | Debian 12    Bookworm | ✅ | ✅ |
-| Debian 11    Bullseye | ✅ | ✅ |
+| Debian 11    Bullseye | EOL | EOL |
 | Mint   22    Wilma | ✅ | ✅|
 | Mint   21.3  Virginia | ✅ | ✅ |
 | Mint   21.2  Victoria | ✅ | ✅ |
