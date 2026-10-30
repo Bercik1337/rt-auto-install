@@ -8,11 +8,9 @@
 
 ## News
 
-**Current version** v2.7 released 2026/10/05
+**Current version** v2.8 released 2026/10/30
 
-	Removed support for Ubuntu 25.04 Plucky Puffin
-	Removed support for Debian 11 (Bullseye)
-	Upgrade rutorrent version from 5.3.3 to 5.3.16
+	Upgrade rutorrent version from 5.3.16 to 5.3.20
 
 For details, always go to Changelog.
 
