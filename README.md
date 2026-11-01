@@ -67,12 +67,12 @@ Run the script with sudo or as root
 	wget https://raw.githubusercontent.com/MarkusLange/rt-auto-install/master/Rt-Install-minimal-apache2_ngnix_lighttpd_prc-socket_choose_branche.bash
 
 ## To-Do ##
-* Add Wiki to explain what is, and why something is done (only someone is interested)
+* ~~Add Wiki to explain what is, and why something is done (only someone is interested)~~
 * ~~remove the SCGI code from the scrip is atm. deactivated~~
 * ~~remove other commented out parts from the script to clean it update~~
 * put some effort in a wider testbase rewriting was done on debian 12.5 only (with countless VMs)
 * ~~may transfer naming and links to this fork so there is less confusion for users~~
 * ~~also transfer changelog and To-Do~~
-* working out with Bercik when he is less busy what he liked to merged
+* ~~working out with Bercik when he is less busy what he liked to merged~~
 * remove/deactivate webserver default pages
 
